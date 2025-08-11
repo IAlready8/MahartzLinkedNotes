@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Comprehensive Feature Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+</head>
+<body>
+  <h1>Comprehensive Feature Test</h1>
+  
+  <h2>1. Plugin System</h2>
+  <button onclick="testPluginSystem()">Test Plugin System</button>
+  <div id="pluginResult"></div>
+  
+  <h2>2. Data Management</h2>
+  <button onclick="testDataManagement()">Test Data Management</button>
+  <div id="dataResult"></div>
+  
+  <h2>3. Advanced Search</h2>
+  <button onclick="testAdvancedSearch()">Test Advanced Search</button>
+  <div id="searchResult"></div>
+  
+  <h2>4. Advanced Editor</h2>
+  <button onclick="testAdvancedEditor()">Test Advanced Editor</button>
+  <div id="editorResult"></div>
+  
+  <h2>5. Monetization</h2>
+  <button onclick="testMonetization()">Test Monetization</button>
+  <div id="monetizationResult"></div>
+  
+  <h2>6. Workspace</h2>
+  <button onclick="testWorkspace()">Test Workspace</button>
+  <div id="workspaceResult"></div>
+  
+  <h2>7. Themes</h2>
+  <button onclick="testThemes()">Test Themes</button>
+  <div id="themesResult"></div>
+  
+  <script src="js/util.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/graph.js"></script>
+  <script src="js/tags.js"></script>
+  <script src="js/templates.js"></script>
+  <script src="js/recommendations.js"></script>
+  <script src="js/collaboration.js"></script>
+  <script src="js/graph-analytics.js"></script>
+  <script src="js/query-engine.js"></script>
+  <script src="js/advanced-viz.js"></script>
+  <script src="js/ai-assistant.js"></script>
+  <script src="js/advanced-ui.js"></script>
+  <script src="js/plugin-system.js"></script>
+  <script src="js/data-management.js"></script>
+  <script src="js/advanced-search.js"></script>
+  <script src="js/advanced-editor.js"></script>
+  <script src="js/monetization.js"></script>
+  <script src="js/workspace.js"></script>
+  <script src="js/themes.js"></script>
+  
+  <script>
+    // Test plugin system
+    async function testPluginSystem() {
+      const result = document.getElementById('pluginResult');
+      try {
+        if (typeof PluginSystem !== 'undefined') {
+          await PluginSystem.init();
+          const plugins = PluginSystem.getAvailablePlugins();
+          result.innerHTML = '<p style="color: green;">✓ Plugin system initialized successfully</p>';
+          result.innerHTML += `<p>Available plugins: ${plugins.length}</p>`;
+          
+          // Test plugin registration
+          PluginSystem.registerPlugin({
+            id: 'test-plugin',
+            name: 'Test Plugin',
+            version: '1.0.0',
+            description: 'A test plugin',
+            author: 'Test Author',
+            category: 'test',
+            icon: '🔧',
+            enabled: true,
+            init: function() { console.log('Test plugin initialized'); },
+            render: function() { console.log('Test plugin rendered'); }
+          });
+          
+          const updatedPlugins = PluginSystem.getAvailablePlugins();
+          result.innerHTML += `<p>After registration: ${updatedPlugins.length} plugins</p>`;
+        } else {
+          result.innerHTML = '<p style="color: red;">✗ PluginSystem not found</p>';
+        }
+      } catch (e) {
+        result.innerHTML = '<p style="color: red;">Error: ' + e.message + '</p>';
+      }
+    }
+    
+    // Test data management
+    async function testDataManagement() {
+      const result = document.getElementById('dataResult');
+      try {
+        if (typeof DataManagement !== 'undefined') {
+          await DataManagement.init();
+          const backupProviders = DataManagement.getBackupProviders();
+          const syncProviders = DataManagement.getSyncProviders();
+          result.innerHTML = '<p style="color: green;">✓ Data management initialized successfully</p>';
+          result.innerHTML += `<p>Backup providers: ${backupProviders.length}</p>`;
+          result.innerHTML += `<p>Sync providers: ${syncProviders.length}</p>`;
+          
+          // Test backup
+          try {
+            const backupResult = await DataManagement.backup('local');
+            result.innerHTML += '<p style="color: green;">✓ Local backup successful</p>';
+          } catch (e) {
+            result.innerHTML += '<p style="color: orange;">⚠ Local backup test: ' + e.message + '</p>';
+          }
+        } else {
+          result.innerHTML = '<p style="color: red;">✗ DataManagement not found</p>';
+        }
+      } catch (e) {
+        result.innerHTML = '<p style="color: red;">Error: ' + e.message + '</p>';
+      }
+    }
+    
+    // Test advanced search
+    async function testAdvancedSearch() {
+      const result = document.getElementById('searchResult');
+      try {
+        if (typeof AdvancedSearch !== 'undefined') {
+          await AdvancedSearch.init();
+          result.innerHTML = '<p style="color: green;">✓ Advanced search initialized successfully</p>';
+          
+          // Test search history
+          const history = AdvancedSearch.searchHistory;
+          result.innerHTML += `<p>Search history items: ${history.length}</p>`;
+          
+          // Test query building
+          const query = AdvancedSearch.buildQuery(
+            ['title', 'body'], 
+            [{field: 'tags', operator: 'CONTAINS', value: '#test'}], 
+            'updatedAt', 
+            'DESC', 
+            10
+          );
+          result.innerHTML += `<p>Built query: ${query}</p>`;
+        } else {
+          result.innerHTML = '<p style="color: red;">✗ AdvancedSearch not found</p>';
+        }
+      } catch (e) {
+        result.innerHTML = '<p style="color: red;">Error: ' + e.message + '</p>';
+      }
+    }
+    
+    // Test advanced editor
+    async function testAdvancedEditor() {
+      const result = document.getElementById('editorResult');
+      try {
+        if (typeof AdvancedEditor !== 'undefined') {
+          await AdvancedEditor.init();
+          result.innerHTML = '<p style="color: green;">✓ Advanced editor initialized successfully</p>';
+          
+          // Test extensions
+          const extensions = AdvancedEditor.extensions;
+          result.innerHTML += `<p>Editor extensions: ${extensions.size}</p>`;
+          
+          // Test stats calculation
+          AdvancedEditor.currentState.wordCount = 150;
+          AdvancedEditor.currentState.charCount = 1500;
+          AdvancedEditor.currentState.readingTime = 1;
+          AdvancedEditor.updateStatsUI();
+          result.innerHTML += '<p style="color: green;">✓ Editor stats updated</p>';
+        } else {
+          result.innerHTML = '<p style="color: red;">✗ AdvancedEditor not found</p>';
+        }
+      } catch (e) {
+        result.innerHTML = '<p style="color: red;">Error: ' + e.message + '</p>';
+      }
+    }
+    
+    // Test monetization
+    async function testMonetization() {
+      const result = document.getElementById('monetizationResult');
+      try {
+        if (typeof Monetization !== 'undefined') {
+          await Monetization.init();
+          result.innerHTML = '<p style="color: green;">✓ Monetization system initialized successfully</p>';
+          
+          // Test user state
+          const user = Monetization.user;
+          result.innerHTML += `<p>User tier: ${user.tier}</p>`;
+          result.innerHTML += `<p>User ID: ${user.id}</p>`;
+          
+          // Test tiers
+          const tiers = Monetization.tiers;
+          result.innerHTML += `<p>Available tiers: ${Object.keys(tiers).length}</p>`;
+        } else {
+          result.innerHTML = '<p style="color: red;">✗ Monetization not found</p>';
+        }
+      } catch (e) {
+        result.innerHTML = '<p style="color: red;">Error: ' + e.message + '</p>';
+      }
+    }
+    
+    // Test workspace
+    async function testWorkspace() {
+      const result = document.getElementById('workspaceResult');
+      try {
+        if (typeof Workspace !== 'undefined') {
+          await Workspace.init();
+          result.innerHTML = '<p style="color: green;">✓ Workspace system initialized successfully</p>';
+          
+          // Test workspaces
+          const workspaces = Workspace.workspaces;
+          result.innerHTML += `<p>Workspaces: ${workspaces.size}</p>`;
+          
+          // Test permissions
+          const canRead = Workspace.checkPermission('read');
+          const canWrite = Workspace.checkPermission('write');
+          result.innerHTML += `<p>Read permission: ${canRead}</p>`;
+          result.innerHTML += `<p>Write permission: ${canWrite}</p>`;
+        } else {
+          result.innerHTML = '<p style="color: red;">✗ Workspace not found</p>';
+        }
+      } catch (e) {
+        result.innerHTML = '<p style="color: red;">Error: ' + e.message + '</p>';
+      }
+    }
+    
+    // Test themes
+    async function testThemes() {
+      const result = document.getElementById('themesResult');
+      try {
+        if (typeof Themes !== 'undefined') {
+          await Themes.init();
+          result.innerHTML = '<p style="color: green;">✓ Themes system initialized successfully</p>';
+          
+          // Test themes
+          const themes = Themes.themes;
+          const customThemes = Themes.customThemes;
+          result.innerHTML += `<p>Built-in themes: ${Object.keys(themes).length}</p>`;
+          result.innerHTML += `<p>Custom themes: ${customThemes.size}</p>`;
+          
+          // Test current theme
+          const currentTheme = Themes.getCurrentTheme();
+          result.innerHTML += `<p>Current theme: ${currentTheme.name}</p>`;
+        } else {
+          result.innerHTML = '<p style="color: red;">✗ Themes not found</p>';
+        }
+      } catch (e) {
+        result.innerHTML = '<p style="color: red;">Error: ' + e.message + '</p>';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Mahart Linked Notes Features</title>
+  <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+</head>
+<body>
+  <h1>Testing Mahart Linked Notes Enhanced Features</h1>
+  
+  <h2>1. Template System</h2>
+  <button onclick="testTemplates()">Test Templates</button>
+  <div id="templateResult"></div>
+  
+  <h2>2. Smart Tag Suggestions</h2>
+  <button onclick="testTagSuggestions()">Test Tag Suggestions</button>
+  <div id="tagResult"></div>
+  
+  <h2>3. Enhanced Search</h2>
+  <button onclick="testSearch()">Test Search</button>
+  <div id="searchResult"></div>
+  
+  <h2>4. Recommendations</h2>
+  <button onclick="testRecommendations()">Test Recommendations</button>
+  <div id="recResult"></div>
+  
+  <script src="js/util.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/graph.js"></script>
+  <script src="js/tags.js"></script>
+  <script src="js/templates.js"></script>
+  <script src="js/recommendations.js"></script>
+  
+  <script>
+    // Test templates
+    async function testTemplates() {
+      const result = document.getElementById('templateResult');
+      try {
+        const templates = Templates.getAll();
+        result.innerHTML = '<p>Available templates: ' + templates.join(', ') + '</p>';
+        
+        // Test applying a template
+        const meetingTemplate = Templates.apply('meeting', { title: 'Project Kickoff' });
+        result.innerHTML += '<p>Meeting template applied: ' + JSON.stringify(meetingTemplate) + '</p>';
+      } catch (e) {
+        result.innerHTML = '<p style="color: red;">Error: ' + e.message + '</p>';
+      }
+    }
+    
+    // Test tag suggestions
+    async function testTagSuggestions() {
+      const result = document.getElementById('tagResult');
+      try {
+        const suggestions = await TagManager.getSuggestionsWithContext(
+          'This is a research project about artificial intelligence and machine learning',
+          'AI Research',
+          ['#research', '#tech'],
+          null
+        );
+        result.innerHTML = '<p>Suggestions: ' + JSON.stringify(suggestions) + '</p>';
+      } catch (e) {
+        result.innerHTML = '<p style="color: red;">Error: ' + e.message + '</p>';
+      }
+    }
+    
+    // Test search
+    async function testSearch() {
+      const result = document.getElementById('searchResult');
+      try {
+        // Create some test notes
+        const testNotes = [
+          { id: '1', title: 'AI Research', body: 'Research on artificial intelligence', tags: ['#research', '#ai'], links: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+          { id: '2', title: 'Machine Learning Basics', body: 'Introduction to ML concepts', tags: ['#ml', '#tutorial'], links: ['1'], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+          { id: '3', title: 'Data Science', body: 'Data analysis and visualization', tags: ['#data', '#science'], links: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+        ];
+        
+        // Build search index
+        Search.buildIndex(testNotes);
+        
+        // Test search
+        const results = Search.query('ai research');
+        result.innerHTML = '<p>Search results: ' + JSON.stringify(results) + '</p>';
+        
+        // Test filtered search
+        const filteredResults = Search.query('research', { tags: ['#research'] });
+        result.innerHTML += '<p>Filtered results: ' + JSON.stringify(filteredResults) + '</p>';
+      } catch (e) {
+        result.innerHTML = '<p style="color: red;">Error: ' + e.message + '</p>';
+      }
+    }
+    
+    // Test recommendations
+    async function testRecommendations() {
+      const result = document.getElementById('recResult');
+      try {
+        // Create some test notes
+        const testNotes = [
+          { id: '1', title: 'AI Research', body: 'Research on artificial intelligence', tags: ['#research', '#ai'], links: ['2'], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+          { id: '2', title: 'Machine Learning Basics', body: 'Introduction to ML concepts', tags: ['#ml', '#tutorial', '#ai'], links: ['1'], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+          { id: '3', title: 'Data Science', body: 'Data analysis and visualization', tags: ['#data', '#science'], links: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+        ];
+        
+        // Mock Store.allNotes to return test notes
+        Store.allNotes = async () => testNotes;
+        
+        // Test recommendations
+        const recs = await Recommendations.getRecommendations('1');
+        result.innerHTML = '<p>Recommendations: ' + JSON.stringify(recs.map(r => r.title)) + '</p>';
+      } catch (e) {
+        result.innerHTML = '<p style="color: red;">Error: ' + e.message + '</p>';
+      }
+    }
+  </script>
+</body>
+</html>

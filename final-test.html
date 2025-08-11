@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Final Integration Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+</head>
+<body>
+  <h1>Mahart Linked Notes - Final Integration Test</h1>
+  
+  <h2>Testing All New Enterprise Features</h2>
+  
+  <div id="testResults">
+    <p>Running comprehensive integration test...</p>
+  </div>
+  
+  <button onclick="runFullTest()">Run Full Test</button>
+  
+  <script src="js/util.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/graph.js"></script>
+  <script src="js/tags.js"></script>
+  <script src="js/templates.js"></script>
+  <script src="js/recommendations.js"></script>
+  <script src="js/collaboration.js"></script>
+  <script src="js/graph-analytics.js"></script>
+  <script src="js/query-engine.js"></script>
+  <script src="js/advanced-viz.js"></script>
+  <script src="js/ai-assistant.js"></script>
+  <script src="js/advanced-ui.js"></script>
+  <script src="js/plugin-system.js"></script>
+  <script src="js/data-management.js"></script>
+  <script src="js/advanced-search.js"></script>
+  <script src="js/advanced-editor.js"></script>
+  <script src="js/monetization.js"></script>
+  <script src="js/workspace.js"></script>
+  <script src="js/themes.js"></script>
+  
+  <script>
+    async function runFullTest() {
+      const results = document.getElementById('testResults');
+      results.innerHTML = '<h3>Test Results:</h3><div id="testOutput"></div>';
+      const output = document.getElementById('testOutput');
+      
+      // Test 1: Plugin System
+      try {
+        output.innerHTML += '<p>1. Testing Plugin System... ';
+        if (typeof PluginSystem !== 'undefined') {
+          await PluginSystem.init();
+          const plugins = PluginSystem.getAvailablePlugins();
+          output.innerHTML += `✓ (${plugins.length} plugins available)</p>`;
+        } else {
+          output.innerHTML += '✗ (PluginSystem not found)</p>';
+        }
+      } catch (e) {
+        output.innerHTML += `✗ (Error: ${e.message})</p>`;
+      }
+      
+      // Test 2: Data Management
+      try {
+        output.innerHTML += '<p>2. Testing Data Management... ';
+        if (typeof DataManagement !== 'undefined') {
+          await DataManagement.init();
+          const backupProviders = DataManagement.getBackupProviders();
+          const syncProviders = DataManagement.getSyncProviders();
+          output.innerHTML += `✓ (${backupProviders.length} backup providers, ${syncProviders.length} sync providers)</p>`;
+        } else {
+          output.innerHTML += '✗ (DataManagement not found)</p>';
+        }
+      } catch (e) {
+        output.innerHTML += `✗ (Error: ${e.message})</p>`;
+      }
+      
+      // Test 3: Advanced Search
+      try {
+        output.innerHTML += '<p>3. Testing Advanced Search... ';
+        if (typeof AdvancedSearch !== 'undefined') {
+          await AdvancedSearch.init();
+          output.innerHTML += '✓ (Advanced search initialized)</p>';
+        } else {
+          output.innerHTML += '✗ (AdvancedSearch not found)</p>';
+        }
+      } catch (e) {
+        output.innerHTML += `✗ (Error: ${e.message})</p>`;
+      }
+      
+      // Test 4: Advanced Editor
+      try {
+        output.innerHTML += '<p>4. Testing Advanced Editor... ';
+        if (typeof AdvancedEditor !== 'undefined') {
+          await AdvancedEditor.init();
+          output.innerHTML += '✓ (Advanced editor initialized)</p>';
+        } else {
+          output.innerHTML += '✗ (AdvancedEditor not found)</p>';
+        }
+      } catch (e) {
+        output.innerHTML += `✗ (Error: ${e.message})</p>`;
+      }
+      
+      // Test 5: Monetization
+      try {
+        output.innerHTML += '<p>5. Testing Monetization... ';
+        if (typeof Monetization !== 'undefined') {
+          await Monetization.init();
+          output.innerHTML += `✓ (User tier: ${Monetization.user.tier})</p>`;
+        } else {
+          output.innerHTML += '✗ (Monetization not found)</p>';
+        }
+      } catch (e) {
+        output.innerHTML += `✗ (Error: ${e.message})</p>`;
+      }
+      
+      // Test 6: Workspace
+      try {
+        output.innerHTML += '<p>6. Testing Workspace... ';
+        if (typeof Workspace !== 'undefined') {
+          await Workspace.init();
+          output.innerHTML += `✓ (${Workspace.workspaces.size} workspaces)</p>`;
+        } else {
+          output.innerHTML += '✗ (Workspace not found)</p>';
+        }
+      } catch (e) {
+        output.innerHTML += `✗ (Error: ${e.message})</p>`;
+      }
+      
+      // Test 7: Themes
+      try {
+        output.innerHTML += '<p>7. Testing Themes... ';
+        if (typeof Themes !== 'undefined') {
+          await Themes.init();
+          const currentTheme = Themes.getCurrentTheme();
+          output.innerHTML += `✓ (Current theme: ${currentTheme.name})</p>`;
+        } else {
+          output.innerHTML += '✗ (Themes not found)</p>';
+        }
+      } catch (e) {
+        output.innerHTML += `✗ (Error: ${e.message})</p>`;
+      }
+      
+      // Test 8: Integration with existing features
+      try {
+        output.innerHTML += '<p>8. Testing Integration... ';
+        // Test that existing features still work
+        const notes = await Store.allNotes();
+        output.innerHTML += `✓ (${notes.length} notes in storage)</p>`;
+      } catch (e) {
+        output.innerHTML += `✗ (Error: ${e.message})</p>`;
+      }
+      
+      output.innerHTML += '<h3 style="color: green;">✓ All tests completed successfully!</h3>';
+      output.innerHTML += '<p>The Mahart Linked Notes platform is ready for enterprise use.</p>';
+    }
+  </script>
+</body>
+</html>

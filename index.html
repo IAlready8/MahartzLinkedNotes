@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Mahart Linked Notes</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <!-- libs via CDN (no build, no docker) -->
+  <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script src="js/util.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/graph.js"></script>
+  <script src="js/tags.js"></script>
+  <script src="js/templates.js"></script>
+  <script src="js/recommendations.js"></script>
+  <script src="js/collaboration.js"></script>
+  <script src="js/graph-analytics.js"></script>
+  <script src="js/query-engine.js"></script>
+  <script src="js/advanced-viz.js"></script>
+  <script src="js/ai-assistant.js"></script>
+  <script src="js/advanced-ui.js"></script>
+  <script src="js/plugin-system.js"></script>
+  <script src="js/data-management.js"></script>
+  <script src="js/advanced-search.js"></script>
+  <script src="js/advanced-editor.js"></script>
+  <script src="js/monetization.js"></script>
+  <script src="js/workspace.js"></script>
+  <script src="js/themes.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/init.js"></script>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div style="display: flex; gap: 8px;">
+      <button id="newNote" class="btn">New Note (⌘/Ctrl+N)</button>
+      <div class="dropdown">
+        <button id="templateBtn" class="btn" style="padding: 8px 16px 8px 12px;">
+          Templates <span style="margin-left: 4px;">▼</span>
+        </button>
+        <div id="templateMenu" class="dropdown-menu" style="display: none; position: absolute; background: var(--panel); border: 1px solid #2a3147; border-radius: 10px; padding: 8px; z-index: 1000; margin-top: 4px;">
+          <!-- Template options will be populated here -->
+        </div>
+      </div>
+    </div>
+    <button id="saveNote" class="btn">Save (⌘/Ctrl+S)</button>
+    <div style="flex: 1; display: flex; gap: 8px;">
+      <input id="q" type="search" placeholder="Quick search (⌘/Ctrl+K): title, tags, body…" style="flex: 1;"/>
+      <button id="filterBtn" class="btn" style="padding: 8px 12px;">Filters</button>
+    </div>
+    <button id="graphBtn" class="btn">Graph</button>
+    <button id="exportBtn" class="btn">Export</button>
+    <button id="importBtn" class="btn">Import</button>
+    <button id="settingsBtn" class="btn">Settings</button>
+  </div>
+
+  <div class="left">
+    <div class="section">
+      <strong>Notes</strong> <span id="noteCount" class="badge">0</span>
+      <div id="noteList"></div>
+    </div>
+    <div class="section">
+      <strong>Tags</strong> <span id="tagCount" class="badge">0</span>
+      <div style="display:flex;gap:4px;margin-bottom:8px;">
+        <button id="tagStatsBtn" class="bulk-btn" style="font-size:10px;">Stats</button>
+        <button id="bulkTagBtn" class="bulk-btn" style="font-size:10px;">Bulk</button>
+      </div>
+      <div id="tagStats" class="tag-stats" style="display:none;"></div>
+      <div id="bulkTagOps" class="bulk-operations"></div>
+      <div id="tagList"></div>
+    </div>
+    <div class="section small">
+      <strong>Backlinks</strong>
+      <div id="backlinks"></div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="card">
+      <h3 style="display:flex;align-items:center;gap:8px;padding:12px;">
+        Editor <span id="dirty" class="badge" style="display:none;">unsaved</span>
+        <button id="historyBtn" class="bulk-btn" style="margin-left: auto; font-size: 10px; padding: 2px 6px;">History</button>
+      </h3>
+      <div class="editor">
+        <textarea id="editor" placeholder="# Title
+
+Write with **Markdown**.
+Link notes with [[Note Title]] or [[ID:xxxx]].
+Add tags with #tag anywhere.
+"></textarea>
+      </div>
+      <div class="meta">
+        <input id="title" placeholder="Title"/>
+        <div id="enhanced-tags-input"></div>
+        <button id="saveNoteInline" class="btn" style="margin-left: 8px; padding: 8px 12px;" title="Save note (⌘/Ctrl+S)">Save (⌘S)</button>
+      </div>
+    </div>
+
+    <!-- Version History Panel -->
+    <div id="historyPanel" class="card" style="display: none;">
+      <h3 style="display:flex;align-items:center;gap:8px;padding:12px;">
+        Version History
+        <button id="closeHistoryBtn" class="bulk-btn" style="margin-left: auto; font-size: 10px; padding: 2px 6px;">Close</button>
+      </h3>
+      <div id="historyList" style="padding: 12px; overflow: auto; max-height: 300px;">
+        <!-- History items will be populated here -->
+      </div>
+      <div style="padding: 12px; border-top: 1px solid #1a2133;">
+        <button id="restoreVersionBtn" class="btn" disabled>Restore Selected Version</button>
+        <button id="deleteHistoryBtn" class="btn" style="background: #1b2130; margin-left: 8px;">Delete History</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="padding:12px;">Preview</h3>
+      <div id="preview" class="preview"></div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="panel">
+      <div class="kpi">
+        <div class="box"><div class="small">Notes</div><div id="kpiNotes" style="font-size:22px;"></div></div>
+        <div class="box"><div class="small">Links/Note</div><div id="kpiLinks" style="font-size:22px;"></div></div>
+        <div class="box"><div class="small">% ≥2 Links</div><div id="kpiHealth" style="font-size:22px;"></div></div>
+      </div>
+      <hr class="sep"/>
+      <canvas id="chartActivity" height="120"></canvas>
+      <hr class="sep"/>
+      <div class="graph" id="miniGraph"></div>
+    </div>
+
+    <div class="panel small">
+      <strong>Performance</strong>
+      <div id="perfBox" class="code"></div>
+    </div>
+
+    <div class="panel small">
+      <strong>Events</strong>
+      <div id="eventLog" class="code" style="max-height:160px"></div>
+    </div>
+    
+    <div class="panel small" id="recommendationsPanel" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <strong>Recommended Notes</strong>
+        <button id="refreshRecsBtn" class="bulk-btn" style="font-size: 10px; padding: 2px 6px;">Refresh</button>
+      </div>
+      <div id="recommendationsList" class="code" style="max-height:160px"></div>
+    </div>
+    
+    <div class="panel small">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <strong>AI Assistant</strong>
+        <button id="aiAssistantBtn" class="bulk-btn" style="font-size: 10px; padding: 2px 6px;">Open</button>
+      </div>
+      <div class="code" style="max-height:160px; font-size: 12px;">
+        <p>Get smart suggestions, answer questions, and boost productivity with AI-powered assistance.</p>
+        <button id="aiAssistantQuickBtn" class="btn" style="width: 100%; margin-top: 8px;">Ask AI Assistant</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Command Palette -->
+<div id="commandPalette" class="command-palette">
+  <div class="palette-overlay"></div>
+  <div class="palette-container">
+    <input type="text" id="paletteInput" placeholder="Type a command or search..." autocomplete="off">
+    <div class="palette-results" id="paletteResults"></div>
+  </div>
+</div>
+
+<!-- Analytics Dashboard Modal -->
+<div id="analyticsDashboard" class="modal">
+  <div class="modal-overlay"></div>
+  <div class="modal-content" style="width: 90%; max-width: 1200px; height: 90vh;">
+    <div class="modal-header">
+      <h2>Knowledge Graph Analytics</h2>
+      <button class="modal-close">&times;</button>
+    </div>
+    <div class="modal-body" style="height: calc(100% - 60px); overflow: auto;">
+      <div id="dashboardContainer" style="height: 100%;">
+        <div class="loading">Loading analytics...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast">Saved</div>
+
+<!-- Filter panel -->
+<div id="filterPanel" class="card" style="display: none; position: absolute; top: 56px; right: 400px; width: 320px; z-index: 1000; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.5);">
+  <h3 style="margin-top: 0;">Search Filters</h3>
+  
+  <div style="margin-bottom: 16px;">
+    <label class="small">Tags (comma-separated)</label>
+    <input id="filterTags" type="text" placeholder="#tag1, #tag2" style="width: 100%; margin-top: 4px;"/>
+  </div>
+  
+  <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+    <div style="flex: 1;">
+      <label class="small">After Date</label>
+      <input id="filterDateFrom" type="date" style="width: 100%; margin-top: 4px;"/>
+    </div>
+    <div style="flex: 1;">
+      <label class="small">Before Date</label>
+      <input id="filterDateTo" type="date" style="width: 100%; margin-top: 4px;"/>
+    </div>
+  </div>
+  
+  <div style="margin-bottom: 16px;">
+    <label class="small">Minimum Links</label>
+    <input id="filterMinLinks" type="number" min="0" placeholder="0" style="width: 100%; margin-top: 4px;"/>
+  </div>
+  
+  <div style="margin-bottom: 16px;">
+    <label class="small">
+      <input id="filterHasBacklinks" type="checkbox" style="margin-right: 8px;"/>
+      Has Backlinks
+    </label>
+  </div>
+  
+  <div style="display: flex; gap: 8px;">
+    <button id="applyFilters" class="btn" style="flex: 1;">Apply</button>
+    <button id="clearFilters" class="btn" style="flex: 1; background: #1b2130;">Clear</button>
+  </div>
+</div>
+
+<!-- Lightweight settings modal -->
+<dialog id="settings">
+  <form method="dialog" class="card" style="padding:16px;min-width:420px">
+    <h3>Settings</h3>
+    <label class="small">Auto-link on save: <input id="autoLink" type="checkbox" checked></label>
+    <label class="small">Enable analytics: <input id="enableAnalytics" type="checkbox" checked></label>
+    <label class="small">Realtime multi-tab sync: <input id="enableBC" type="checkbox" checked></label>
+    <hr class="sep"/>
+    <button class="btn" value="cancel">Close</button>
+  </form>
+</dialog>
+
+<input id="importFile" type="file" accept="application/json" hidden/>
+</body>
+</html>

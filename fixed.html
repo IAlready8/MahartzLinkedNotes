@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahart Linked Notes - Fixed</title>
+    <link rel="stylesheet" href="css/styles.css"/>
+    <style>
+        /* Ensure basic visibility */
+        .app { display: grid; height: 100vh; }
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 10px; background: #333; color: white; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="topbar">
+            <button id="newNote" class="btn">New Note (⌘N)</button>
+            <button id="saveNote" class="btn">Save (⌘S)</button>
+            <input id="q" type="search" placeholder="Search notes..."/>
+            <button id="graphBtn" class="btn">Graph</button>
+            <button id="exportBtn" class="btn">Export</button>
+            <button id="importBtn" class="btn">Import</button>
+            <button id="settingsBtn" class="btn">Settings</button>
+        </div>
+
+        <div class="left">
+            <div class="section">
+                <div><strong>Notes</strong> <span id="noteCount" class="badge">0</span></div>
+                <div id="noteList"></div>
+            </div>
+            <div class="section">
+                <div><strong>Tags</strong> <span id="tagCount" class="badge">0</span></div>
+                <div id="tagList"></div>
+            </div>
+            <div class="section small">
+                <div><strong>Backlinks</strong></div>
+                <div id="backlinks"></div>
+            </div>
+        </div>
+
+        <div class="main">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Editor</h3>
+                    <span id="dirty" class="badge" style="display:none;">unsaved</span>
+                </div>
+                <div class="editor">
+                    <textarea id="editor" placeholder="Write your note here..."></textarea>
+                </div>
+                <div class="meta">
+                    <input id="title" placeholder="Note title"/>
+                    <div id="tags" style="display:flex;gap:5px;flex-wrap:wrap;"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Preview</h3>
+                </div>
+                <div id="preview" class="preview"></div>
+            </div>
+        </div>
+
+        <div class="right">
+            <div class="panel">
+                <div class="kpi">
+                    <div class="box"><div class="small">Notes</div><div id="kpiNotes">0</div></div>
+                    <div class="box"><div class="small">Links/Note</div><div id="kpiLinks">0</div></div>
+                    <div class="box"><div class="small">Health</div><div id="kpiHealth">0%</div></div>
+                </div>
+                <hr class="sep"/>
+                <div class="graph" id="miniGraph"></div>
+            </div>
+        </div>
+    </div>
+
+    <dialog id="settings">
+        <form method="dialog" class="card" style="padding:16px;min-width:300px">
+            <h3>Settings</h3>
+            <label><input id="autoLink" type="checkbox" checked> Auto-link on save</label>
+            <label><input id="enableAnalytics" type="checkbox" checked> Enable analytics</label>
+            <button type="submit" class="btn">Close</button>
+        </form>
+    </dialog>
+
+    <div id="toast" class="toast" style="display:none;"></div>
+    
+    <!-- Load scripts in correct order -->
+    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+    
+    <script>
+        // Simple utility functions
+        const el = (sel) => document.querySelector(sel);
+        const els = (sel) => document.querySelectorAll(sel);
+        
+        // Simple ID generator
+        const ULID = () => Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        
+        // Simple toast function
+        const toast = (msg) => {
+            const t = el('#toast');
+            t.textContent = msg;
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3000);
+        };
+        
+        // Note storage in memory (simplified)
+        let notes = [];
+        let currentNote = null;
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('Initializing app...');
+            
+            // Create a sample note if none exist
+            if (notes.length === 0) {
+                const sampleNote = {
+                    id: ULID(),
+                    title: 'Welcome to Mahart Notes',
+                    body: '# Welcome!\n\nThis is a sample note to get you started.\n\nTry creating a new note with the "New Note" button.\n\nYou can link notes using [[Note Title]] syntax.',
+                    tags: ['#welcome', '#sample'],
+                    links: [],
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                notes.push(sampleNote);
+            }
+            
+            // Bind events
+            el('#newNote').onclick = newNote;
+            el('#saveNote').onclick = saveNote;
+            el('#editor').addEventListener('input', renderPreview);
+            el('#title').addEventListener('input', () => el('#dirty').style.display = 'inline-block');
+            
+            // Render initial UI
+            renderNotesList();
+            renderTagsList();
+            renderKPI();
+            
+            // Open first note
+            if (notes.length > 0) {
+                openNote(notes[0].id);
+            }
+            
+            console.log('App initialized with', notes.length, 'notes');
+        });
+        
+        // Create new note
+        function newNote() {
+            const note = {
+                id: ULID(),
+                title: '',
+                body: '',
+                tags: [],
+                links: [],
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            notes.push(note);
+            openNote(note.id);
+            renderNotesList();
+            renderTagsList();
+        }
+        
+        // Save current note
+        function saveNote() {
+            if (!currentNote) return;
+            
+            currentNote.title = el('#title').value;
+            currentNote.body = el('#editor').value;
+            currentNote.updatedAt = new Date().toISOString();
+            
+            el('#dirty').style.display = 'none';
+            toast('Note saved');
+            renderNotesList();
+            renderTagsList();
+            renderKPI();
+        }
+        
+        // Open a note
+        function openNote(id) {
+            const note = notes.find(n => n.id === id);
+            if (!note) return;
+            
+            currentNote = note;
+            el('#title').value = note.title;
+            el('#editor').value = note.body;
+            el('#dirty').style.display = 'none';
+            renderPreview();
+            renderBacklinks();
+        }
+        
+        // Render notes list
+        function renderNotesList() {
+            const container = el('#noteList');
+            container.innerHTML = '';
+            
+            notes.forEach(note => {
+                const div = document.createElement('div');
+                div.className = 'item';
+                div.innerHTML = `
+                    <div style="padding:8px;cursor:pointer">
+                        <div>${note.title || '(untitled)'}</div>
+                        <div class="small">${new Date(note.updatedAt).toLocaleString()}</div>
+                    </div>
+                `;
+                div.onclick = () => openNote(note.id);
+                container.appendChild(div);
+            });
+            
+            el('#noteCount').textContent = notes.length;
+        }
+        
+        // Render tags list
+        function renderTagsList() {
+            const container = el('#tagList');
+            container.innerHTML = '';
+            
+            // Collect all tags
+            const tagCounts = {};
+            notes.forEach(note => {
+                (note.tags || []).forEach(tag => {
+                    tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+                });
+            });
+            
+            // Display tags
+            Object.entries(tagCounts).forEach(([tag, count]) => {
+                const span = document.createElement('span');
+                span.className = 'tag';
+                span.textContent = `${tag} (${count})`;
+                container.appendChild(span);
+            });
+            
+            el('#tagCount').textContent = Object.keys(tagCounts).length;
+        }
+        
+        // Render backlinks
+        function renderBacklinks() {
+            const container = el('#backlinks');
+            container.innerHTML = '<div class="small">No backlinks</div>';
+        }
+        
+        // Render preview
+        function renderPreview() {
+            const content = el('#editor').value;
+            // Simple markdown rendering
+            let html = content
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/# (.*?)(\n|$)/g, '<h1>$1</h1>')
+                .replace(/## (.*?)(\n|$)/g, '<h2>$1</h2>')
+                .replace(/\n/g, '<br>');
+            el('#preview').innerHTML = html;
+        }
+        
+        // Render KPIs
+        function renderKPI() {
+            el('#kpiNotes').textContent = notes.length;
+            el('#kpiLinks').textContent = '0';
+            el('#kpiHealth').textContent = '0%';
+        }
+    </script>
+</body>
+</html>

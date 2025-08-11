@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Save Functionality</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 0; padding: 20px; background: #0f1115; color: #e7ecf5; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .note { background: #151922; border: 1px solid #2a3147; border-radius: 8px; padding: 16px; margin: 16px 0; }
+        .note-title { font-size: 1.2em; font-weight: bold; margin-bottom: 8px; }
+        .note-content { margin-bottom: 8px; }
+        .note-meta { font-size: 0.9em; color: #8b93a5; }
+        button { background: #1b2130; border: 1px solid #2a3147; color: #d7def0; padding: 8px 12px; border-radius: 6px; cursor: pointer; margin: 4px; }
+        button:hover { border-color: #3a4563; }
+        input, textarea { background: #0b0e14; border: 1px solid #1f2434; border-radius: 6px; padding: 8px; color: #e7ecf5; width: 100%; margin: 8px 0; }
+        .tag { display: inline-block; background: #111624; border: 1px solid #232c44; color: #a8b3ce; padding: 4px 8px; border-radius: 12px; margin: 4px 2px; font-size: 0.9em; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #111827; border: 1px solid #1f2937; color: #e5e7eb; padding: 10px 14px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.25); opacity: 0; transform: translateY(10px); transition: .25s; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Save Functionality</h1>
+        <button onclick="testSave()">Test Save</button>
+        <button onclick="testLoad()">Test Load</button>
+        <button onclick="testLocalStorage()">Test LocalStorage</button>
+        
+        <div id="output"></div>
+        
+        <div class="note">
+            <div class="note-title">Test Note</div>
+            <input id="test-title" placeholder="Note title" value="Test Note Title">
+            <textarea id="test-content" placeholder="Note content">This is a test note to verify save functionality.</textarea>
+            <button onclick="saveTestNote()">Save Test Note</button>
+            <button onclick="loadTestNote()">Load Test Note</button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Note saved</div>
+
+    <script>
+        // Simple toast function
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Test basic save functionality
+        function testSave() {
+            try {
+                const testData = {
+                    id: 'test-' + Date.now(),
+                    title: 'Test Note',
+                    content: 'This is a test note saved at ' + new Date().toISOString(),
+                    timestamp: Date.now()
+                };
+                
+                localStorage.setItem('test-note', JSON.stringify(testData));
+                document.getElementById('output').innerHTML = `
+                    <div class="note">
+                        <div class="note-title">Save Test Results</div>
+                        <div class="note-content">
+                            <p><strong>Status:</strong> <span style="color: #00d18f;">SUCCESS</span></p>
+                            <p><strong>Data:</strong> ${JSON.stringify(testData)}</p>
+                        </div>
+                    </div>
+                `;
+                showToast('Test data saved successfully');
+            } catch (error) {
+                document.getElementById('output').innerHTML = `
+                    <div class="note">
+                        <div class="note-title">Save Test Results</div>
+                        <div class="note-content">
+                            <p><strong>Status:</strong> <span style="color: #ef476f;">FAILED</span></p>
+                            <p><strong>Error:</strong> ${error.message}</p>
+                        </div>
+                    </div>
+                `;
+                showToast('Save test failed');
+            }
+        }
+
+        // Test basic load functionality
+        function testLoad() {
+            try {
+                const testData = JSON.parse(localStorage.getItem('test-note'));
+                if (testData) {
+                    document.getElementById('output').innerHTML = `
+                        <div class="note">
+                            <div class="note-title">Load Test Results</div>
+                            <div class="note-content">
+                                <p><strong>Status:</strong> <span style="color: #00d18f;">SUCCESS</span></p>
+                                <p><strong>Data:</strong> ${JSON.stringify(testData)}</p>
+                            </div>
+                        </div>
+                    `;
+                    showToast('Test data loaded successfully');
+                } else {
+                    document.getElementById('output').innerHTML = `
+                        <div class="note">
+                            <div class="note-title">Load Test Results</div>
+                            <div class="note-content">
+                                <p><strong>Status:</strong> <span style="color: #ffd166;">NO DATA</span></p>
+                                <p>No test data found. Run "Test Save" first.</p>
+                            </div>
+                        </div>
+                    `;
+                    showToast('No test data found');
+                }
+            } catch (error) {
+                document.getElementById('output').innerHTML = `
+                    <div class="note">
+                        <div class="note-title">Load Test Results</div>
+                        <div class="note-content">
+                            <p><strong>Status:</strong> <span style="color: #ef476f;">FAILED</span></p>
+                            <p><strong>Error:</strong> ${error.message}</p>
+                        </div>
+                    </div>
+                `;
+                showToast('Load test failed');
+            }
+        }
+
+        // Test LocalStorage availability
+        function testLocalStorage() {
+            try {
+                const testKey = 'localstorage-test';
+                const testValue = 'test-value';
+                
+                localStorage.setItem(testKey, testValue);
+                const retrievedValue = localStorage.getItem(testKey);
+                localStorage.removeItem(testKey);
+                
+                if (retrievedValue === testValue) {
+                    document.getElementById('output').innerHTML = `
+                        <div class="note">
+                            <div class="note-title">LocalStorage Test Results</div>
+                            <div class="note-content">
+                                <p><strong>Status:</strong> <span style="color: #00d18f;">AVAILABLE</span></p>
+                                <p>LocalStorage is working correctly.</p>
+                            </div>
+                        </div>
+                    `;
+                    showToast('LocalStorage is available');
+                } else {
+                    document.getElementById('output').innerHTML = `
+                        <div class="note">
+                            <div class="note-title">LocalStorage Test Results</div>
+                            <div class="note-content">
+                                <p><strong>Status:</strong> <span style="color: #ef476f;">INCONSISTENT</span></p>
+                                <p>LocalStorage is available but not working correctly.</p>
+                            </div>
+                        </div>
+                    `;
+                    showToast('LocalStorage inconsistent');
+                }
+            } catch (error) {
+                document.getElementById('output').innerHTML = `
+                    <div class="note">
+                        <div class="note-title">LocalStorage Test Results</div>
+                        <div class="note-content">
+                            <p><strong>Status:</strong> <span style="color: #ef476f;">UNAVAILABLE</span></p>
+                            <p><strong>Error:</strong> ${error.message}</p>
+                        </div>
+                    </div>
+                `;
+                showToast('LocalStorage unavailable');
+            }
+        }
+
+        // Save test note
+        function saveTestNote() {
+            try {
+                const title = document.getElementById('test-title').value;
+                const content = document.getElementById('test-content').value;
+                
+                const note = {
+                    id: 'manual-test-' + Date.now(),
+                    title: title,
+                    content: content,
+                    timestamp: Date.now()
+                };
+                
+                localStorage.setItem('manual-test-note', JSON.stringify(note));
+                document.getElementById('output').innerHTML = `
+                    <div class="note">
+                        <div class="note-title">Manual Save Results</div>
+                        <div class="note-content">
+                            <p><strong>Status:</strong> <span style="color: #00d18f;">SUCCESS</span></p>
+                            <p>Note saved with title: "${title}"</p>
+                        </div>
+                    </div>
+                `;
+                showToast('Note saved successfully');
+            } catch (error) {
+                document.getElementById('output').innerHTML = `
+                    <div class="note">
+                        <div class="note-title">Manual Save Results</div>
+                        <div class="note-content">
+                            <p><strong>Status:</strong> <span style="color: #ef476f;">FAILED</span></p>
+                            <p><strong>Error:</strong> ${error.message}</p>
+                        </div>
+                    </div>
+                `;
+                showToast('Failed to save note');
+            }
+        }
+
+        // Load test note
+        function loadTestNote() {
+            try {
+                const note = JSON.parse(localStorage.getItem('manual-test-note'));
+                if (note) {
+                    document.getElementById('test-title').value = note.title;
+                    document.getElementById('test-content').value = note.content;
+                    document.getElementById('output').innerHTML = `
+                        <div class="note">
+                            <div class="note-title">Manual Load Results</div>
+                            <div class="note-content">
+                                <p><strong>Status:</strong> <span style="color: #00d18f;">SUCCESS</span></p>
+                                <p>Note loaded with title: "${note.title}"</p>
+                            </div>
+                        </div>
+                    `;
+                    showToast('Note loaded successfully');
+                } else {
+                    document.getElementById('output').innerHTML = `
+                        <div class="note">
+                            <div class="note-title">Manual Load Results</div>
+                            <div class="note-content">
+                                <p><strong>Status:</strong> <span style="color: #ffd166;">NO DATA</span></p>
+                                <p>No saved note found. Save a note first.</p>
+                            </div>
+                        </div>
+                    `;
+                    showToast('No saved note found');
+                }
+            } catch (error) {
+                document.getElementById('output').innerHTML = `
+                    <div class="note">
+                        <div class="note-title">Manual Load Results</div>
+                        <div class="note-content">
+                            <p><strong>Status:</strong> <span style="color: #ef476f;">FAILED</span></p>
+                            <p><strong>Error:</strong> ${error.message}</p>
+                        </div>
+                    </div>
+                `;
+                showToast('Failed to load note');
+            }
+        }
+
+        // Run initial tests
+        document.addEventListener('DOMContentLoaded', () => {
+            testLocalStorage();
+        });
+    </script>
+</body>
+</html>

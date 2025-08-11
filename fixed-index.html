@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Mahart Linked Notes</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <!-- Load libraries first -->
+  <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <button id="newNote" class="btn">New Note (⌘/Ctrl+N)</button>
+    <button id="saveNote" class="btn">Save (⌘/Ctrl+S)</button>
+    <input id="q" type="search" placeholder="Quick search (⌘/Ctrl+K): title, tags, body…"/>
+    <button id="graphBtn" class="btn">Graph</button>
+    <button id="exportBtn" class="btn">Export</button>
+    <button id="importBtn" class="btn">Import</button>
+    <button id="settingsBtn" class="btn">Settings</button>
+  </div>
+
+  <div class="left">
+    <div class="section">
+      <strong>Notes</strong> <span id="noteCount" class="badge">0</span>
+      <div id="noteList"></div>
+    </div>
+    <div class="section">
+      <strong>Tags</strong> <span id="tagCount" class="badge">0</span>
+      <div style="display:flex;gap:4px;margin-bottom:8px;">
+        <button id="tagStatsBtn" class="bulk-btn" style="font-size:10px;">Stats</button>
+        <button id="bulkTagBtn" class="bulk-btn" style="font-size:10px;">Bulk</button>
+      </div>
+      <div id="tagStats" class="tag-stats" style="display:none;"></div>
+      <div id="bulkTagOps" class="bulk-operations"></div>
+      <div id="tagList"></div>
+    </div>
+    <div class="section small">
+      <strong>Backlinks</strong>
+      <div id="backlinks"></div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="card">
+      <h3 style="display:flex;align-items:center;gap:8px;padding:12px;">
+        Editor <span id="dirty" class="badge" style="display:none;">unsaved</span>
+      </h3>
+      <div class="editor">
+        <textarea id="editor" placeholder="# Title
+
+Write with **Markdown**.
+Link notes with [[Note Title]] or [[ID:xxxx]].
+Add tags with #tag anywhere.
+"></textarea>
+      </div>
+      <div class="meta">
+        <input id="title" placeholder="Title"/>
+        <div id="enhanced-tags-input"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="padding:12px;">Preview</h3>
+      <div id="preview" class="preview"></div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="panel">
+      <div class="kpi">
+        <div class="box"><div class="small">Notes</div><div id="kpiNotes" style="font-size:22px;"></div></div>
+        <div class="box"><div class="small">Links/Note</div><div id="kpiLinks" style="font-size:22px;"></div></div>
+        <div class="box"><div class="small">% ≥2 Links</div><div id="kpiHealth" style="font-size:22px;"></div></div>
+      </div>
+      <hr class="sep"/>
+      <canvas id="chartActivity" height="120"></canvas>
+      <hr class="sep"/>
+      <div class="graph" id="miniGraph"></div>
+    </div>
+
+    <div class="panel small">
+      <strong>Performance</strong>
+      <div id="perfBox" class="code"></div>
+    </div>
+
+    <div class="panel small">
+      <strong>Events</strong>
+      <div id="eventLog" class="code" style="max-height:160px"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast">Saved</div>
+
+<!-- Lightweight settings modal -->
+<dialog id="settings">
+  <form method="dialog" class="card" style="padding:16px;min-width:420px">
+    <h3>Settings</h3>
+    <label class="small">Auto-link on save: <input id="autoLink" type="checkbox" checked></label>
+    <label class="small">Enable analytics: <input id="enableAnalytics" type="checkbox" checked></label>
+    <label class="small">Realtime multi-tab sync: <input id="enableBC" type="checkbox" checked></label>
+    <hr class="sep"/>
+    <button class="btn" value="cancel">Close</button>
+  </form>
+</dialog>
+
+<input id="importFile" type="file" accept="application/json" hidden/>
+
+<!-- Load our scripts after libraries -->
+<script src="js/util.js"></script>
+<script src="js/store.js"></script>
+<script src="js/search.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/graph.js"></script>
+<script src="js/tags.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

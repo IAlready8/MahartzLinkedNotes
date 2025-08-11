@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Mahart Notes</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 0; padding: 20px; background: #0f1115; color: #e7ecf5; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .note { background: #151922; border: 1px solid #2a3147; border-radius: 8px; padding: 16px; margin: 16px 0; }
+        .note-title { font-size: 1.2em; font-weight: bold; margin-bottom: 8px; }
+        .note-content { margin-bottom: 8px; }
+        .note-meta { font-size: 0.9em; color: #8b93a5; }
+        button { background: #1b2130; border: 1px solid #2a3147; color: #d7def0; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+        button:hover { border-color: #3a4563; }
+        input, textarea { background: #0b0e14; border: 1px solid #1f2434; border-radius: 6px; padding: 8px; color: #e7ecf5; width: 100%; margin: 8px 0; }
+        .tag { display: inline-block; background: #111624; border: 1px solid #232c44; color: #a8b3ce; padding: 4px 8px; border-radius: 12px; margin: 4px 2px; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Mahart Notes</h1>
+        <button onclick="testStorage()">Test Storage</button>
+        <button onclick="createTestNote()">Create Test Note</button>
+        <button onclick="listNotes()">List Notes</button>
+        
+        <div id="output"></div>
+        
+        <div id="notes-container"></div>
+    </div>
+
+    <!-- Load libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+    
+    <script>
+        // Simple ID generator
+        function ULID() {
+            return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        }
+        
+        // Simple nowISO function
+        function nowISO() {
+            return new Date().toISOString();
+        }
+        
+        // Test storage functionality
+        async function testStorage() {
+            try {
+                const testKey = 'test-key-' + Date.now();
+                const testValue = { message: 'Hello from test', timestamp: nowISO() };
+                
+                // Test set
+                await localforage.setItem(testKey, testValue);
+                
+                // Test get
+                const retrieved = await localforage.getItem(testKey);
+                
+                // Test remove
+                await localforage.removeItem(testKey);
+                
+                document.getElementById('output').innerHTML = `
+                    <div class="note">
+                        <div class="note-title">Storage Test Results</div>
+                        <div class="note-content">
+                            <p><strong>Set:</strong> ${JSON.stringify(testValue)}</p>
+                            <p><strong>Get:</strong> ${JSON.stringify(retrieved)}</p>
+                            <p><strong>Status:</strong> <span style="color: #00d18f;">PASS</span></p>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('output').innerHTML = `
+                    <div class="note">
+                        <div class="note-title">Storage Test Results</div>
+                        <div class="note-content">
+                            <p><strong>Error:</strong> ${error.message}</p>
+                            <p><strong>Status:</strong> <span style="color: #ef476f;">FAIL</span></p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Create a test note
+        async function createTestNote() {
+            try {
+                // Get existing notes
+                let notes = (await localforage.getItem('notes')) || [];
+                
+                // Create new note
+                const newNote = {
+                    id: ULID(),
+                    title: 'Test Note ' + (notes.length + 1),
+                    body: 'This is a test note created at ' + new Date().toLocaleString() + '.\n\nIt demonstrates the basic functionality of the note-taking system.',
+                    tags: ['#test', '#demo'],
+                    links: [],
+                    createdAt: nowISO(),
+                    updatedAt: nowISO()
+                };
+                
+                // Add to notes array
+                notes.push(newNote);
+                
+                // Save back to storage
+                await localforage.setItem('notes', notes);
+                
+                document.getElementById('output').innerHTML = `
+                    <div class="note">
+                        <div class="note-title">Note Creation Test</div>
+                        <div class="note-content">
+                            <p><strong>Created Note:</strong> ${newNote.title}</p>
+                            <p><strong>ID:</strong> ${newNote.id}</p>
+                            <p><strong>Status:</strong> <span style="color: #00d18f;">SUCCESS</span></p>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('output').innerHTML = `
+                    <div class="note">
+                        <div class="note-title">Note Creation Test</div>
+                        <div class="note-content">
+                            <p><strong>Error:</strong> ${error.message}</p>
+                            <p><strong>Status:</strong> <span style="color: #ef476f;">FAIL</span></p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // List all notes
+        async function listNotes() {
+            try {
+                const notes = (await localforage.getItem('notes')) || [];
+                
+                if (notes.length === 0) {
+                    document.getElementById('notes-container').innerHTML = `
+                        <div class="note">
+                            <div class="note-title">No Notes Found</div>
+                            <div class="note-content">
+                                <p>Click "Create Test Note" to add your first note.</p>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '<h2>Notes (' + notes.length + ')</h2>';
+                
+                notes.forEach(note => {
+                    html += `
+                        <div class="note">
+                            <div class="note-title">${note.title || '(untitled)'}</div>
+                            <div class="note-content">${note.body ? note.body.substring(0, 100) + '...' : ''}</div>
+                            <div class="note-meta">
+                                Created: ${new Date(note.createdAt).toLocaleString()}<br>
+                                Tags: ${(note.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('notes-container').innerHTML = html;
+                document.getElementById('output').innerHTML = `
+                    <div class="note">
+                        <div class="note-title">Notes Listed</div>
+                        <div class="note-content">
+                            <p><strong>Total Notes:</strong> ${notes.length}</p>
+                            <p><strong>Status:</strong> <span style="color: #00d18f;">SUCCESS</span></p>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('notes-container').innerHTML = `
+                    <div class="note">
+                        <div class="note-title">Error Listing Notes</div>
+                        <div class="note-content">
+                            <p><strong>Error:</strong> ${error.message}</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Run storage test automatically when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            testStorage();
+        });
+    </script>
+</body>
+</html>
