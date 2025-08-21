@@ -11,7 +11,9 @@ const Analytics = {
   async log(evt, data={}){
     if(!this.enabled) return;
     await Store.log({ id: ULID(), evt, data, t: Date.now() });
-    UI.eventsPush({evt, data});
+    if(typeof UI !== 'undefined' && UI.eventsPush) {
+      UI.eventsPush({evt, data});
+    }
   },
   derive(notes){
     const total = notes.length;

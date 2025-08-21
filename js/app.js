@@ -55,6 +55,16 @@ const UI = {
       const notes = await Store.allNotes();
       if(!notes.length) await this.seed();
       await this.refresh();
+      
+      // Force initial preview render
+      setTimeout(() => {
+        const preview = el('#preview');
+        if (preview && preview.innerHTML.trim() === '') {
+          this.renderPreviewLive();
+          console.log('Forced initial preview render');
+        }
+      }, 500);
+      
       Analytics.endMark('init');
       console.log('App initialized successfully');
     } catch (error) {
@@ -172,13 +182,55 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
       if (saveNoteBtn) saveNoteBtn.onclick=()=>this.save();
       if (graphBtn) graphBtn.onclick=()=>this.showGraph();
       if (exportBtn) exportBtn.onclick=()=>this.export();
-      if (importBtn) importBtn.onclick=()=>{ if(importFile) importFile.click(); };
+      if (importBtn) importBtn.onclick=()=>{ 
+        const fileInput = el('#importFile');
+        if(fileInput) {
+          fileInput.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            await this.import(file);
+            fileInput.value = '';
+          };
+          fileInput.click();
+        }
+      };
       if (settingsBtn) settingsBtn.onclick=()=>{ const settings = el('#settings'); if(settings) settings.showModal(); };
       if (autoLink) autoLink.onchange=(e)=>this.state.autoLink=e.target.checked;
       if (enableAnalytics) enableAnalytics.onchange=(e)=>{ this.state.analytics=e.target.checked; if(typeof Analytics !== 'undefined') Analytics.enabled=e.target.checked; };
       if (enableBC) enableBC.onchange=(e)=>{ this.state.bc=e.target.checked; this.bc && this.bc.close(); this.bc=this.state.bc? new BroadcastChannel('mahart-notes'):null; };
-      if (q) q.addEventListener('input', debounce(()=>this.search(q.value), 120));
-      if (editor) editor.addEventListener('input', ()=>{ const dirty = el('#dirty'); if(dirty) dirty.style.display='inline-block'; this.renderPreview(); });
+      if (q) {
+        q.addEventListener('input', debounce(()=>{
+          this.search(q.value);
+          this.updateSearchSuggestions(q.value);
+        }, 120));
+        q.addEventListener('focus', ()=> this.showSearchSuggestions());
+        q.addEventListener('blur', ()=> setTimeout(()=> this.hideSearchSuggestions(), 200));
+        q.addEventListener('keydown', (e)=> this.handleSearchKeydown(e));
+      }
+      if (editor) {
+        editor.addEventListener('input', ()=>{
+          const dirty = el('#dirty'); 
+          if(dirty) dirty.style.display='inline-block'; 
+          console.log('Editor input detected, updating preview...');
+          this.renderPreviewLive();
+        });
+        // Also update on paste
+        editor.addEventListener('paste', ()=>{
+          console.log('Editor paste detected, updating preview...');
+          setTimeout(() => this.renderPreviewLive(), 10);
+        });
+        // Also update on keyup for immediate feedback
+        editor.addEventListener('keyup', ()=>{
+          this.renderPreviewLive();
+        });
+        // Force initial render if editor has content
+        if (editor.value.trim()) {
+          setTimeout(() => {
+            console.log('Initial editor content detected, rendering preview...');
+            this.renderPreviewLive();
+          }, 100);
+        }
+      }
       if (title) title.addEventListener('input', ()=> { const dirty = el('#dirty'); if(dirty) dirty.style.display='inline-block'; });
       
       // Enhanced tag system bindings
@@ -278,8 +330,7 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
       this.renderKPI(notes);
       this.renderMiniGraph(notes);
       this.renderRecommendations();
-      const perfBox = el('#perfBox');
-      if(perfBox && typeof Analytics !== 'undefined') perfBox.textContent = Analytics.perfDump();
+      this.renderPerformanceStats();
       
       // Update status bar
       if (typeof AdvancedUI !== 'undefined') {
@@ -312,11 +363,25 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
         <div>${n.title||'(untitled)'} <span class="badge">#${n.tags?n.tags.length:0} tags</span> <span class="badge">${n.links?n.links.length:0} links</span></div>
         <div class="small">${(n.updatedAt||n.createdAt).slice(0,16).replace('T',' ')}</div>
       </div>`;
-      div.onclick = ()=> this.openNote(n.id);
+      div.onclick = ()=> {
+        console.log('Opening note:', n.id);
+        this.openNote(n.id);
+      };
       box.appendChild(div);
     }
     const noteCount = el('#noteCount');
     if (noteCount) noteCount.textContent = notes.length;
+    
+    // Auto-open first note if none is currently open and no note is being displayed
+    if (!this.state.currentId && sorted.length > 0) {
+      const editor = el('#editor');
+      const title = el('#title');
+      // Only auto-open if editor is truly empty
+      if ((!editor || !editor.value.trim()) && (!title || !title.value.trim())) {
+        console.log('Auto-opening first note:', sorted[0].id);
+        setTimeout(() => this.openNote(sorted[0].id), 200);
+      }
+    }
     
     // Re-render bulk selection if in bulk mode
     if(this.state.bulkMode) {
@@ -417,14 +482,97 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
   renderPreview(){
     const editor = el('#editor');
     const preview = el('#preview');
-    if (!editor || !preview) return;
-    const md = editor.value;
-    if (typeof renderMD !== 'undefined') {
-      preview.innerHTML = renderMD(md);
-    } else {
-      // Fallback rendering
-      preview.textContent = md;
+    if (!editor || !preview) {
+      console.log('Preview elements not found:', { editor: !!editor, preview: !!preview });
+      return;
     }
+    const md = editor.value;
+    
+    try {
+      if (typeof renderMD !== 'undefined') {
+        preview.innerHTML = renderMD(md);
+        console.log('Preview rendered with renderMD');
+      } else {
+        // Fallback rendering
+        preview.innerHTML = `<p>${md.replace(/\n/g, '<br>')}</p>`;
+        console.log('Preview rendered with fallback');
+      }
+    } catch (error) {
+      console.error('Preview rendering error:', error);
+      preview.innerHTML = `<div style="color: var(--bad);">Preview error: ${error.message}</div>`;
+    }
+  },
+  
+  renderPreviewLive(){
+    const editor = el('#editor');
+    const preview = el('#preview');
+    if (!editor || !preview) {
+      console.log('Live preview elements not found:', { editor: !!editor, preview: !!preview });
+      return;
+    }
+    
+    const md = editor.value;
+    
+    // Skip update if content hasn't changed
+    if (this.lastPreviewContent === md) {
+      return;
+    }
+    this.lastPreviewContent = md;
+    
+    try {
+      // Use the live preview function with enhanced features
+      if (typeof livePreviewDebounced !== 'undefined') {
+        livePreviewDebounced(md, preview);
+        console.log('Live preview updated with livePreviewDebounced');
+      } else if (typeof renderMD !== 'undefined') {
+        preview.innerHTML = renderMD(md);
+        console.log('Live preview updated with renderMD');
+      } else {
+        // Fallback rendering with basic markdown
+        let html = md
+          .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+          .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+          .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.+?)\*/g, '<em>$1</em>')
+          .replace(/\[\[([^\]]+)\]\]/g, '<a class="link" href="#" onclick="UI.followWiki(\'$1\')">$1</a>')
+          .replace(/(^|\s)(#[a-z0-9_\-]+)/gi, '$1<span class="tag" style="color: var(--acc); background: var(--acc)20; padding: 2px 6px; border-radius: 12px; border: 1px solid var(--acc);">$2</span>')
+          .replace(/\n/g, '<br>');
+        
+        preview.innerHTML = html;
+        console.log('Live preview updated with fallback markdown');
+      }
+    } catch (error) {
+      console.error('Live preview rendering error:', error);
+      preview.innerHTML = `<div style="color: var(--bad);">Live preview error: ${error.message}</div>`;
+    }
+    
+    // Update word count and other stats in real-time
+    this.updateEditorStats(md);
+  },
+  
+  updateEditorStats(content){
+    // Real-time editor statistics
+    const words = content.trim() ? content.trim().split(/\s+/).length : 0;
+    const chars = content.length;
+    const lines = content.split('\n').length;
+    const tags = (content.match(/#[a-z0-9_\-]+/gi) || []).length;
+    const links = (content.match(/\[\[([^\]]+)\]\]/g) || []).length;
+    
+    // Update status in the UI if there's a status area
+    const statusArea = el('#editorStatus');
+    if (statusArea) {
+      statusArea.innerHTML = `
+        <span>Words: ${words}</span> | 
+        <span>Chars: ${chars}</span> | 
+        <span>Lines: ${lines}</span> | 
+        <span>Tags: ${tags}</span> | 
+        <span>Links: ${links}</span>
+      `;
+    }
+    
+    // Store stats for analytics
+    this.currentNoteStats = { words, chars, lines, tags, links };
   },
   renderKPI(notes){
     if (typeof Analytics === 'undefined') return;
@@ -468,7 +616,14 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
     if(this.tagInput) {
       this.tagInput.setTags(n.tags || []);
     }
-    if (editor) editor.value = n.body||'';
+    if (editor) {
+      editor.value = n.body||'';
+      // Force initial preview render
+      setTimeout(() => {
+        this.renderPreviewLive();
+        this.updateEditorStats(n.body||'');
+      }, 100);
+    }
     if (dirty) dirty.style.display='none';
     this.renderPreview();
     this.renderBacklinks();
@@ -487,6 +642,12 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
     await this.openNote(n.id);
     const notes = await Store.allNotes();
     await this.refresh();
+    
+    // Force preview update for new note
+    setTimeout(() => {
+      this.renderPreviewLive();
+    }, 200);
+    
     if(typeof Analytics !== 'undefined') Analytics.log('create', {id:n.id});
   },
   
@@ -663,7 +824,10 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
     const editor = el('#editor');
     
     if (title) n.title = title.value.trim() || n.title || '(untitled)';
-    n.tags = this.tagInput ? this.tagInput.getTags() : [];
+    // Extract tags from content and merge with tag input
+    const contentTags = editor ? [...new Set((editor.value.match(/#[a-z0-9_\-]+/gi) || []).map(t => t.toLowerCase()))] : [];
+    const inputTags = this.tagInput ? this.tagInput.getTags() : [];
+    n.tags = [...new Set([...contentTags, ...inputTags])];
     if (editor) n.body = editor.value;
     if(this.state.autoLink){
       const all = await Store.allNotes();
@@ -675,6 +839,12 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
     if (dirty) dirty.style.display='none';
     toast('Saved');
     await this.refresh();
+    
+    // Update preview to reflect saved content
+    setTimeout(() => {
+      this.renderPreviewLive();
+    }, 100);
+    
     if(typeof Analytics !== 'undefined') Analytics.log('save', {id});
     if(this.bc) this.bc.postMessage({type:'sync'});
     
@@ -938,7 +1108,9 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
 
   clearFilters(){
     // Clear filters in search module
-    Search.clearFilters();
+    if (typeof Search !== 'undefined' && Search.clearFilters) {
+      Search.clearFilters();
+    }
     
     // Clear form fields
     const filterTags = el('#filterTags');
@@ -1050,7 +1222,8 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
     if (typeof Workspace !== 'undefined') {
       Workspace.showWorkspaceSettings();
     }
-  }
+  },
+  
   async export(){
     const data = await Store.export();
     const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
@@ -1303,6 +1476,221 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
       await this.refresh();
       toast(`Removed ${tagsToRemove.length} tags from ${this.state.selectedNotes.size} notes`);
       if(this.bc) this.bc.postMessage({type:'sync'});
+    }
+  },
+  
+  // Enhanced search suggestions
+  updateSearchSuggestions(query) {
+    const container = el('#searchSuggestions');
+    if (!container || !query || query.length < 2) {
+      this.hideSearchSuggestions();
+      return;
+    }
+    
+    if (typeof Search !== 'undefined' && typeof Search.getSuggestions === 'function') {
+      const suggestions = Search.getSuggestions(query, 8);
+      this.renderSearchSuggestions(suggestions);
+    }
+  },
+  
+  renderSearchSuggestions(suggestions) {
+    const container = el('#searchSuggestions');
+    if (!container) return;
+    
+    if (suggestions.length === 0) {
+      this.hideSearchSuggestions();
+      return;
+    }
+    
+    container.innerHTML = suggestions.map((suggestion, index) => {
+      const typeClass = suggestion.type;
+      const countText = suggestion.count ? ` (${suggestion.count})` : '';
+      
+      return `
+        <div class="search-suggestion-item ${index === 0 ? 'selected' : ''}" 
+             data-index="${index}" 
+             data-type="${suggestion.type}"
+             data-text="${suggestion.text}"
+             data-id="${suggestion.id || ''}">
+          <span class="suggestion-text">${suggestion.text}</span>
+          <div>
+            <span class="suggestion-type ${typeClass}">${suggestion.type}</span>
+            <span class="suggestion-count">${countText}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+    
+    // Add click handlers
+    container.querySelectorAll('.search-suggestion-item').forEach(item => {
+      item.addEventListener('click', () => {
+        this.selectSuggestion(item);
+      });
+    });
+    
+    this.showSearchSuggestions();
+    this.selectedSuggestionIndex = 0;
+  },
+  
+  showSearchSuggestions() {
+    const container = el('#searchSuggestions');
+    if (container) {
+      container.style.display = 'block';
+    }
+  },
+  
+  hideSearchSuggestions() {
+    const container = el('#searchSuggestions');
+    if (container) {
+      container.style.display = 'none';
+    }
+  },
+  
+  handleSearchKeydown(e) {
+    const container = el('#searchSuggestions');
+    if (!container || container.style.display === 'none') return;
+    
+    const items = container.querySelectorAll('.search-suggestion-item');
+    if (items.length === 0) return;
+    
+    switch(e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        this.selectedSuggestionIndex = Math.min(this.selectedSuggestionIndex + 1, items.length - 1);
+        this.updateSelectedSuggestion(items);
+        break;
+        
+      case 'ArrowUp':
+        e.preventDefault();
+        this.selectedSuggestionIndex = Math.max(this.selectedSuggestionIndex - 1, 0);
+        this.updateSelectedSuggestion(items);
+        break;
+        
+      case 'Enter':
+        e.preventDefault();
+        const selectedItem = items[this.selectedSuggestionIndex];
+        if (selectedItem) {
+          this.selectSuggestion(selectedItem);
+        }
+        break;
+        
+      case 'Escape':
+        this.hideSearchSuggestions();
+        break;
+    }
+  },
+  
+  updateSelectedSuggestion(items) {
+    items.forEach((item, index) => {
+      item.classList.toggle('selected', index === this.selectedSuggestionIndex);
+    });
+  },
+  
+  selectSuggestion(item) {
+    const type = item.dataset.type;
+    const text = item.dataset.text;
+    const id = item.dataset.id;
+    const q = el('#q');
+    
+    if (type === 'title' && id) {
+      // Open the note directly
+      this.openNote(id);
+      if (q) q.value = '';
+    } else if (type === 'tag') {
+      // Set search to this tag
+      if (q) q.value = `tag:${text}`;
+      this.search(q.value);
+    } else {
+      // Set search to this text
+      if (q) q.value = text;
+      this.search(q.value);
+    }
+    
+    this.hideSearchSuggestions();
+  },
+  
+  // Performance monitoring for right panel
+  async renderPerformanceStats() {
+    const perfBox = el('#perfBox');
+    if (!perfBox) return;
+    
+    const dbHealth = Store.getDbHealth ? await Store.getDbHealth() : null;
+    const searchStats = Search.getSearchStats ? Search.getSearchStats() : null;
+    
+    if (dbHealth && searchStats) {
+      perfBox.innerHTML = `
+        <div class="performance-panel">
+          <div class="performance-header">
+            <strong>System Performance</strong>
+            <button onclick="UI.optimizeSystem()" class="bulk-btn" style="font-size: 10px;">Optimize</button>
+          </div>
+          <div class="performance-stats">
+            <div class="performance-stat">
+              <span class="stat-label">Notes</span>
+              <span class="stat-value">${dbHealth.noteCount}</span>
+            </div>
+            <div class="performance-stat">
+              <span class="stat-label">Storage</span>
+              <span class="stat-value">${dbHealth.estimatedSize}KB</span>
+            </div>
+            <div class="performance-stat">
+              <span class="stat-label">Index</span>
+              <span class="stat-value">${searchStats.indexSize}</span>
+            </div>
+            <div class="performance-stat">
+              <span class="stat-label">Cache</span>
+              <span class="stat-value">${searchStats.cacheSize}</span>
+            </div>
+            <div class="performance-stat">
+              <span class="stat-label">Backups</span>
+              <span class="stat-value">${dbHealth.backupCount}</span>
+            </div>
+            <div class="performance-stat">
+              <span class="stat-label">Versions</span>
+              <span class="stat-value">${dbHealth.versionCount}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      // Fallback display
+      perfBox.innerHTML = `
+        <div class="performance-panel">
+          <div class="performance-header">
+            <strong>Performance</strong>
+          </div>
+          <div style="color: var(--muted); font-size: 11px;">
+            System monitoring active
+          </div>
+        </div>
+      `;
+    }
+  },
+  
+  async optimizeSystem() {
+    try {
+      toast('Optimizing system...');
+      
+      if (Store.optimizeDb) {
+        const result = await Store.optimizeDb();
+        if (result.success) {
+          toast(`Optimization complete! Cleaned ${result.deletedVersions} old versions`);
+        } else {
+          toast('Optimization failed');
+        }
+      }
+      
+      // Clear render caches
+      if (typeof markdownCache !== 'undefined') {
+        markdownCache.clear();
+      }
+      
+      // Refresh performance display
+      this.renderPerformanceStats();
+      
+    } catch (error) {
+      console.error('System optimization failed:', error);
+      toast('Optimization failed');
     }
   }
 };

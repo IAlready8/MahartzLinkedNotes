@@ -5,6 +5,8 @@ const Collaboration = {
   peers: new Map(),
   pendingChanges: new Map(),
   conflictResolver: null,
+  cursorPositions: new Map(),
+  localCursor: { position: 0, selectionStart: 0, selectionEnd: 0 },
   
   async init() {
     if (!window.BroadcastChannel) return;
@@ -17,6 +19,42 @@ const Collaboration = {
     
     // Periodic presence updates
     setInterval(() => this.sendPresence(), 30000);
+    
+    // Set up cursor tracking
+    this.setupCursorTracking();
+  },
+  
+  setupCursorTracking() {
+    // Track cursor position in editor
+    const editor = document.getElementById('editor');
+    if (editor) {
+      const updateCursor = () => {
+        this.localCursor = {
+          position: editor.selectionStart,
+          selectionStart: editor.selectionStart,
+          selectionEnd: editor.selectionEnd
+        };
+        
+        // Send cursor position to peers
+        this.sendCursorPosition();
+      };
+      
+      editor.addEventListener('keyup', updateCursor);
+      editor.addEventListener('click', updateCursor);
+      editor.addEventListener('select', updateCursor);
+    }
+  },
+  
+  sendCursorPosition() {
+    if (!this.channel || !UI.state.currentId) return;
+    
+    this.channel.postMessage({
+      type: 'cursor-update',
+      userId: this.getUserId(),
+      noteId: UI.state.currentId,
+      cursor: this.localCursor,
+      timestamp: Date.now()
+    });
   },
   
   sendPresence() {
@@ -47,6 +85,44 @@ const Collaboration = {
       case 'conflict-detected':
         this.handleConflict(data);
         break;
+      case 'cursor-update':
+        this.handleCursorUpdate(data);
+        break;
+    }
+  },
+  
+  handleCursorUpdate(data) {
+    // Only process if it's for the current note
+    if (data.noteId !== UI.state.currentId) return;
+    
+    // Store cursor position
+    this.cursorPositions.set(data.userId, {
+      ...data.cursor,
+      timestamp: data.timestamp,
+      userId: data.userId
+    });
+    
+    // Clean up old cursor positions
+    const now = Date.now();
+    for (const [userId, cursor] of this.cursorPositions.entries()) {
+      if (now - cursor.timestamp > 60000) { // 1 minute
+        this.cursorPositions.delete(userId);
+      }
+    }
+    
+    // Update UI to show cursors
+    this.renderCollaborativeCursors();
+  },
+  
+  renderCollaborativeCursors() {
+    // In a more complex implementation, we would render cursors in the editor
+    // For now, we'll just update a status indicator
+    const peerCount = this.getPeerCount();
+    if (peerCount > 1) {
+      // Update status bar with collaboration info
+      if (typeof AdvancedUI !== 'undefined') {
+        AdvancedUI.updateStatusBar();
+      }
     }
   },
   

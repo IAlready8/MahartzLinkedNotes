@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Highlight Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #0f1115; color: #e7ecf5; }
+        .container { display: flex; gap: 20px; }
+        .editor-side, .preview-side { flex: 1; }
+        textarea { width: 100%; height: 300px; background: #1b2130; color: #e7ecf5; border: 1px solid #2a3147; padding: 10px; }
+        .preview { width: 100%; height: 300px; background: #0b0f18; border: 1px solid #1a2133; padding: 10px; overflow: auto; }
+        
+        .color-picker { 
+            position: absolute; 
+            background: #151922; 
+            border: 1px solid #2a3147; 
+            padding: 10px; 
+            border-radius: 8px;
+            display: none;
+            z-index: 1000;
+        }
+        
+        .color-btn { 
+            width: 30px; 
+            height: 30px; 
+            margin: 2px; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 4px;
+        }
+        
+        .highlight-red { color: #ff6b8a !important; background: transparent !important; font-weight: 600 !important; }
+        .highlight-blue { color: #42a5f5 !important; background: transparent !important; font-weight: 600 !important; }
+        .highlight-green { color: #4caf50 !important; background: transparent !important; font-weight: 600 !important; }
+        .highlight-yellow { color: #ffeb3b !important; background: transparent !important; font-weight: 600 !important; }
+        
+        .btn { background: #1b2130; color: #e7ecf5; border: 1px solid #2a3147; padding: 5px 10px; margin: 2px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>Simple Text Highlighting Test</h2>
+    <p>Instructions: 1) Select text in the editor 2) Click a color button 3) See the result in preview</p>
+    
+    <div class="container">
+        <div class="editor-side">
+            <h3>Editor</h3>
+            <textarea id="editor">
+# Test Document
+
+Select this text and try highlighting it!
+
+This is some sample text that you can highlight.
+Try selecting different words and applying colors.
+
+##red:This text is already highlighted red==
+==blue:This text is already highlighted blue==
+            </textarea>
+            <div>
+                <button class="btn" onclick="applyHighlight('red')" style="background: #ef476f;">Red</button>
+                <button class="btn" onclick="applyHighlight('blue')" style="background: #6ee7ff; color: black;">Blue</button>
+                <button class="btn" onclick="applyHighlight('green')" style="background: #00d18f;">Green</button>
+                <button class="btn" onclick="applyHighlight('yellow')" style="background: #ffd166; color: black;">Yellow</button>
+                <button class="btn" onclick="removeHighlight()">Remove</button>
+            </div>
+        </div>
+        
+        <div class="preview-side">
+            <h3>Preview</h3>
+            <div id="preview" class="preview"></div>
+        </div>
+    </div>
+
+    <script>
+        const editor = document.getElementById('editor');
+        const preview = document.getElementById('preview');
+        
+        function updatePreview() {
+            let content = editor.value;
+            
+            // Step 1: Extract highlights to prevent markdown interference
+            const highlights = [];
+            content = content.replace(/==(\w+):([^=]+)==/g, (match, color, text) => {
+                const id = `HIGHLIGHT_${highlights.length}`;
+                highlights.push({ color, text, id });
+                return `{{${id}}}`;
+            });
+            
+            // Step 2: Process markdown
+            content = content.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+            content = content.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+            content = content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            content = content.replace(/\n/g, '<br>');
+            
+            // Step 3: Restore highlights
+            highlights.forEach(({ color, text, id }) => {
+                const coloredSpan = `<span class="highlight-${color}">${text}</span>`;
+                content = content.replace(`{{${id}}}`, coloredSpan);
+            });
+            
+            preview.innerHTML = content;
+        }
+        
+        function applyHighlight(color) {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const selectedText = editor.value.substring(start, end);
+            
+            if (selectedText) {
+                const beforeText = editor.value.substring(0, start);
+                const afterText = editor.value.substring(end);
+                const highlightedText = `==${color}:${selectedText}==`;
+                
+                editor.value = beforeText + highlightedText + afterText;
+                
+                // Move cursor to end of highlighted text
+                const newPos = start + highlightedText.length;
+                editor.setSelectionRange(newPos, newPos);
+                
+                updatePreview();
+                console.log(`Applied ${color} highlight to: "${selectedText}"`);
+            } else {
+                alert('Please select some text first!');
+            }
+        }
+        
+        function removeHighlight() {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const content = editor.value;
+            
+            // Find highlight around cursor
+            const regex = /==(\w+):([^=]+)==/g;
+            let match;
+            
+            while ((match = regex.exec(content)) !== null) {
+                const matchStart = match.index;
+                const matchEnd = match.index + match[0].length;
+                
+                if (start >= matchStart && start <= matchEnd) {
+                    const beforeText = content.substring(0, matchStart);
+                    const afterText = content.substring(matchEnd);
+                    const plainText = match[2];
+                    
+                    editor.value = beforeText + plainText + afterText;
+                    editor.setSelectionRange(matchStart + plainText.length, matchStart + plainText.length);
+                    updatePreview();
+                    console.log(`Removed highlight from: "${plainText}"`);
+                    return;
+                }
+            }
+            
+            alert('No highlight found at cursor position!');
+        }
+        
+        // Update preview when typing
+        editor.addEventListener('input', updatePreview);
+        
+        // Initial preview
+        updatePreview();
+        
+        console.log('Simple highlight test loaded. Select text and click color buttons!');
+    </script>
+</body>
+</html>

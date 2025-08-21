@@ -89,22 +89,14 @@ const Graph = {
       .force('center', d3.forceCenter(w/2, h/2))
       .force('collision', d3.forceCollide().radius(d => Math.max(8, Math.min(20, 6+d.deg))));
     
-    // Create link groups for different relationship types
-    const linkGroups = {};
-    const relationshipTypes = ['strong', 'medium', 'weak', 'tag-based'];
-    
-    relationshipTypes.forEach(type => {
-      linkGroups[type] = svg.append('g').selectAll('line')
-        .data(links.filter(l => l.type === type))
-        .join('line')
-        .attr('stroke', this.getLinkColor(type))
-        .attr('stroke-width', d => Math.min(4, Math.max(1, d.strength)))
-        .attr('stroke-opacity', 0.6)
-        .attr('stroke-dasharray', this.getLinkDashArray(type));
-    });
-    
-    // Update all links together for tick
-    const allLinks = svg.append('g').selectAll('line').data(links);
+    // Create links with proper styling
+    const allLinks = svg.append('g').selectAll('line')
+      .data(links)
+      .join('line')
+      .attr('stroke', d => this.getLinkColor(d.type))
+      .attr('stroke-width', d => Math.min(4, Math.max(1, d.strength)))
+      .attr('stroke-opacity', 0.6)
+      .attr('stroke-dasharray', d => this.getLinkDashArray(d.type));
     
     const gnode = svg.append('g').selectAll('circle').data(nodes).join('circle')
       .attr('r', d=>Math.max(4, Math.min(14, 4+d.deg)))

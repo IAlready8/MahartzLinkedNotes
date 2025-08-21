@@ -1,389 +1,299 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mahart Linked Notes - Working Version</title>
-    <link rel="stylesheet" href="css/styles.css"/>
-    <style>
-        /* Ensure all elements are visible */
-        body { margin: 0; background: #0f1115; color: #e7ecf5; font-family: system-ui, -apple-system, sans-serif; }
-        .app { display: grid; grid-template-columns: 300px 1fr 360px; grid-template-rows: 48px 1fr; grid-template-areas: "top top top" "left main right"; height: 100vh; }
-        .topbar { grid-area: top; display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #151922; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
-        .left { grid-area: left; border-right: 1px solid #1f2434; background: #151922; overflow: auto; }
-        .main { grid-area: main; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px; }
-        .right { grid-area: right; border-left: 1px solid #1f2434; background: #151922; overflow: auto; }
-        .section { padding: 12px; border-bottom: 1px solid #1f2434; }
-        .card { background: #0b0f18; border: 1px solid #1a2133; border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.25); overflow: hidden; display: flex; flex-direction: column; }
-        .card-header { padding: 12px; border-bottom: 1px solid #1a2133; background: #0f1422; }
-        .editor, .preview { height: calc(100vh - 120px); overflow: auto; padding: 12px; }
-        .editor textarea { width: 100%; height: 100%; background: transparent; border: none; color: #e7ecf5; outline: none; resize: none; font: 14px/1.5 ui-monospace, monospace; }
-        .meta { display: flex; gap: 8px; padding: 8px; border-top: 1px solid #1a2133; }
-        .meta input { flex: 1; background: #0b0e14; border: 1px solid #1f2434; border-radius: 8px; color: #e7ecf5; padding: 8px; }
-        .btn { background: #1b2130; border: 1px solid #2a3147; border-radius: 10px; color: #d7def0; padding: 8px 12px; cursor: pointer; }
-        .btn:hover { border-color: #3a4563; }
-        .badge { background: #121829; border: 1px solid #243053; color: #a8b3ce; padding: 2px 6px; border-radius: 6px; margin-left: 6px; font-size: 12px; }
-        .tag { display: inline-block; background: #111624; border: 1px solid #232c44; color: #a8b3ce; padding: 3px 8px; border-radius: 999px; margin: 2px; font-size: 12px; cursor: pointer; }
-        .item { padding: 6px 4px; cursor: pointer; border-bottom: 1px solid #1f2434; }
-        .item:hover { background: #111624; }
-        .small { font-size: 12px; color: #8b93a5; }
-        .kpi { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px; }
-        .box { background: #0b0f18; border: 1px solid #1a2133; border-radius: 12px; padding: 10px; text-align: center; }
-        .graph { height: 260px; background: #0b0f18; border: 1px solid #1a2133; border-radius: 12px; margin: 12px; }
-        hr.sep { border: 0; border-top: 1px solid #1a2133; margin: 8px 0; }
-        .toast { position: fixed; bottom: 20px; right: 20px; background: #111827; border: 1px solid #1f2937; color: #e5e7eb; padding: 10px 14px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.25); opacity: 0; transform: translateY(10px); transition: .25s; }
-        .toast.show { opacity: 1; transform: translateY(0); }
-        dialog { background: #0b0f18; border: 1px solid #1a2133; border-radius: 14px; padding: 16px; }
-        #tagList { display: flex; flex-wrap: wrap; gap: 4px; }
-        .tag-input-container { position: relative; background: #0b0e14; border: 1px solid #1f2434; border-radius: 8px; padding: 4px; min-height: 40px; flex: 2; }
-        .tags-display { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; min-height: 24px; }
-        .tag-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 12px; border: 1px solid; font-size: 12px; font-weight: 500; line-height: 1; transition: all 0.2s ease; backdrop-filter: blur(4px); }
-        .tag-remove { background: none; border: none; cursor: pointer; padding: 0; margin: 0; font-size: 14px; font-weight: bold; line-height: 1; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; }
-        .tag-input-field { background: transparent; border: none; color: #e7ecf5; outline: none; padding: 6px 8px; width: 100%; font-size: 14px; }
-        .tag-suggestions { position: absolute; top: 100%; left: 0; right: 0; background: #0b0f18; border: 1px solid #1a2133; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,.25); max-height: 200px; overflow-y: auto; z-index: 1000; display: none; margin-top: 4px; }
-        .tag-suggestion { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; cursor: pointer; border-left: 3px solid transparent; transition: all 0.15s ease; }
-        .tag-suggestion:hover { background-color: #111624; border-left-color: #6ee7ff !important; }
-    </style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Mahart Linked Notes - WORKING VERSION</title>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 </head>
 <body>
-    <div class="app">
-        <div class="topbar">
-            <button id="newNote" class="btn">New Note (⌘N)</button>
-            <button id="saveNote" class="btn">Save (⌘S)</button>
-            <input id="q" type="search" placeholder="Search notes..."/>
-            <button id="graphBtn" class="btn">Graph</button>
-            <button id="exportBtn" class="btn">Export</button>
-            <button id="importBtn" class="btn">Import</button>
-            <button id="settingsBtn" class="btn">Settings</button>
-        </div>
+<div class="app">
+  <div class="topbar">
+    <button id="newNote" class="btn">New Note</button>
+    <button id="saveNote" class="btn">Save</button>
+    <input id="q" type="search" placeholder="Search..." style="flex: 1; margin: 0 8px;"/>
+    <button id="exportBtn" class="btn">Export</button>
+  </div>
 
-        <div class="left">
-            <div class="section">
-                <div><strong>Notes</strong> <span id="noteCount" class="badge">0</span></div>
-                <div id="noteList"></div>
-            </div>
-            <div class="section">
-                <div><strong>Tags</strong> <span id="tagCount" class="badge">0</span></div>
-                <div id="tagList"></div>
-            </div>
-            <div class="section small">
-                <div><strong>Backlinks</strong></div>
-                <div id="backlinks">No backlinks</div>
-            </div>
-        </div>
+  <div class="left">
+    <div class="section">
+      <strong>Notes</strong> <span id="noteCount" class="badge">0</span>
+      <div id="noteList"></div>
+    </div>
+  </div>
 
-        <div class="main">
-            <div class="card">
-                <div class="card-header">
-                    <h3>Editor</h3>
-                    <span id="dirty" class="badge" style="display:none;">unsaved</span>
-                </div>
-                <div class="editor">
-                    <textarea id="editor" placeholder="Write your note here..."></textarea>
-                </div>
-                <div class="meta">
-                    <input id="title" placeholder="Note title"/>
-                    <div class="tag-input-container">
-                        <div class="tags-display" id="tagsDisplay"></div>
-                        <input type="text" id="tagInput" class="tag-input-field" placeholder="Add tags..."/>
-                        <div class="tag-suggestions" id="tagSuggestions"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h3>Preview</h3>
-                </div>
-                <div id="preview" class="preview"></div>
-            </div>
-        </div>
-
-        <div class="right">
-            <div class="panel">
-                <div class="kpi">
-                    <div class="box"><div class="small">Notes</div><div id="kpiNotes">0</div></div>
-                    <div class="box"><div class="small">Links/Note</div><div id="kpiLinks">0</div></div>
-                    <div class="box"><div class="small">Health</div><div id="kpiHealth">0%</div></div>
-                </div>
-                <hr class="sep"/>
-                <div class="graph" id="miniGraph">
-                    <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#6b7280">
-                        Graph will appear here
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="main">
+    <div class="card">
+      <h3 style="padding:12px;">Editor <span id="dirty" class="badge" style="display:none;">unsaved</span></h3>
+      <div class="editor">
+        <textarea id="editor" placeholder="Type your note here..."></textarea>
+      </div>
+      <div class="meta">
+        <input id="title" placeholder="Note title"/>
+        <button id="saveNoteInline" class="btn">Save</button>
+      </div>
+      <div id="editorStatus" style="padding: 4px 12px; border-top: 1px solid #1a2133; font-size: 11px; color: var(--muted);">
+        Words: 0 | Chars: 0 | Lines: 1
+      </div>
     </div>
 
-    <dialog id="settings">
-        <form method="dialog" style="padding:16px;min-width:300px">
-            <h3>Settings</h3>
-            <label style="display:block;margin:10px 0;"><input id="autoLink" type="checkbox" checked> Auto-link on save</label>
-            <label style="display:block;margin:10px 0;"><input id="enableAnalytics" type="checkbox" checked> Enable analytics</label>
-            <button type="submit" class="btn">Close</button>
-        </form>
-    </dialog>
+    <div class="card">
+      <h3 style="padding:12px;">Preview</h3>
+      <div id="preview" class="preview"></div>
+    </div>
+  </div>
 
-    <div id="toast" class="toast">Note saved</div>
+  <div class="right">
+    <div class="panel small">
+      <strong>Status</strong>
+      <div id="status">Ready</div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast">Saved</div>
+
+<script>
+// ESSENTIAL UTILITIES ONLY
+const el = (sel) => document.querySelector(sel);
+const ULID = () => Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+const nowISO = () => new Date().toISOString();
+const debounce = (fn, ms=300) => { let t; return (...a) => { clearTimeout(t); t=setTimeout(()=>fn(...a), ms)}};
+const toast = (msg) => { const t=el('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1200); }
+
+// MARKDOWN RENDERING
+const renderMD = (md) => {
+  if (!md) return '';
+  
+  try {
+    let html = marked.parse(md);
+    html = DOMPurify.sanitize(html);
     
-    <script>
-        // Utility functions
-        const el = (sel) => document.querySelector(sel);
-        const els = (sel) => document.querySelectorAll(sel);
-        const ULID = () => Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-        const nowISO = () => new Date().toISOString();
-        const debounce = (fn, ms) => { let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); }; };
-        
-        // Simple toast
-        const toast = (msg) => {
-            const t = el('#toast');
-            t.textContent = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
-        };
-        
-        // Mock storage
-        const Store = {
-            _notes: [],
-            async allNotes() { return this._notes; },
-            async saveNotes(notes) { this._notes = notes; },
-            async upsert(note) {
-                const index = this._notes.findIndex(n => n.id === note.id);
-                if (index >= 0) {
-                    this._notes[index] = note;
-                } else {
-                    this._notes.push(note);
-                }
-            },
-            async get(id) { return this._notes.find(n => n.id === id) || null; }
-        };
-        
-        // Simple tag manager
-        const TagManager = {
-            parseTags(input) {
-                if (!input) return [];
-                return input.split(/[,#\s]+/).filter(t => t).map(t => `#${t.toLowerCase()}`);
-            },
-            getAllTags(notes) {
-                const tags = {};
-                notes.forEach(note => {
-                    (note.tags || []).forEach(tag => {
-                        tags[tag] = (tags[tag] || 0) + 1;
-                    });
-                });
-                return tags;
-            }
-        };
-        
-        // App state
-        const App = {
-            currentNote: null,
-            currentTags: [],
-            
-            async init() {
-                // Create sample note if none exist
-                const notes = await Store.allNotes();
-                if (notes.length === 0) {
-                    const sample = {
-                        id: ULID(),
-                        title: 'Welcome to Mahart Notes',
-                        body: '# Welcome!\n\nThis is a sample note.\n\nTry creating a new note with the "New Note" button.\n\nYou can link notes using [[Note Title]] syntax and add tags like #example #welcome.',
-                        tags: ['#welcome', '#example'],
-                        links: [],
-                        createdAt: nowISO(),
-                        updatedAt: nowISO()
-                    };
-                    await Store.upsert(sample);
-                }
-                
-                // Bind events
-                this.bind();
-                
-                // Refresh UI
-                await this.refresh();
-                
-                // Open first note
-                const allNotes = await Store.allNotes();
-                if (allNotes.length > 0) {
-                    this.openNote(allNotes[0].id);
-                }
-            },
-            
-            bind() {
-                el('#newNote').onclick = () => this.newNote();
-                el('#saveNote').onclick = () => this.saveNote();
-                el('#settingsBtn').onclick = () => el('#settings').showModal();
-                el('#editor').addEventListener('input', () => {
-                    el('#dirty').style.display = 'inline-block';
-                    this.renderPreview();
-                });
-                el('#title').addEventListener('input', () => {
-                    el('#dirty').style.display = 'inline-block';
-                });
-                
-                // Tag input
-                const tagInput = el('#tagInput');
-                tagInput.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ',') {
-                        e.preventDefault();
-                        const tag = tagInput.value.trim();
-                        if (tag) {
-                            const fullTag = tag.startsWith('#') ? tag : `#${tag}`;
-                            if (!this.currentTags.includes(fullTag)) {
-                                this.currentTags.push(fullTag);
-                                this.renderTagsInput();
-                            }
-                            tagInput.value = '';
-                        }
-                    } else if (e.key === 'Backspace' && tagInput.value === '') {
-                        if (this.currentTags.length > 0) {
-                            this.currentTags.pop();
-                            this.renderTagsInput();
-                        }
-                    }
-                });
-            },
-            
-            async refresh() {
-                const notes = await Store.allNotes();
-                this.renderNotesList(notes);
-                this.renderTagsList(notes);
-                this.renderKPI(notes);
-            },
-            
-            renderNotesList(notes) {
-                const container = el('#noteList');
-                container.innerHTML = '';
-                
-                notes.forEach(note => {
-                    const div = document.createElement('div');
-                    div.className = 'item';
-                    div.innerHTML = `
-                        <div>${note.title || '(untitled)'}</div>
-                        <div class="small">${new Date(note.updatedAt).toLocaleString()}</div>
-                    `;
-                    div.onclick = () => this.openNote(note.id);
-                    container.appendChild(div);
-                });
-                
-                el('#noteCount').textContent = notes.length;
-            },
-            
-            renderTagsList(notes) {
-                const container = el('#tagList');
-                container.innerHTML = '';
-                
-                const tags = TagManager.getAllTags(notes);
-                Object.entries(tags).forEach(([tag, count]) => {
-                    const span = document.createElement('span');
-                    span.className = 'tag';
-                    span.textContent = `${tag} (${count})`;
-                    span.onclick = () => this.filterByTag(tag);
-                    container.appendChild(span);
-                });
-                
-                el('#tagCount').textContent = Object.keys(tags).length;
-            },
-            
-            renderTagsInput() {
-                const container = el('#tagsDisplay');
-                container.innerHTML = '';
-                
-                this.currentTags.forEach((tag, index) => {
-                    const span = document.createElement('span');
-                    span.className = 'tag-pill';
-                    span.style.borderColor = '#6ee7ff';
-                    span.style.color = '#6ee7ff';
-                    span.innerHTML = `
-                        ${tag} <button class="tag-remove" style="color:#6ee7ff">×</button>
-                    `;
-                    span.querySelector('.tag-remove').onclick = (e) => {
-                        e.stopPropagation();
-                        this.currentTags.splice(index, 1);
-                        this.renderTagsInput();
-                    };
-                    container.appendChild(span);
-                });
-            },
-            
-            renderPreview() {
-                const content = el('#editor').value;
-                // Simple markdown rendering
-                let html = content
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                    .replace(/# (.*?)(\n|$)/g, '<h1>$1</h1>')
-                    .replace(/## (.*?)(\n|$)/g, '<h2>$1</h2>')
-                    .replace(/\[\[(.*?)\]\]/g, '<a href="#" style="color:#6ee7ff;text-decoration:none;border-bottom:1px dashed #6ee7ff;">$1</a>')
-                    .replace(/#(\w+)/g, '<span style="background:#6ee7ff15;border:1px solid #6ee7ff;border-radius:4px;padding:0 4px;color:#6ee7ff;">#$1</span>')
-                    .replace(/\n/g, '<br>');
-                el('#preview').innerHTML = html;
-            },
-            
-            renderKPI(notes) {
-                el('#kpiNotes').textContent = notes.length;
-                const totalLinks = notes.reduce((sum, note) => sum + (note.links || []).length, 0);
-                const avgLinks = notes.length ? (totalLinks / notes.length).toFixed(1) : 0;
-                el('#kpiLinks').textContent = avgLinks;
-                
-                const wellConnected = notes.filter(n => (n.links || []).length >= 2).length;
-                const health = notes.length ? Math.round((wellConnected / notes.length) * 100) : 0;
-                el('#kpiHealth').textContent = `${health}%`;
-            },
-            
-            async newNote() {
-                const note = {
-                    id: ULID(),
-                    title: '',
-                    body: '',
-                    tags: [],
-                    links: [],
-                    createdAt: nowISO(),
-                    updatedAt: nowISO()
-                };
-                await Store.upsert(note);
-                this.openNote(note.id);
-                await this.refresh();
-            },
-            
-            async openNote(id) {
-                const note = await Store.get(id);
-                if (!note) return;
-                
-                this.currentNote = note;
-                el('#title').value = note.title || '';
-                el('#editor').value = note.body || '';
-                this.currentTags = [...(note.tags || [])];
-                this.renderTagsInput();
-                el('#dirty').style.display = 'none';
-                this.renderPreview();
-            },
-            
-            async saveNote() {
-                if (!this.currentNote) return;
-                
-                this.currentNote.title = el('#title').value || '(untitled)';
-                this.currentNote.body = el('#editor').value;
-                this.currentNote.tags = [...this.currentTags];
-                this.currentNote.updatedAt = nowISO();
-                
-                await Store.upsert(this.currentNote);
-                el('#dirty').style.display = 'none';
-                toast('Note saved');
-                await this.refresh();
-            },
-            
-            filterByTag(tag) {
-                console.log('Filtering by tag:', tag);
-                // In a full implementation, this would filter the notes list
-            }
-        };
-        
-        // Initialize app when DOM is loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            App.init();
-        });
-    </script>
+    // Enhanced wikilink rendering
+    html = html.replace(/\[\[([^\]]+)\]\]/g, '<a class="link" href="#" onclick="openWikiLink(\'$1\')">[[$1]]</a>');
+    
+    // Enhanced tag rendering
+    html = html.replace(/(^|\s)#([a-z0-9_\-]+)/gi, '$1<span class="tag" style="background: #6ee7ff20; border: 1px solid #6ee7ff; color: #6ee7ff; padding: 2px 6px; border-radius: 12px; cursor: pointer;">#$2</span>');
+    
+    return html;
+  } catch (error) {
+    console.error('Markdown error:', error);
+    return md.replace(/\n/g, '<br>');
+  }
+};
+
+// SIMPLE STORE
+const Store = {
+  async allNotes() { return (await localforage.getItem('notes')) || []; },
+  async saveNotes(arr) { await localforage.setItem('notes', arr); return arr; },
+  async upsert(note) {
+    const ns = await this.allNotes();
+    const i = ns.findIndex(n => n.id === note.id);
+    if (i >= 0) ns[i] = note; else ns.push(note);
+    await this.saveNotes(ns);
+    return note;
+  },
+  async get(id) { return (await this.allNotes()).find(n => n.id === id); }
+};
+
+// NOTE MODEL
+const Note = {
+  create({title='', body='', tags=[]} = {}) {
+    return { 
+      id: ULID(), 
+      title, 
+      body, 
+      tags, 
+      links: [], 
+      createdAt: nowISO(), 
+      updatedAt: nowISO() 
+    };
+  }
+};
+
+// MAIN APP
+const App = {
+  currentId: null,
+  
+  async init() {
+    console.log('Initializing app...');
+    this.bind();
+    await this.refresh();
+    
+    // Auto-open first note or create one
+    const notes = await Store.allNotes();
+    if (notes.length === 0) {
+      await this.newNote();
+    } else {
+      await this.openNote(notes[0].id);
+    }
+    
+    console.log('App initialized successfully');
+  },
+  
+  bind() {
+    const editor = el('#editor');
+    const title = el('#title');
+    
+    if (editor) {
+      editor.addEventListener('input', () => {
+        console.log('Editor input - updating preview');
+        this.updatePreview();
+        this.updateStats();
+        const dirty = el('#dirty');
+        if (dirty) dirty.style.display = 'inline-block';
+      });
+    }
+    
+    if (title) {
+      title.addEventListener('input', () => {
+        const dirty = el('#dirty');
+        if (dirty) dirty.style.display = 'inline-block';
+      });
+    }
+    
+    const newBtn = el('#newNote');
+    if (newBtn) newBtn.onclick = () => this.newNote();
+    
+    const saveBtn = el('#saveNote');
+    if (saveBtn) saveBtn.onclick = () => this.save();
+    
+    const saveInlineBtn = el('#saveNoteInline');
+    if (saveInlineBtn) saveInlineBtn.onclick = () => this.save();
+    
+    const exportBtn = el('#exportBtn');
+    if (exportBtn) exportBtn.onclick = () => this.export();
+  },
+  
+  updatePreview() {
+    const editor = el('#editor');
+    const preview = el('#preview');
+    
+    if (!editor || !preview) return;
+    
+    const content = editor.value;
+    const rendered = renderMD(content);
+    preview.innerHTML = rendered;
+    
+    console.log('Preview updated');
+  },
+  
+  updateStats() {
+    const editor = el('#editor');
+    const status = el('#editorStatus');
+    
+    if (!editor || !status) return;
+    
+    const content = editor.value;
+    const words = content.trim() ? content.trim().split(/\s+/).length : 0;
+    const chars = content.length;
+    const lines = content.split('\n').length;
+    
+    status.innerHTML = `Words: ${words} | Chars: ${chars} | Lines: ${lines}`;
+  },
+  
+  async refresh() {
+    const notes = await Store.allNotes();
+    this.renderList(notes);
+  },
+  
+  renderList(notes) {
+    const box = el('#noteList');
+    if (!box) return;
+    
+    box.innerHTML = '';
+    const sorted = [...notes].sort((a,b) => (b.updatedAt||'').localeCompare(a.updatedAt||''));
+    
+    for (const n of sorted) {
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML = `<div style="padding:6px 4px;cursor:pointer">
+        <div>${n.title || '(untitled)'}</div>
+        <div class="small">${(n.updatedAt||n.createdAt).slice(0,16).replace('T',' ')}</div>
+      </div>`;
+      div.onclick = () => this.openNote(n.id);
+      box.appendChild(div);
+    }
+    
+    const noteCount = el('#noteCount');
+    if (noteCount) noteCount.textContent = notes.length;
+  },
+  
+  async openNote(id) {
+    const n = await Store.get(id);
+    if (!n) return;
+    
+    this.currentId = n.id;
+    const title = el('#title');
+    const editor = el('#editor');
+    const dirty = el('#dirty');
+    
+    if (title) title.value = n.title || '';
+    if (editor) editor.value = n.body || '';
+    if (dirty) dirty.style.display = 'none';
+    
+    this.updatePreview();
+    this.updateStats();
+    
+    console.log('Opened note:', n.title);
+  },
+  
+  async newNote() {
+    const n = Note.create({ title: 'New Note', body: '# New Note\n\nStart writing here...' });
+    await Store.upsert(n);
+    await this.openNote(n.id);
+    await this.refresh();
+    console.log('Created new note');
+  },
+  
+  async save() {
+    if (!this.currentId) {
+      await this.newNote();
+      return;
+    }
+    
+    const n = await Store.get(this.currentId);
+    const title = el('#title');
+    const editor = el('#editor');
+    
+    if (title) n.title = title.value.trim() || n.title || '(untitled)';
+    if (editor) n.body = editor.value;
+    n.updatedAt = nowISO();
+    
+    await Store.upsert(n);
+    
+    const dirty = el('#dirty');
+    if (dirty) dirty.style.display = 'none';
+    
+    toast('Saved');
+    await this.refresh();
+    console.log('Saved note');
+  },
+  
+  async export() {
+    const notes = await Store.allNotes();
+    const data = { notes, exportedAt: nowISO() };
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement('a'), {href: url, download: `notes-${Date.now()}.json`});
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Exported');
+  }
+};
+
+// Global functions
+window.openWikiLink = (link) => {
+  console.log('Wiki link clicked:', link);
+  toast('Wiki link: ' + link);
+};
+
+// INITIALIZE
+document.addEventListener('DOMContentLoaded', () => App.init());
+</script>
+
 </body>
 </html>

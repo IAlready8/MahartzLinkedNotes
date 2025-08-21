@@ -19,7 +19,7 @@ const extractWikiLinks = (md)=> {
   // returns array like ["Note Title", "ID:xxxx"]
   return links;
 };
-// Performance optimized markdown rendering with caching
+// Performance optimized live markdown rendering with enhanced tag highlighting
 const markdownCache = new Map();
 const renderMD = (md) => {
   if (!md) return '';
@@ -30,25 +30,125 @@ const renderMD = (md) => {
     return markdownCache.get(cacheKey);
   }
   
-  const html = DOMPurify.sanitize(marked.parse(md));
-  const result = html
-    .replace(/\[\[([^\]]+)\]\]/g, (m, p1)=>{
-      const t = p1.trim();
-      return `<a class="link" data-wikilink="${encodeURIComponent(t)}">[[${t}]]</a>`;
-    })
-    .replace(/(^|\s)#([a-z0-9_\-]+)/gi, '$1<span class="tag">#$2</span>')
-    // Handle custom highlight classes
-    .replace(/<span class="highlight-([a-z]+)-text">([^<]*)<\/span>/g, '<span class="highlight-$1-text">$2</span>');
+  // Enhanced tag color mapping
+  const tagColors = {
+    'content': '#3B82F6', 'method': '#10B981', 'project': '#F59E0B', 'meta': '#8B5CF6',
+    'domain': '#EF4444', 'status': '#6B7280', 'priority': '#DC2626', 'source': '#059669',
+    'important': '#DC2626', 'urgent': '#F97316', 'todo': '#8B5CF6', 'done': '#10B981',
+    'note': '#6B7280', 'idea': '#06B6D4', 'question': '#F59E0B', 'research': '#3B82F6'
+  };
+  
+  // Function to get tag color based on content
+  const getTagColor = (tag) => {
+    const cleanTag = tag.toLowerCase().replace('#', '');
+    
+    // Check for exact matches first
+    if (tagColors[cleanTag]) return tagColors[cleanTag];
+    
+    // Check for partial matches or categories
+    for (const [key, color] of Object.entries(tagColors)) {
+      if (cleanTag.includes(key) || key.includes(cleanTag)) {
+        return color;
+      }
+    }
+    
+    // Generate consistent color based on tag name
+    let hash = 0;
+    for (let i = 0; i < cleanTag.length; i++) {
+      hash = cleanTag.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const colors = ['#6ee7ff', '#9a7cff', '#00d18f', '#ffd166', '#ef476f', '#06d6a0', '#118ab2'];
+    return colors[Math.abs(hash) % colors.length];
+  };
+  
+  let html = DOMPurify.sanitize(marked.parse(md));
+  
+  // Enhanced wikilink rendering with better styling
+  html = html.replace(/\[\[([^\]]+)\]\]/g, (m, p1) => {
+    const t = p1.trim();
+    const isIdLink = t.toLowerCase().startsWith('id:');
+    const linkClass = isIdLink ? 'link id-link' : 'link title-link';
+    return `<a class="${linkClass}" data-wikilink="${encodeURIComponent(t)}" title="Open: ${t}">[[${t}]]</a>`;
+  });
+  
+  // Enhanced tag rendering with dynamic colors and better styling
+  html = html.replace(/(^|\s)#([a-z0-9_\-]+)/gi, (match, prefix, tag) => {
+    const color = getTagColor(tag);
+    const isDarkColor = ['#DC2626', '#EF4444', '#8B5CF6', '#6B7280'].includes(color);
+    const textColor = isDarkColor ? '#ffffff' : '#000000';
+    
+    return `${prefix}<span class="tag enhanced-tag" style="
+      background: ${color}20;
+      border: 1px solid ${color};
+      border-radius: 12px;
+      padding: 3px 8px;
+      color: ${color};
+      font-weight: 500;
+      font-size: 12px;
+      text-shadow: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    " data-tag="${tag}" onclick="UI.filterTag('#${tag}')" title="Filter by #${tag}">#${tag}</span>`;
+  });
+  
+  // Handle custom highlight classes
+  html = html.replace(/<span class="highlight-([a-z]+)-text">([^<]*)<\/span>/g, '<span class="highlight-$1-text">$2</span>');
+  
+  // Enhance code blocks
+  html = html.replace(/<pre><code([^>]*)>([\s\S]*?)<\/code><\/pre>/g, (match, attrs, code) => {
+    return `<pre class="code-block"><code${attrs}>${code}</code></pre>`;
+  });
+  
+  // Enhance inline code
+  html = html.replace(/<code>([^<]+)<\/code>/g, '<code class="inline-code">$1</code>');
   
   // Cache result (limit cache size to prevent memory leaks)
   if (markdownCache.size > 1000) {
     const firstKey = markdownCache.keys().next().value;
     markdownCache.delete(firstKey);
   }
-  markdownCache.set(cacheKey, result);
+  markdownCache.set(cacheKey, html);
   
-  return result;
+  return html;
 };
+
+// Live preview update function with debouncing
+const livePreviewDebounced = debounce((content, previewElement) => {
+  if (!previewElement) return;
+  
+  try {
+    const rendered = renderMD(content);
+    previewElement.innerHTML = rendered;
+    
+    // Add click handlers for enhanced tags
+    previewElement.querySelectorAll('.enhanced-tag').forEach(tag => {
+      tag.addEventListener('mouseenter', (e) => {
+        e.target.style.transform = 'translateY(-1px)';
+        e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+      });
+      tag.addEventListener('mouseleave', (e) => {
+        e.target.style.transform = 'translateY(0)';
+        e.target.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+      });
+    });
+    
+    // Ensure wikilink clicks are handled
+    previewElement.querySelectorAll('a.link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const token = decodeURIComponent(link.dataset.wikilink);
+        if (typeof UI !== 'undefined' && UI.followWiki) {
+          UI.followWiki(token);
+        }
+      });
+    });
+    
+  } catch (error) {
+    console.error('Error rendering markdown preview:', error);
+    previewElement.innerHTML = `<div class="error-preview">Error rendering preview: ${error.message}</div>`;
+  }
+}, 50); // Very fast debounce for live feeling
 
 // Performance utilities
 const memoize = (fn, maxSize = 100) => {
