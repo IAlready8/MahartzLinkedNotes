@@ -75,32 +75,278 @@ const UI = {
     }
   },
   async seed(){
-    const a = Note.create({title:'Zettelkasten Primer', tags:['#method','#zettel'], body: `
-# Zettelkasten Primer
-- Capture atomic ideas.
-- Link liberally with [[Links]] to create structure.
-- Use #tags for quick slicing.
+    const a = Note.create({title:'AI Project Showcase', tags:['#ai','#projects','#showcase'], body: `
+# AI Project Showcase
 
-See [[Workflow Guide]] and [[ID:seed-analytics]].
+Welcome to the ultimate showcase of cutting-edge AI-built projects! This site features innovative applications powered by artificial intelligence.
+
+## Featured Projects
+
+<div class="project-gallery">
+  <div class="project-card" data-project="neural-canvas">
+    <h3>Neural Canvas</h3>
+    <p>An AI-powered creative tool that generates unique digital artwork based on natural language descriptions.</p>
+    <div class="project-tags">
+      <span class="tag ai-tag">#art</span>
+      <span class="tag ai-tag">#generative</span>
+      <span class="tag ai-tag">#neural</span>
+    </div>
+    <button class="btn project-btn" onclick="UI.openNote('seed-neural-canvas')">View Details</button>
+  </div>
+  
+  <div class="project-card" data-project="code-synth">
+    <h3>Code Synth</h3>
+    <p>An AI assistant that can generate entire applications from simple descriptions.</p>
+    <div class="project-tags">
+      <span class="tag ai-tag">#development</span>
+      <span class="tag ai-tag">#automation</span>
+      <span class="tag ai-tag">#coding</span>
+    </div>
+    <button class="btn project-btn" onclick="UI.openNote('seed-code-synth')">View Details</button>
+  </div>
+  
+  <div class="project-card" data-project="mind-mapper">
+    <h3>Mind Mapper</h3>
+    <p>An AI that creates visual mind maps from complex topics and ideas.</p>
+    <div class="project-tags">
+      <span class="tag ai-tag">#visualization</span>
+      <span class="tag ai-tag">#learning</span>
+      <span class="tag ai-tag">#organization</span>
+    </div>
+    <button class="btn project-btn" onclick="UI.openNote('seed-mind-mapper')">View Details</button>
+  </div>
+</div>
+
+Explore these projects and more using the tags and links throughout the site!
 `});
-    a.id = 'seed-primer';
-    const b = Note.create({title:'Workflow Guide', tags:['#guide'], body: `
+    a.id = 'seed-ai-showcase';
+    
+    const b = Note.create({title:'Neural Canvas Details', tags:['#art','#generative','#neural'], body: `
+# Neural Canvas Details
+
+Neural Canvas is an innovative AI-powered creative tool that transforms natural language descriptions into unique digital artwork.
+
+## Key Features
+<div class="ai-project-features">
+
+- **Natural Language Interface**: Describe what you want to see in plain English
+- **Style Transfer**: Apply artistic styles from famous painters to your creations
+- **Real-time Generation**: See your ideas come to life instantly
+- **Community Gallery**: Share and explore artwork from other users
+</div>
+
+## Technical Highlights
+<div class="ai-project-highlights">
+
+- Utilizes state-of-the-art diffusion models
+- Custom-trained on a diverse dataset of artistic styles
+- Optimized for real-time performance on consumer hardware
+</div>
+
+Tags: #ai #art #generative #neural
+See [[AI Project Showcase]]
+`});
+    b.id = 'seed-neural-canvas';
+    
+    const c = Note.create({title:'Code Synth Details', tags:['#development','#automation','#coding'], body: `
+# Code Synth Details
+
+Code Synth is an AI assistant that revolutionizes software development by generating entire applications from simple descriptions.
+
+## Key Features
+<div class="ai-project-features">
+
+- **High-level Description Parsing**: Understands complex project requirements
+- **Multi-language Support**: Generates code in JavaScript, Python, Java, and more
+- **Auto-documentation**: Creates comprehensive documentation for generated code
+- **Integration Ready**: Seamlessly integrates with popular development tools
+</div>
+
+## Technical Highlights
+<div class="ai-project-highlights">
+
+- Built on large language models specifically trained on codebases
+- Utilizes advanced prompt engineering for accurate code generation
+- Includes security and best practices validation
+</div>
+
+Tags: #ai #development #automation #coding
+See [[AI Project Showcase]]
+`});
+    c.id = 'seed-code-synth';
+    
+    const d = Note.create({title:'Mind Mapper Details', tags:['#visualization','#learning','#organization'], body: `
+# Mind Mapper Details
+
+Mind Mapper is an AI that creates visual mind maps from complex topics and ideas, helping users organize and understand information more effectively.
+
+## Key Features
+<div class="ai-project-features">
+
+- **Topic Analysis**: Automatically identifies key concepts and relationships
+- **Visual Hierarchy**: Creates intuitive visual structures for complex information
+- **Interactive Exploration**: Navigate through concepts with dynamic visualizations
+- **Export Options**: Share mind maps in various formats
+</div>
+
+## Technical Highlights
+<div class="ai-project-highlights">
+
+- Employs natural language processing for concept extraction
+- Uses graph theory algorithms for optimal layout
+- Adapts to different domains and knowledge areas
+</div>
+
+Tags: #ai #visualization #learning #organization
+See [[AI Project Showcase]]
+`});
+    d.id = 'seed-mind-mapper';
+    
+    const e = Note.create({title:'Workflow Guide', tags:['#guide'], body: `
 # Workflow Guide
+
 1. Create note (⌘/Ctrl+N)
 2. Title, write short atomic idea
-3. Link to parent/sibling [[Zettelkasten Primer]]
+3. Link to parent/sibling [[AI Project Showcase]]
 4. Add 2+ links to strengthen graph
+5. Use #tags for quick slicing and organization
 `});
-    b.id = 'seed-workflow';
-    const c = Note.create({title:'Analytics Playbook', tags:['#analytics','#metrics'], body: `
+    e.id = 'seed-workflow';
+    
+    const f = Note.create({title:'Analytics Playbook', tags:['#analytics','#metrics'], body: `
 # Analytics Playbook
+
 - Effectiveness: % notes with ≥2 links
 - Link density: avg links/note
 - Momentum: notes updated/day (14d)
 - Usage: create/edit/open events
+
+For AI projects, also track:
+- Conceptual coherence in generated content
+- User engagement with AI-generated artifacts
+- Cross-project knowledge connections
+
+See [[AI Project Showcase]]
 `});
-    c.id = 'seed-analytics';
-    const all = [a,b,c];
+    f.id = 'seed-analytics';
+    
+    const all = [a,b,c,d,e,f];
+    // compute links
+    for(const n of all) Note.computeLinks(n, all);
+    await Store.saveNotes(all);
+    await Store.log({id:ULID(),evt:'seed',t:Date.now()});
+  },
+    
+    const b = Note.create({title:'Neural Canvas Details', tags:['#art','#generative','#neural'], body: `
+# Neural Canvas Details
+
+Neural Canvas is an innovative AI-powered creative tool that transforms natural language descriptions into unique digital artwork.
+
+## Key Features
+<div class="ai-project-features">
+
+- **Natural Language Interface**: Describe what you want to see in plain English
+- **Style Transfer**: Apply artistic styles from famous painters to your creations
+- **Real-time Generation**: See your ideas come to life instantly
+- **Community Gallery**: Share and explore artwork from other users
+</div>
+
+## Technical Highlights
+<div class="ai-project-highlights">
+
+- Utilizes state-of-the-art diffusion models
+- Custom-trained on a diverse dataset of artistic styles
+- Optimized for real-time performance on consumer hardware
+</div>
+
+Tags: #ai #art #generative #neural
+See [[AI Project Showcase]]
+`});
+    b.id = 'seed-neural-canvas';
+    
+    const c = Note.create({title:'Code Synth Details', tags:['#development','#automation','#coding'], body: `
+# Code Synth Details
+
+Code Synth is an AI assistant that revolutionizes software development by generating entire applications from simple descriptions.
+
+## Key Features
+<div class="ai-project-features">
+
+- **High-level Description Parsing**: Understands complex project requirements
+- **Multi-language Support**: Generates code in JavaScript, Python, Java, and more
+- **Auto-documentation**: Creates comprehensive documentation for generated code
+- **Integration Ready**: Seamlessly integrates with popular development tools
+</div>
+
+## Technical Highlights
+<div class="ai-project-highlights">
+
+- Built on large language models specifically trained on codebases
+- Utilizes advanced prompt engineering for accurate code generation
+- Includes security and best practices validation
+</div>
+
+Tags: #ai #development #automation #coding
+See [[AI Project Showcase]]
+`});
+    c.id = 'seed-code-synth';
+    
+    const d = Note.create({title:'Mind Mapper Details', tags:['#visualization','#learning','#organization'], body: `
+# Mind Mapper Details
+
+Mind Mapper is an AI that creates visual mind maps from complex topics and ideas, helping users organize and understand information more effectively.
+
+## Key Features
+<div class="ai-project-features">
+
+- **Topic Analysis**: Automatically identifies key concepts and relationships
+- **Visual Hierarchy**: Creates intuitive visual structures for complex information
+- **Interactive Exploration**: Navigate through concepts with dynamic visualizations
+- **Export Options**: Share mind maps in various formats
+</div>
+
+## Technical Highlights
+<div class="ai-project-highlights">
+
+- Employs natural language processing for concept extraction
+- Uses graph theory algorithms for optimal layout
+- Adapts to different domains and knowledge areas
+</div>
+
+Tags: #ai #visualization #learning #organization
+See [[AI Project Showcase]]
+`});
+    d.id = 'seed-mind-mapper';
+    
+    const e = Note.create({title:'Workflow Guide', tags:['#guide'], body: `
+# Workflow Guide
+
+1. Create note (⌘/Ctrl+N)
+2. Title, write short atomic idea
+3. Link to parent/sibling [[AI Project Showcase]]
+4. Add 2+ links to strengthen graph
+5. Use #tags for quick slicing and organization
+`});
+    e.id = 'seed-workflow';
+    
+    const f = Note.create({title:'Analytics Playbook', tags:['#analytics','#metrics'], body: `
+# Analytics Playbook
+
+- Effectiveness: % notes with ≥2 links
+- Link density: avg links/note
+- Momentum: notes updated/day (14d)
+- Usage: create/edit/open events
+
+For AI projects, also track:
+- Conceptual coherence in generated content
+- User engagement with AI-generated artifacts
+- Cross-project knowledge connections
+
+See [[AI Project Showcase]]
+`});
+    f.id = 'seed-analytics';
+    
+    const all = [a,b,c,d,e,f];
     // compute links
     for(const n of all) Note.computeLinks(n, all);
     await Store.saveNotes(all);
@@ -359,8 +605,19 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
       const div = document.createElement('div');
       div.className='item';
       div.dataset.noteId = n.id; // Add note ID for bulk operations
+      
+      // Check if note is AI-related
+      const isAIRelated = n.tags && n.tags.some(tag => 
+        tag.includes('#ai') || tag.includes('#artificial') ||
+        tag.includes('#neural') || tag.includes('#machine') ||
+        tag.includes('#deep') || tag.includes('#learning') ||
+        tag.includes('#generative') || tag.includes('#automation') ||
+        tag.includes('#coding') || tag.includes('#development') ||
+        tag.includes('#visualization')
+      );
+      
       div.innerHTML = `<div style="padding:6px 4px;cursor:pointer">
-        <div>${n.title||'(untitled)'} <span class="badge">#${n.tags?n.tags.length:0} tags</span> <span class="badge">${n.links?n.links.length:0} links</span></div>
+        <div>${n.title||'(untitled)'} ${isAIRelated ? '<span class="badge" style="background: #1b2130; border-color: #2a3147; color: #6ee7ff;">AI</span>' : ''} <span class="badge">#${n.tags?n.tags.length:0} tags</span> <span class="badge">${n.links?n.links.length:0} links</span></div>
         <div class="small">${(n.updatedAt||n.createdAt).slice(0,16).replace('T',' ')}</div>
       </div>`;
       div.onclick = ()=> {
@@ -392,6 +649,14 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
     const tagBox = el('#tagList');
     if (!tagBox) return;
     tagBox.innerHTML='';
+    
+    // Add special AI projects filter
+    const aiProjectsFilter = document.createElement('span');
+    aiProjectsFilter.className = 'tag ai-tag';
+    aiProjectsFilter.textContent = '#ai-projects';
+    aiProjectsFilter.onclick = () => this.filterTag('#ai-projects');
+    tagBox.appendChild(aiProjectsFilter);
+    
     const counts = {};
     for(const n of notes) for(const t of (n.tags||[])) counts[t]=(counts[t]||0)+1;
     const items = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,80);
@@ -406,14 +671,25 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
         category = TagManager.getTagCategory ? TagManager.getTagCategory(t) : category;
       }
       
-      span.className = `tag tag-category-${category}`;
-      span.style.borderLeftColor = color;
+      // Special styling for AI-related tags
+      if (t.includes('ai') || t.includes('artificial') || 
+          t.includes('neural') || t.includes('machine') ||
+          t.includes('deep') || t.includes('learning') ||
+          t.includes('generative') || t.includes('automation') ||
+          t.includes('coding') || t.includes('development') ||
+          t.includes('visualization')) {
+        span.className = 'tag ai-tag';
+      } else {
+        span.className = `tag tag-category-${category}`;
+        span.style.borderLeftColor = color;
+      }
+      
       span.textContent = `${t} (${c})`;
       span.onclick=()=> this.filterTag(t);
       tagBox.appendChild(span);
     }
     const tagCount = el('#tagCount');
-    if (tagCount) tagCount.textContent = items.length;
+    if (tagCount) tagCount.textContent = items.length + 1; // +1 for the special filter
   },
   renderBacklinks(){
     const id = this.state.currentId;
@@ -490,8 +766,14 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
     
     try {
       if (typeof renderMD !== 'undefined') {
-        preview.innerHTML = renderMD(md);
-        console.log('Preview rendered with renderMD');
+        let html = renderMD(md);
+        
+        // Apply AI project showcase styles
+        html = html.replace(/<h1>/g, '<h1 class="ai-project-title">');
+        html = html.replace(/<div class="preview">/g, '<div class="preview ai-showcase">');
+        
+        preview.innerHTML = html;
+        console.log('Preview rendered with renderMD and AI showcase styles');
       } else {
         // Fallback rendering
         preview.innerHTML = `<p>${md.replace(/\n/g, '<br>')}</p>`;
@@ -523,14 +805,34 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
       // Use the live preview function with enhanced features
       if (typeof livePreviewDebounced !== 'undefined') {
         livePreviewDebounced(md, preview);
+        // Apply AI project showcase styles after rendering
+        setTimeout(() => {
+          const titles = preview.querySelectorAll('h1');
+          titles.forEach(title => title.classList.add('ai-project-title'));
+          
+          preview.classList.add('ai-showcase');
+          
+          // Add click handlers to project buttons
+          const projectButtons = preview.querySelectorAll('.project-btn');
+          projectButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+              const noteId = e.target.getAttribute('onclick').match(/'([^']+)'/)[1];
+              this.openNote(noteId);
+            });
+          });
+        }, 10);
         console.log('Live preview updated with livePreviewDebounced');
       } else if (typeof renderMD !== 'undefined') {
-        preview.innerHTML = renderMD(md);
+        let html = renderMD(md);
+        // Apply AI project showcase styles
+        html = html.replace(/<h1>/g, '<h1 class="ai-project-title">');
+        html = html.replace(/<div class="preview">/g, '<div class="preview ai-showcase">');
+        preview.innerHTML = html;
         console.log('Live preview updated with renderMD');
       } else {
         // Fallback rendering with basic markdown
         let html = md
-          .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+          .replace(/^# (.+)$/gm, '<h1 class="ai-project-title">$1</h1>')
           .replace(/^## (.+)$/gm, '<h2>$1</h2>')
           .replace(/^### (.+)$/gm, '<h3>$1</h3>')
           .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
@@ -539,7 +841,7 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
           .replace(/(^|\s)(#[a-z0-9_\-]+)/gi, '$1<span class="tag" style="color: var(--acc); background: var(--acc)20; padding: 2px 6px; border-radius: 12px; border: 1px solid var(--acc);">$2</span>')
           .replace(/\n/g, '<br>');
         
-        preview.innerHTML = html;
+        preview.innerHTML = `<div class="preview ai-showcase">${html}</div>`;
         console.log('Live preview updated with fallback markdown');
       }
     } catch (error) {
@@ -585,6 +887,9 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
     if (kpiLinks) kpiLinks.textContent = k.linksPer;
     if (kpiHealth) kpiHealth.textContent = k.pct2+'%';
     
+    // Add AI project statistics
+    this.renderAIStats(notes);
+    
     // activity chart
     const chartActivity = el('#chartActivity');
     if(chartActivity && typeof Chart !== 'undefined') {
@@ -594,6 +899,68 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
         labels:Object.keys(k.daily),
         datasets:[{ label:'Notes updated', data:Object.values(k.daily) }]
       }, options:{ responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }});
+    }
+  },
+
+  renderAIStats(notes) {
+    // Count AI-related notes
+    const aiNotes = notes.filter(note => 
+      note.tags && note.tags.some(tag => 
+        tag.includes('#ai') || tag.includes('#artificial')
+      )
+    );
+    
+    // Count AI-related tags
+    const aiTags = new Set();
+    notes.forEach(note => {
+      if (note.tags) {
+        note.tags.forEach(tag => {
+          if (tag.includes('#ai') || tag.includes('#artificial') || 
+              tag.includes('#neural') || tag.includes('#machine') ||
+              tag.includes('#deep') || tag.includes('#learning')) {
+            aiTags.add(tag);
+          }
+        });
+      }
+    });
+    
+    // Find the project showcase note
+    const showcaseNote = notes.find(note => note.title === 'AI Project Showcase');
+    
+    // Create or update AI stats panel
+    let aiStatsPanel = el('#aiStatsPanel');
+    if (!aiStatsPanel) {
+      aiStatsPanel = document.createElement('div');
+      aiStatsPanel.id = 'aiStatsPanel';
+      aiStatsPanel.className = 'panel small';
+      aiStatsPanel.innerHTML = `
+        <strong>AI Project Statistics</strong>
+        <div id="aiStatsContent"></div>
+      `;
+      
+      // Insert after the KPI panel
+      const kpiPanel = el('#kpiPanel');
+      if (kpiPanel && kpiPanel.parentNode) {
+        kpiPanel.parentNode.insertBefore(aiStatsPanel, kpiPanel.nextSibling);
+      } else {
+        // Fallback: append to right panel
+        const rightPanel = el('.right');
+        if (rightPanel) {
+          rightPanel.appendChild(aiStatsPanel);
+        }
+      }
+    }
+    
+    // Update stats content
+    const aiStatsContent = el('#aiStatsContent');
+    if (aiStatsContent) {
+      aiStatsContent.innerHTML = `
+        <div class="code" style="font-size: 12px;">
+          <div>AI Notes: <span style="color: #6ee7ff;">${aiNotes.length}</span></div>
+          <div>AI Tags: <span style="color: #9a7cff;">${aiTags.size}</span></div>
+          ${showcaseNote ? `<div>Showcase Links: <span style="color: #ffd166;">${showcaseNote.links ? showcaseNote.links.length : 0}</span></div>` : ''}
+        </div>
+      `;
     }
   },
   renderMiniGraph(notes){
@@ -1131,7 +1498,22 @@ See [[Workflow Guide]] and [[ID:seed-analytics]].
   },
   async filterTag(t){
     const notes = await Store.allNotes();
-    this.renderList(notes.filter(n=> (n.tags||[]).includes(t)));
+    if (t === '#ai-projects') {
+      // Special filter for all AI projects
+      const aiNotes = notes.filter(note => 
+        note.tags && note.tags.some(tag => 
+          tag.includes('#ai') || tag.includes('#artificial') ||
+          tag.includes('#neural') || tag.includes('#machine') ||
+          tag.includes('#deep') || tag.includes('#learning') ||
+          tag.includes('#generative') || tag.includes('#automation') ||
+          tag.includes('#coding') || tag.includes('#development') ||
+          tag.includes('#visualization')
+        )
+      );
+      this.renderList(aiNotes);
+    } else {
+      this.renderList(notes.filter(n=> (n.tags||[]).includes(t)));
+    }
   },
   async followWiki(token){
     if(token.toLowerCase().startsWith('id:')){

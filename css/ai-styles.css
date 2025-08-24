@@ -1,0 +1,135 @@
+.ai-project-highlights {
+  background: #0f1422;
+  border-left: 3px solid #9a7cff;
+  padding: 12px;
+  margin: 12px 0;
+}
+
+.tag.ai-tag {
+  background: #111624;
+  border: 1px solid #232c44;
+  color: #6ee7ff;
+  padding: 4px 8px;
+  border-radius: 12px;
+  margin: 2px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.tag.ai-tag:hover {
+  background: #1b2130;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(110, 231, 255, 0.2);
+}
+
+/* AI Stats Panel */
+#aiStatsPanel .code div {
+  margin: 4px 0;
+}
+
+/* Custom styles for AI Project Showcase */
+.project-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.project-card {
+  background: #0b0f18;
+  border: 1px solid #1a2133;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  border-color: #2a3147;
+}
+
+.project-card h3 {
+  color: #9a7cff;
+  margin-top: 0;
+  border-bottom: 1px solid #1a2133;
+  padding-bottom: 8px;
+}
+
+.project-tags {
+  margin: 12px 0;
+}
+
+.project-btn {
+  background: #1b2130;
+  border: 1px solid #2a3147;
+  color: #d7def0;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: 6px;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.project-btn:hover {
+  background: #2a3147;
+  border-color: #3a4563;
+  transform: translateY(-2px);
+}
+
+/* Enhanced preview styles for AI content */
+.preview h1 {
+  color: #6ee7ff;
+  border-bottom: 2px solid #1a2133;
+}
+
+.preview h2 {
+  color: #9a7cff;
+  border-bottom: 1px solid #1a2133;
+}
+
+.preview h3 {
+  color: #ffd166;
+}
+
+.preview ul li::before {
+  content: "▶";
+  color: #6ee7ff;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
+}
+
+.preview blockquote {
+  border-left: 4px solid #9a7cff;
+  background: #0b0f1815;
+}
+
+/* Enhanced link styles for AI projects */
+.preview a.link.title-link {
+  color: #6ee7ff;
+  border-bottom-color: #284b55;
+}
+
+.preview a.link.title-link:hover {
+  color: #80f3ff;
+  border-bottom-color: #6ee7ff;
+}
+
+/* Enhanced tag styles for AI projects */
+.preview .enhanced-tag {
+  background: #111624;
+  border: 1px solid #232c44;
+  color: #a8b3ce;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.preview .enhanced-tag:hover {
+  background: #1b2130;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}

@@ -8,6 +8,19 @@ const AdvancedUI = {
     this.createFloatingActions();
     this.enhanceNoteList();
     this.enhanceTagSystem();
+    this.applyAIShowcaseHeader();
+  },
+  
+  // Apply AI showcase header to the app
+  applyAIShowcaseHeader() {
+    // Add AI showcase header to the main editor card
+    const editorCard = document.querySelector('.main .card:first-child');
+    if (editorCard && !document.querySelector('.ai-showcase-header')) {
+      const header = document.createElement('div');
+      header.className = 'ai-showcase-header';
+      header.innerHTML = '<h1>AI Project Showcase</h1>';
+      editorCard.insertBefore(header, editorCard.firstChild);
+    }
   },
   
   // Create command palette (Ctrl/Cmd + P)
