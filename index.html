@@ -5,45 +5,34 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Mahart Linked Notes - AI Project Showcase</title>
   <link rel="stylesheet" href="css/styles.css"/>
-  <link rel="stylesheet" href="css/ai-styles.css"/>
-  <link rel="stylesheet" href="css/presentation-styles.css"/>
-  <link rel="stylesheet" href="css/learning-mode-styles.css"/>
-  <link rel="stylesheet" href="css/theme-editor-styles.css"/>
-  <link rel="stylesheet" href="css/competitive-importers-styles.css"/>
-  <link rel="stylesheet" href="css/dynamic-dashboards-styles.css"/>
   <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
   <style>
-    /* Additional styles for AI Project Showcase */
+    /* Custom AI showcase styles for complex gradients */
     .ai-showcase-header {
       background: linear-gradient(90deg, #0f1115, #151922);
-      border-bottom: 1px solid #1f2434;
-      padding: 10px 12px;
-      margin: -12px -12px 12px -12px;
-      text-align: center;
+      @apply border-b border-border p-3 -m-3 mb-3 text-center;
     }
     
     .ai-showcase-header h1 {
-      color: #6ee7ff;
-      font-size: 1.8em;
-      margin: 0;
+      @apply text-accent text-3xl m-0;
     }
   </style>
 </head>
-<body>
-<div class="app">
+<body class="bg-bg text-text font-sans h-full m-0">
+<div class="app-grid">
   <div class="topbar">
-    <div style="display: flex; gap: 8px;">
+    <div class="flex gap-2">
       <button id="newNote" class="btn">New Note (⌘/Ctrl+N)</button>
     </div>
     <button id="saveNote" class="btn">Save (⌘/Ctrl+S)</button>
-    <div style="flex: 1; display: flex; gap: 8px; position: relative;">
-      <div style="flex: 1; position: relative;">
-        <input id="q" type="search" placeholder="Quick search (⌘/Ctrl+K): title, tags, body…" style="width: 100%;" autocomplete="off"/>
-        <div id="searchSuggestions" class="search-suggestions" style="display: none;"></div>
+    <div class="flex-1 flex gap-2 relative">
+      <div class="flex-1 relative">
+        <input id="q" type="search" placeholder="Quick search (⌘/Ctrl+K): title, tags, body…" class="search-input" autocomplete="off"/>
+        <div id="searchSuggestions" class="search-suggestions hidden"></div>
       </div>
     </div>
     <button id="tagsBtn" class="btn">Tags</button>
@@ -53,7 +42,7 @@
     <button id="settingsBtn" class="btn">Settings</button>
   </div>
 
-  <div class="left">
+  <div class="sidebar-left">
     <div class="section">
       <strong>Notes</strong> <span id="noteCount" class="badge">0</span>
       <div id="noteList"></div>
@@ -62,165 +51,173 @@
       <strong>Tags</strong> <span id="tagCount" class="badge">0</span>
       <div id="tagList"></div>
     </div>
-    <div class="section small">
+    <div class="section">
       <strong>Backlinks</strong>
       <div id="backlinks"></div>
     </div>
   </div>
 
-  <div class="main">
+  <div class="main-content">
     <div class="card">
-      <h3 style="display:flex;align-items:center;gap:8px;padding:12px;">
-        Editor <span id="dirty" class="badge" style="display:none;">unsaved</span>
+      <h3 class="card-header flex items-center gap-2">
+        Editor <span id="dirty" class="badge hidden">unsaved</span>
       </h3>
-      <div class="editor">
+      <div class="h-editor overflow-auto p-3">
         <textarea id="editor" placeholder="# Title
 
 Write with **Markdown**.
 Link notes with [[Note Title]] or [[ID:xxxx]].
 Add tags with #tag anywhere.
-"></textarea>
+" class="editor-textarea"></textarea>
         
         <!-- Text Highlighting Controls -->
-        <div id="highlightControls" class="highlight-controls" style="display: none;">
-          <div class="highlight-controls-header">
-            <span>Highlight Text</span>
-            <button onclick="UI.autoFixHighlights()" class="btn" style="font-size: 10px; padding: 4px 8px; background: #1b2130; color: #ffd166;" title="Fix broken highlight syntax">Auto-Fix</button>
+        <div id="highlightControls" class="hidden p-3 bg-card-bg border border-card-border rounded-lg mt-2">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-text">Highlight Text</span>
+            <button onclick="UI.autoFixHighlights()" class="btn text-xs px-2 py-1 bg-btn-bg text-warning" title="Fix broken highlight syntax">Auto-Fix</button>
           </div>
-          <div class="color-options">
-            <button onclick="UI.applyHighlight('red')" class="color-btn red" title="Red highlight">Red</button>
-            <button onclick="UI.applyHighlight('orange')" class="color-btn orange" title="Orange highlight">Orange</button>
-            <button onclick="UI.applyHighlight('yellow')" class="color-btn yellow" title="Yellow highlight">Yellow</button>
-            <button onclick="UI.applyHighlight('green')" class="color-btn green" title="Green highlight">Green</button>
-            <button onclick="UI.applyHighlight('blue')" class="color-btn blue" title="Blue highlight">Blue</button>
-            <button onclick="UI.applyHighlight('purple')" class="color-btn purple" title="Purple highlight">Purple</button>
+          <div class="flex gap-1 mb-2">
+            <button onclick="UI.applyHighlight('red')" class="w-8 h-8 bg-red-500 rounded hover:bg-red-600" title="Red highlight"></button>
+            <button onclick="UI.applyHighlight('orange')" class="w-8 h-8 bg-orange-500 rounded hover:bg-orange-600" title="Orange highlight"></button>
+            <button onclick="UI.applyHighlight('yellow')" class="w-8 h-8 bg-yellow-500 rounded hover:bg-yellow-600" title="Yellow highlight"></button>
+            <button onclick="UI.applyHighlight('green')" class="w-8 h-8 bg-green-500 rounded hover:bg-green-600" title="Green highlight"></button>
+            <button onclick="UI.applyHighlight('blue')" class="w-8 h-8 bg-blue-500 rounded hover:bg-blue-600" title="Blue highlight"></button>
+            <button onclick="UI.applyHighlight('purple')" class="w-8 h-8 bg-purple-500 rounded hover:bg-purple-600" title="Purple highlight"></button>
           </div>
-          <div class="highlight-actions">
-            <button onclick="UI.removeHighlight()" class="btn remove-btn" title="Remove highlight">Remove</button>
+          <div>
+            <button onclick="UI.removeHighlight()" class="btn bg-danger text-white" title="Remove highlight">Remove</button>
           </div>
         </div>
       </div>
-      <div class="meta">
-        <input id="title" placeholder="Title"/>
-        <div id="enhanced-tags-input" class="tag-input-container">
+      <div class="flex gap-2 p-2 border-t border-card-border">
+        <input id="title" placeholder="Title" class="input-field flex-1"/>
+        <div id="enhanced-tags-input" class="relative bg-input-bg border border-input-border rounded-lg p-2 min-h-10">
             <div class="tags-display" id="tagsDisplay"></div>
-            <input type="text" id="tagInput" class="tag-input-field" placeholder="Add tags..."/>
+            <input type="text" id="tagInput" class="bg-transparent border-none outline-none text-text" placeholder="Add tags..."/>
             <div class="tag-suggestions" id="tagSuggestions"></div>
         </div>
-        <button id="saveNoteInline" class="btn" style="margin-left: 8px; padding: 8px 12px;" title="Save note (⌘/Ctrl+S)">Save</button>
+        <button id="saveNoteInline" class="btn ml-2" title="Save note (⌘/Ctrl+S)">Save</button>
       </div>
-      <div class="editor-status" id="editorStatus" style="padding: 4px 12px; border-top: 1px solid #1a2133; font-size: 11px; color: var(--muted); background: #0f1422;">
+      <div class="editor-status px-3 py-1 border-t border-card-border text-xs text-muted bg-editor-header" id="editorStatus">
         <span>Words: 0</span> | <span>Chars: 0</span> | <span>Lines: 1</span> | <span>Tags: 0</span> | <span>Links: 0</span>
       </div>
     </div>
 
     <div class="card">
-      <h3 style="padding:12px;">Live Preview</h3>
-      <div id="preview" class="preview"></div>
+      <h3 class="card-header">Live Preview</h3>
+      <div id="preview" class="h-editor overflow-auto p-3"></div>
     </div>
   </div>
 
-
-  <div class="right">
-    <div class="panel">
-      <div class="kpi">
-        <div class="box"><div class="small">Notes</div><div id="kpiNotes" style="font-size:22px;"></div></div>
-        <div class="box"><div class="small">Links/Note</div><div id="kpiLinks" style="font-size:22px;"></div></div>
-        <div class="box"><div class="small">% ≥2 Links</div><div id="kpiHealth" style="font-size:22px;"></div></div>
+  <div class="sidebar-right">
+    <div class="section">
+      <div class="kpi-grid">
+        <div class="kpi-box"><div class="text-xs text-muted">Notes</div><div id="kpiNotes" class="text-xl"></div></div>
+        <div class="kpi-box"><div class="text-xs text-muted">Links/Note</div><div id="kpiLinks" class="text-xl"></div></div>
+        <div class="kpi-box"><div class="text-xs text-muted">% ≥2 Links</div><div id="kpiHealth" class="text-xl"></div></div>
       </div>
-      <hr class="sep"/>
+      <hr class="border-border my-3"/>
       <canvas id="chartActivity" height="120"></canvas>
-      <hr class="sep"/>
-      <div class="graph" id="miniGraph"></div>
+      <hr class="border-border my-3"/>
+      <div id="miniGraph" class="min-h-32"></div>
     </div>
 
-    <div class="panel small">
+    <div class="section">
       <strong>Performance</strong>
-      <div id="perfBox" class="code"></div>
+      <div id="perfBox" class="code-block"></div>
     </div>
 
-    <div class="panel small">
+    <div class="section">
       <strong>Events</strong>
-      <div id="eventLog" class="code" style="max-height:160px"></div>
+      <div id="eventLog" class="code-block max-h-40"></div>
     </div>
   </div>
 </div>
 
-<div id="toast" class="toast">Saved</div>
+<div id="toast" class="fixed bottom-4 right-4 bg-success text-white px-4 py-2 rounded-lg shadow-app transform translate-y-full opacity-0 transition-all duration-300">Saved</div>
 
 <!-- Tags Management Modal -->
-<dialog id="tagsModal">
-  <div class="card" style="padding:16px;min-width:600px;max-height:80vh;overflow:auto;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <h3 style="margin:0;">Tag Management</h3>
-      <button class="btn" onclick="el('#tagsModal').close()" style="padding:4px 8px;">×</button>
+<dialog id="tagsModal" class="backdrop:bg-black backdrop:bg-opacity-50 bg-transparent border-none p-0">
+  <div class="card p-4 min-w-[600px] max-h-[80vh] overflow-auto">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="m-0 text-xl font-semibold text-text">Tag Management</h3>
+      <button class="btn px-2 py-1" onclick="el('#tagsModal').close()">×</button>
     </div>
     
-    <div style="margin-bottom:16px;">
-      <div style="display:flex;gap:8px;margin-bottom:8px;">
-        <input id="newTagInput" placeholder="Create new tag (e.g., #project)" style="flex:1;background:#0b0e14;border:1px solid #1f2434;border-radius:8px;color:var(--text);padding:8px;">
+    <div class="mb-4">
+      <div class="flex gap-2 mb-2">
+        <input id="newTagInput" placeholder="Create new tag (e.g., #project)" class="input-field flex-1">
         <button class="btn" onclick="UI.createNewTag()">Add Tag</button>
       </div>
-      <div style="font-size:11px;color:var(--muted);">Tags are automatically created when you use #hashtags in notes</div>
+      <div class="text-xs text-muted">Tags are automatically created when you use #hashtags in notes</div>
     </div>
 
-    <div style="display:flex;gap:16px;">
-      <div style="flex:1;">
-        <h4>All Tags <span id="totalTagCount" class="badge">0</span></h4>
-        <div id="allTagsList" style="max-height:300px;overflow:auto;border:1px solid #1a2133;border-radius:8px;padding:8px;"></div>
+    <div class="flex gap-4">
+      <div class="flex-1">
+        <h4 class="text-lg font-medium mb-2">All Tags <span id="totalTagCount" class="badge">0</span></h4>
+        <div id="allTagsList" class="max-h-72 overflow-auto border border-card-border rounded-lg p-2"></div>
       </div>
       
-      <div style="flex:1;">
-        <h4>Tag Details</h4>
-        <div id="tagDetails" style="border:1px solid #1a2133;border-radius:8px;padding:12px;min-height:200px;">
-          <div style="color:var(--muted);text-align:center;padding:40px 0;">Select a tag to view details</div>
+      <div class="flex-1">
+        <h4 class="text-lg font-medium mb-2">Tag Details</h4>
+        <div id="tagDetails" class="border border-card-border rounded-lg p-3 min-h-48">
+          <div class="text-muted text-center py-10">Select a tag to view details</div>
         </div>
       </div>
     </div>
 
-    <div style="margin-top:16px;display:flex;gap:8px;">
+    <div class="mt-4 flex gap-2">
       <button class="btn" onclick="UI.exportTags()">Export Tags</button>
-      <button class="btn" onclick="UI.cleanupUnusedTags()" style="background:#2d1b1b;color:#ef476f;">Cleanup Unused</button>
-      <button class="btn" onclick="el('#tagsModal').close()" style="margin-left:auto;">Close</button>
+      <button class="btn bg-red-900 text-danger border-red-800" onclick="UI.cleanupUnusedTags()">Cleanup Unused</button>
+      <button class="btn ml-auto" onclick="el('#tagsModal').close()">Close</button>
     </div>
   </div>
 </dialog>
 
 <!-- Graph Visualization Modal -->
-<dialog id="graphModal">
-  <div class="card" style="padding:16px;min-width:800px;max-height:80vh;">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <h3 style="margin:0;">Knowledge Graph</h3>
-      <button class="btn" onclick="el('#graphModal').close()" style="padding:4px 8px;">×</button>
+<dialog id="graphModal" class="backdrop:bg-black backdrop:bg-opacity-50 bg-transparent border-none p-0">
+  <div class="card p-4 min-w-[800px] max-h-[80vh]">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="m-0 text-xl font-semibold text-text">Knowledge Graph</h3>
+      <button class="btn px-2 py-1" onclick="el('#graphModal').close()">×</button>
     </div>
     
-    <div style="margin-bottom:16px;">
-      <div style="display:flex;gap:8px;">
+    <div class="mb-4">
+      <div class="flex gap-2">
         <button class="btn" onclick="UI.renderGraph()">Refresh Graph</button>
         <button class="btn" onclick="UI.centerGraph()">Center View</button>
         <button class="btn" onclick="UI.exportGraph()">Export Image</button>
       </div>
     </div>
 
-    <div id="graphContainer" style="width:100%;height:500px;border:1px solid #1a2133;border-radius:8px;background:#0b0f18;">
-      <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);">
+    <div id="graphContainer" class="w-full h-[500px] border border-card-border rounded-lg bg-card-bg">
+      <div class="flex items-center justify-center h-full text-muted">
         Graph will render here
       </div>
     </div>
 
-    <div style="margin-top:16px;">
+    <div class="mt-4">
       <button class="btn" onclick="el('#graphModal').close()">Close</button>
     </div>
   </div>
 </dialog>
 
-<dialog id="settings">
-  <form method="dialog" class="card" style="padding:16px;min-width:420px">
-    <h3>Settings</h3>
-    <label class="small">Auto-link on save: <input id="autoLink" type="checkbox" checked></label>
-    <label class="small">Enable analytics: <input id="enableAnalytics" type="checkbox" checked></label>
-    <label class="small">Realtime multi-tab sync: <input id="enableBC" type="checkbox" checked></label>
-    <hr class="sep"/>
+<dialog id="settings" class="backdrop:bg-black backdrop:bg-opacity-50 bg-transparent border-none p-0">
+  <form method="dialog" class="card p-4 min-w-[420px]">
+    <h3 class="text-xl font-semibold text-text mb-4">Settings</h3>
+    <label class="flex items-center justify-between py-2 text-sm">
+      <span>Auto-link on save:</span>
+      <input id="autoLink" type="checkbox" checked class="ml-2">
+    </label>
+    <label class="flex items-center justify-between py-2 text-sm">
+      <span>Enable analytics:</span>
+      <input id="enableAnalytics" type="checkbox" checked class="ml-2">
+    </label>
+    <label class="flex items-center justify-between py-2 text-sm">
+      <span>Realtime multi-tab sync:</span>
+      <input id="enableBC" type="checkbox" checked class="ml-2">
+    </label>
+    <hr class="border-border my-4"/>
     <button class="btn" value="cancel">Close</button>
   </form>
 </dialog>

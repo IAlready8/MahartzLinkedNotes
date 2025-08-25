@@ -1,0 +1,154 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom component classes for complex elements that need multiple utilities */
+@layer components {
+  .app-grid {
+    @apply h-full grid;
+    grid-template-columns: 300px 1fr 360px;
+    grid-template-rows: 48px 1fr;
+    grid-template-areas: 
+      "top top top"
+      "left main right";
+  }
+  
+  .topbar {
+    @apply grid-area-top flex items-center gap-2 px-3 py-2 bg-panel shadow-app sticky top-0 z-10;
+  }
+  
+  .sidebar-left {
+    @apply grid-area-left border-r border-border bg-panel overflow-auto;
+  }
+  
+  .main-content {
+    @apply grid-area-main grid grid-cols-2 gap-2 p-2;
+  }
+  
+  .sidebar-right {
+    @apply grid-area-right border-l border-border bg-panel overflow-auto;
+  }
+  
+  .card {
+    @apply bg-card-bg border border-card-border rounded-app shadow-app overflow-hidden flex flex-col;
+  }
+  
+  .card-header {
+    @apply m-0 p-3 border-b border-card-border bg-editor-header;
+  }
+  
+  .btn {
+    @apply bg-btn-bg border border-btn-border rounded-lg text-text px-3 py-2 cursor-pointer hover:border-btn-hover transition-colors;
+  }
+  
+  .input-field {
+    @apply bg-input-bg text-text border border-input-border rounded-lg px-3 py-2 focus:outline-none focus:border-accent;
+  }
+  
+  .search-input {
+    @apply flex-1 bg-input-bg text-text border border-input-border rounded-lg px-3 py-2.5 focus:outline-none focus:border-accent;
+  }
+  
+  .editor-textarea {
+    @apply w-full h-full bg-transparent border-none text-text outline-none resize-none font-mono text-sm leading-relaxed;
+  }
+  
+  .tag {
+    @apply inline-block bg-tag-bg border border-tag-border text-blue-200 px-2 py-1 rounded-full m-0.5 text-xs cursor-pointer hover:bg-opacity-80 transition-colors;
+  }
+  
+  .badge {
+    @apply bg-gray-800 border border-gray-600 text-blue-200 px-1.5 py-0.5 rounded ml-1.5 text-xs;
+  }
+  
+  .link {
+    @apply text-link no-underline border-b border-dashed border-link-border transition-all duration-200 hover:text-link-hover hover:border-link-hover;
+  }
+  
+  .link-id {
+    @apply text-link-id border-link-id;
+  }
+  
+  .section {
+    @apply p-3 border-b border-border;
+  }
+  
+  .kpi-grid {
+    @apply grid grid-cols-3 gap-2;
+  }
+  
+  .kpi-box {
+    @apply bg-card-bg border border-card-border rounded-xl p-2.5 text-center;
+  }
+  
+  .code-block {
+    @apply font-mono bg-code-bg border border-card-border rounded-lg p-2 overflow-auto;
+  }
+}
+
+/* Additional component styles for complex interactions */
+@layer components {
+  .toast {
+    @apply fixed bottom-4 right-4 bg-success text-white px-4 py-2 rounded-lg shadow-app transform translate-y-full opacity-0 transition-all duration-300;
+  }
+  
+  .toast.show {
+    @apply translate-y-0 opacity-100;
+  }
+  
+  .search-suggestions {
+    @apply absolute top-full left-0 right-0 bg-card-bg border border-card-border rounded-lg mt-1 max-h-48 overflow-auto z-20;
+  }
+  
+  .link-id {
+    @apply text-link-id border-link-id;
+  }
+  
+  /* Enhanced tag styles with categories */
+  .tag-category-content { @apply bg-blue-900 border-blue-600 text-blue-200; }
+  .tag-category-method { @apply bg-green-900 border-green-600 text-green-200; }
+  .tag-category-project { @apply bg-yellow-900 border-yellow-600 text-yellow-200; }
+  .tag-category-meta { @apply bg-purple-900 border-purple-600 text-purple-200; }
+  .tag-category-domain { @apply bg-red-900 border-red-600 text-red-200; }
+  .tag-category-status { @apply bg-gray-900 border-gray-600 text-gray-200; }
+  .tag-category-priority { @apply bg-red-900 border-red-700 text-red-200; }
+  .tag-category-source { @apply bg-emerald-900 border-emerald-600 text-emerald-200; }
+  
+  /* AI showcase specific styles */
+  .ai-tag { @apply bg-cyan-900 border-cyan-600 text-cyan-200; }
+  
+  /* Preview area styles */
+  .preview {
+    @apply prose prose-invert max-w-none;
+  }
+}
+
+/* Theme switching utilities */
+@layer utilities {
+  .theme-light {
+    --tw-bg-opacity: 1;
+    --bg: 255 255 255;
+    --panel: 248 249 250;
+    --muted: 108 117 125;
+    --text: 33 37 41;
+    --accent: 13 110 253;
+    --accent-2: 111 66 193;
+    --success: 25 135 84;
+    --warning: 255 193 7;
+    --danger: 220 53 69;
+    --border: 222 226 230;
+  }
+  
+  .theme-solarized {
+    --bg: 0 43 54;
+    --panel: 7 54 66;
+    --muted: 88 110 117;
+    --text: 253 246 227;
+    --accent: 42 161 152;
+    --accent-2: 108 113 196;
+    --success: 133 153 0;
+    --warning: 181 137 0;
+    --danger: 220 50 47;
+    --border: 88 110 117;
+  }
+}
