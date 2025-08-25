@@ -1,0 +1,156 @@
+/* Presentation Mode Styles */
+
+.presentation-view {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.presentation-header {
+  background: #0f1115;
+  border-bottom: 1px solid #1f2434;
+  padding: 20px;
+  text-align: center;
+}
+
+.presentation-header h1 {
+  color: #6ee7ff;
+  margin: 0 0 10px 0;
+}
+
+.presentation-meta {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.presentation-content {
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+}
+
+.presentation-slide {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #151922;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  display: none;
+}
+
+.presentation-slide:first-child {
+  display: block;
+}
+
+.presentation-slide h2 {
+  color: #9a7cff;
+  border-bottom: 1px solid #1f2434;
+  padding-bottom: 10px;
+  margin-top: 0;
+}
+
+.slide-content {
+  line-height: 1.6;
+}
+
+.slide-content h3 {
+  color: #ffd166;
+}
+
+.slide-content ul, .slide-content ol {
+  margin-left: 20px;
+}
+
+.slide-content li {
+  margin-bottom: 8px;
+}
+
+.slide-content blockquote {
+  border-left: 4px solid #9a7cff;
+  padding-left: 16px;
+  margin: 16px 0;
+  color: #8b93a5;
+  background: #0b0f1815;
+  padding: 8px 16px;
+  border-radius: 0 8px 8px 0;
+}
+
+.slide-content code {
+  background: #0b0f18;
+  border: 1px solid #1a2133;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+}
+
+.presentation-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background: #0f1115;
+  border-top: 1px solid #1f2434;
+}
+
+#slideCounter {
+  font-size: 14px;
+  color: #8b93a5;
+}
+
+/* Modal styles for presentation */
+#presentationModal .modal-content {
+  background: #0f1115;
+  border: 1px solid #1f2434;
+  border-radius: 8px;
+}
+
+#presentationModal .modal-header {
+  background: #0f1115;
+  border-bottom: 1px solid #1f2434;
+  padding: 16px;
+}
+
+#presentationModal .modal-header h2 {
+  color: #e7ecf5;
+  margin: 0;
+}
+
+#presentationModal .modal-close {
+  background: none;
+  border: none;
+  color: #8b93a5;
+  font-size: 24px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+#presentationModal .modal-close:hover {
+  background: #111624;
+  color: #e7ecf5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .presentation-controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .presentation-slide {
+    padding: 15px;
+  }
+  
+  .presentation-header {
+    padding: 15px;
+  }
+}

@@ -1,0 +1,40 @@
+/* Competitive Importers Styles */
+
+.import-platforms {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.platform-option {
+  background: #0b0f18;
+  border: 1px solid #1a2133;
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.platform-option:hover {
+  border-color: var(--acc);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.platform-name {
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.platform-description {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.platform-extension {
+  font-size: 12px;
+  color: var(--accent);
+}
