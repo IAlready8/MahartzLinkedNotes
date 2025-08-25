@@ -29,6 +29,9 @@ const AIKnowledgeDiscovery = {
   
   // Add discovery button to the UI
   addDiscoveryButton() {
+    // Check if button already exists
+    if (document.getElementById('discoveryBtn')) return;
+    
     // Add to the topbar
     const topbar = document.querySelector('.topbar');
     if (topbar) {

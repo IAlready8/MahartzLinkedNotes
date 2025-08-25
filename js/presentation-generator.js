@@ -9,6 +9,9 @@ const PresentationGenerator = {
   
   // Add presentation mode button to the UI
   addPresentationButton() {
+    // Check if button already exists
+    if (document.getElementById('presentationBtn')) return;
+    
     // Add to the topbar
     const topbar = document.querySelector('.topbar');
     if (topbar) {

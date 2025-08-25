@@ -785,7 +785,7 @@ See [[AI Project Showcase]]
           .replace(/^### (.+)$/gm, '<h3>$1</h3>')
           .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
           .replace(/\*(.+?)\*/g, '<em>$1</em>')
-          .replace(/\[\[([^\]]+)\]\]/g, '<a class="link" href="#" onclick="UI.followWiki(\'$1\')">$1</a>')
+          .replace(/\[\[([^\]]+)\]\]/g, '<a class="link" href="#" data-wikilink="$1" onclick="UI.followWiki(\'$1\')">$1</a>')
           .replace(/(^|\s)(#[a-z0-9_\-]+)/gi, '$1<span class="tag" style="color: var(--acc); background: var(--acc)20; padding: 2px 6px; border-radius: 12px; border: 1px solid var(--acc);">$2</span>')
           .replace(/\n/g, '<br>');
         

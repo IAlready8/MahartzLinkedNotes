@@ -111,6 +111,9 @@ const DynamicDashboards = {
   
   // Add dashboard button to the UI
   addDashboardButton() {
+    // Check if button already exists
+    if (document.getElementById('dashboardBtn')) return;
+    
     // Add to the topbar
     const topbar = document.querySelector('.topbar');
     if (topbar) {

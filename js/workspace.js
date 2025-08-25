@@ -122,6 +122,9 @@ const Workspace = {
     const topbar = document.querySelector('.topbar');
     if (!topbar) return;
     
+    // Check if workspace selector already exists
+    if (document.getElementById('workspaceBtn')) return;
+    
     // Create workspace selector
     const workspaceSelector = document.createElement('div');
     workspaceSelector.className = 'workspace-selector';

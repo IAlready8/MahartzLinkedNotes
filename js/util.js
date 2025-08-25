@@ -68,7 +68,8 @@ const renderMD = (md) => {
     const t = p1.trim();
     const isIdLink = t.toLowerCase().startsWith('id:');
     const linkClass = isIdLink ? 'link id-link' : 'link title-link';
-    return `<a class="${linkClass}" data-wikilink="${encodeURIComponent(t)}" title="Open: ${t}">[[${t}]]</a>`;
+    const displayText = isIdLink ? t.substring(3) : t; // Remove 'id:' prefix for display
+    return `<a class="${linkClass}" data-wikilink="${encodeURIComponent(t)}" title="Open: ${t}">${displayText}</a>`;
   });
   
   // Enhanced tag rendering with dynamic colors and better styling

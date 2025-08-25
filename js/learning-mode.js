@@ -34,6 +34,9 @@ const LearningMode = {
   
   // Add learning mode selector to the UI
   addModeSelector() {
+    // Check if selector already exists
+    if (document.getElementById('learningModeSelect')) return;
+    
     // Add to the topbar
     const topbar = document.querySelector('.topbar');
     if (topbar) {
