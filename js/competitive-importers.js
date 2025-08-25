@@ -246,9 +246,3 @@ const CompetitiveImporters = {
   }
 };
 
-// Initialize when DOM is loaded
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => CompetitiveImporters.init());
-} else {
-  CompetitiveImporters.init();
-}

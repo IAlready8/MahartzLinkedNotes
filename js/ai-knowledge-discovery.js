@@ -419,9 +419,3 @@ const AIKnowledgeDiscovery = {
   }
 };
 
-// Initialize when DOM is loaded
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => AIKnowledgeDiscovery.init());
-} else {
-  AIKnowledgeDiscovery.init();
-}

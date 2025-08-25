@@ -51,6 +51,30 @@ const UI = {
       if (typeof Themes !== 'undefined') {
         await Themes.init();
       }
+
+      // Initialize new features
+      if (typeof PresentationGenerator !== 'undefined') {
+        PresentationGenerator.init();
+      }
+      if (typeof SmartTemplates !== 'undefined') {
+        SmartTemplates.init();
+      }
+      if (typeof LearningMode !== 'undefined') {
+        LearningMode.init();
+      }
+      if (typeof ThemeEditor !== 'undefined') {
+        ThemeEditor.init();
+      }
+      if (typeof CompetitiveImporters !== 'undefined') {
+        CompetitiveImporters.init();
+      }
+      if (typeof DynamicDashboards !== 'undefined') {
+        DynamicDashboards.init();
+      }
+      if (typeof AIKnowledgeDiscovery !== 'undefined') {
+        AIKnowledgeDiscovery.init();
+      }
+
       // seed if empty
       const notes = await Store.allNotes();
       if(!notes.length) await this.seed();

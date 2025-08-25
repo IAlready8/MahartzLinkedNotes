@@ -150,9 +150,3 @@ const LearningMode = {
   }
 };
 
-// Initialize when DOM is loaded
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => LearningMode.init());
-} else {
-  LearningMode.init();
-}

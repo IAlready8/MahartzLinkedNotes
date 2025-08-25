@@ -356,9 +356,3 @@ See [[AI Project Showcase]]`
   }
 };
 
-// Initialize when DOM is loaded
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => SmartTemplates.init());
-} else {
-  SmartTemplates.init();
-}

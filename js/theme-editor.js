@@ -224,9 +224,3 @@ const ThemeEditor = {
   }
 };
 
-// Initialize when DOM is loaded
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => ThemeEditor.init());
-} else {
-  ThemeEditor.init();
-}
