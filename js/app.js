@@ -260,122 +260,6 @@ See [[AI Project Showcase]]
     await Store.saveNotes(all);
     await Store.log({id:ULID(),evt:'seed',t:Date.now()});
   },
-    
-    const b = Note.create({title:'Neural Canvas Details', tags:['#art','#generative','#neural'], body: `
-# Neural Canvas Details
-
-Neural Canvas is an innovative AI-powered creative tool that transforms natural language descriptions into unique digital artwork.
-
-## Key Features
-<div class="ai-project-features">
-
-- **Natural Language Interface**: Describe what you want to see in plain English
-- **Style Transfer**: Apply artistic styles from famous painters to your creations
-- **Real-time Generation**: See your ideas come to life instantly
-- **Community Gallery**: Share and explore artwork from other users
-</div>
-
-## Technical Highlights
-<div class="ai-project-highlights">
-
-- Utilizes state-of-the-art diffusion models
-- Custom-trained on a diverse dataset of artistic styles
-- Optimized for real-time performance on consumer hardware
-</div>
-
-Tags: #ai #art #generative #neural
-See [[AI Project Showcase]]
-`});
-    b.id = 'seed-neural-canvas';
-    
-    const c = Note.create({title:'Code Synth Details', tags:['#development','#automation','#coding'], body: `
-# Code Synth Details
-
-Code Synth is an AI assistant that revolutionizes software development by generating entire applications from simple descriptions.
-
-## Key Features
-<div class="ai-project-features">
-
-- **High-level Description Parsing**: Understands complex project requirements
-- **Multi-language Support**: Generates code in JavaScript, Python, Java, and more
-- **Auto-documentation**: Creates comprehensive documentation for generated code
-- **Integration Ready**: Seamlessly integrates with popular development tools
-</div>
-
-## Technical Highlights
-<div class="ai-project-highlights">
-
-- Built on large language models specifically trained on codebases
-- Utilizes advanced prompt engineering for accurate code generation
-- Includes security and best practices validation
-</div>
-
-Tags: #ai #development #automation #coding
-See [[AI Project Showcase]]
-`});
-    c.id = 'seed-code-synth';
-    
-    const d = Note.create({title:'Mind Mapper Details', tags:['#visualization','#learning','#organization'], body: `
-# Mind Mapper Details
-
-Mind Mapper is an AI that creates visual mind maps from complex topics and ideas, helping users organize and understand information more effectively.
-
-## Key Features
-<div class="ai-project-features">
-
-- **Topic Analysis**: Automatically identifies key concepts and relationships
-- **Visual Hierarchy**: Creates intuitive visual structures for complex information
-- **Interactive Exploration**: Navigate through concepts with dynamic visualizations
-- **Export Options**: Share mind maps in various formats
-</div>
-
-## Technical Highlights
-<div class="ai-project-highlights">
-
-- Employs natural language processing for concept extraction
-- Uses graph theory algorithms for optimal layout
-- Adapts to different domains and knowledge areas
-</div>
-
-Tags: #ai #visualization #learning #organization
-See [[AI Project Showcase]]
-`});
-    d.id = 'seed-mind-mapper';
-    
-    const e = Note.create({title:'Workflow Guide', tags:['#guide'], body: `
-# Workflow Guide
-
-1. Create note (⌘/Ctrl+N)
-2. Title, write short atomic idea
-3. Link to parent/sibling [[AI Project Showcase]]
-4. Add 2+ links to strengthen graph
-5. Use #tags for quick slicing and organization
-`});
-    e.id = 'seed-workflow';
-    
-    const f = Note.create({title:'Analytics Playbook', tags:['#analytics','#metrics'], body: `
-# Analytics Playbook
-
-- Effectiveness: % notes with ≥2 links
-- Link density: avg links/note
-- Momentum: notes updated/day (14d)
-- Usage: create/edit/open events
-
-For AI projects, also track:
-- Conceptual coherence in generated content
-- User engagement with AI-generated artifacts
-- Cross-project knowledge connections
-
-See [[AI Project Showcase]]
-`});
-    f.id = 'seed-analytics';
-    
-    const all = [a,b,c,d,e,f];
-    // compute links
-    for(const n of all) Note.computeLinks(n, all);
-    await Store.saveNotes(all);
-    await Store.log({id:ULID(),evt:'seed',t:Date.now()});
-  },
   async createFallbackNote() {
     try {
       const note = Note.create({
@@ -424,8 +308,8 @@ See [[AI Project Showcase]]
     });
   },
   bind(){
-    // Wait for elements to be available
-    setTimeout(() => {
+    // More robust element binding with retry mechanism
+    const bindElements = () => {
       const newNoteBtn = el('#newNote');
       const templateBtn = el('#templateBtn');
       const templateMenu = el('#templateMenu');
@@ -442,6 +326,14 @@ See [[AI Project Showcase]]
       const enableAnalytics = el('#enableAnalytics');
       const enableBC = el('#enableBC');
       
+      // Check if critical elements are available
+      if (!newNoteBtn || !saveNoteBtn || !editor) {
+        console.log('Critical UI elements not ready, retrying...');
+        setTimeout(bindElements, 50);
+        return;
+      }
+      
+      // Bind buttons
       if (newNoteBtn) newNoteBtn.onclick=()=>this.newNote();
       if (templateBtn) {
         templateBtn.onclick = (e) => {
@@ -585,7 +477,12 @@ See [[AI Project Showcase]]
           DataManagement.showSyncModal();
         }
       };
-    }, 100);
+      
+      console.log('UI elements bound successfully');
+    };
+    
+    // Start binding process
+    bindElements();
   },
   async refresh(){
     try {
@@ -819,33 +716,60 @@ See [[AI Project Showcase]]
     
     const md = editor.value;
     
-    // Skip update if content hasn't changed
-    if (this.lastPreviewContent === md) {
-      return;
-    }
-    this.lastPreviewContent = md;
-    
     try {
+      // Always update preview regardless of content change to ensure consistency
+      this.lastPreviewContent = md;
+      
+      // Clear preview first to ensure clean state
+      preview.innerHTML = '';
+      
       // Use the live preview function with enhanced features
       if (typeof livePreviewDebounced !== 'undefined') {
-        livePreviewDebounced(md, preview);
+        // Call immediately without debounce for more responsive preview
+        const rendered = typeof renderMD !== 'undefined' ? renderMD(md) : `<p>${md.replace(/\n/g, '<br>')}</p>`;
+        
         // Apply AI project showcase styles after rendering
-        setTimeout(() => {
-          const titles = preview.querySelectorAll('h1');
-          titles.forEach(title => title.classList.add('ai-project-title'));
+        let styledHtml = rendered;
+        styledHtml = styledHtml.replace(/<h1>/g, '<h1 class="ai-project-title">');
+        styledHtml = styledHtml.replace(/<div class="preview">/g, '<div class="preview ai-showcase">');
+        
+        preview.innerHTML = styledHtml;
+        
+        // Apply AI showcase class to preview container
+        preview.classList.add('ai-showcase');
+        
+        // Add click handlers to project buttons
+        const projectButtons = preview.querySelectorAll('.project-btn');
+        projectButtons.forEach(button => {
+          // Remove existing event listeners to prevent duplicates
+          const newButton = button.cloneNode(true);
+          button.parentNode.replaceChild(newButton, button);
           
-          preview.classList.add('ai-showcase');
-          
-          // Add click handlers to project buttons
-          const projectButtons = preview.querySelectorAll('.project-btn');
-          projectButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-              const noteId = e.target.getAttribute('onclick').match(/'([^']+)'/)[1];
-              this.openNote(noteId);
-            });
+          newButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            const onclickAttr = newButton.getAttribute('onclick');
+            if (onclickAttr) {
+              const noteIdMatch = onclickAttr.match(/'([^']+)'/);
+              if (noteIdMatch && noteIdMatch[1]) {
+                this.openNote(noteIdMatch[1]);
+              }
+            }
           });
-        }, 10);
-        console.log('Live preview updated with livePreviewDebounced');
+        });
+        
+        // Add click handlers for links
+        const links = preview.querySelectorAll('a.link');
+        links.forEach(link => {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const token = decodeURIComponent(link.dataset.wikilink);
+            if (typeof UI !== 'undefined' && UI.followWiki) {
+              UI.followWiki(token);
+            }
+          });
+        });
+        
+        console.log('Live preview updated with renderMD');
       } else if (typeof renderMD !== 'undefined') {
         let html = renderMD(md);
         // Apply AI project showcase styles

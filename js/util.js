@@ -123,11 +123,15 @@ const livePreviewDebounced = debounce((content, previewElement) => {
     
     // Add click handlers for enhanced tags
     previewElement.querySelectorAll('.enhanced-tag').forEach(tag => {
-      tag.addEventListener('mouseenter', (e) => {
+      // Remove existing event listeners to prevent duplicates
+      const newTag = tag.cloneNode(true);
+      tag.parentNode.replaceChild(newTag, tag);
+      
+      newTag.addEventListener('mouseenter', (e) => {
         e.target.style.transform = 'translateY(-1px)';
         e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
       });
-      tag.addEventListener('mouseleave', (e) => {
+      newTag.addEventListener('mouseleave', (e) => {
         e.target.style.transform = 'translateY(0)';
         e.target.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
       });
@@ -135,9 +139,13 @@ const livePreviewDebounced = debounce((content, previewElement) => {
     
     // Ensure wikilink clicks are handled
     previewElement.querySelectorAll('a.link').forEach(link => {
-      link.addEventListener('click', (e) => {
+      // Remove existing event listeners to prevent duplicates
+      const newLink = link.cloneNode(true);
+      link.parentNode.replaceChild(newLink, link);
+      
+      newLink.addEventListener('click', (e) => {
         e.preventDefault();
-        const token = decodeURIComponent(link.dataset.wikilink);
+        const token = decodeURIComponent(newLink.dataset.wikilink);
         if (typeof UI !== 'undefined' && UI.followWiki) {
           UI.followWiki(token);
         }
