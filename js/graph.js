@@ -18,6 +18,7 @@ const Graph = {
     // Performance optimization: limit nodes if dataset is too large
     const opts = {...this.renderOptions, ...options};
     let processedNotes = notes;
+    const linkMode = opts.linkMode || 'tags';
     
     if (notes.length > opts.maxNodes) {
       console.warn(`Large dataset detected (${notes.length} notes). Limiting to ${opts.maxNodes} most connected nodes.`);
@@ -27,18 +28,42 @@ const Graph = {
         .slice(0, opts.maxNodes);
     }
     
-    // Optimized relationship strength calculation using processed notes
+    // Generate links based on mode
     const processedIds = new Set(processedNotes.map(n=>n.id));
     const linkStrength = new Map();
     
-    processedNotes.forEach(note => {
-      (note.links || []).forEach(targetId => {
-        if (processedIds.has(targetId)) {
-          const key = [note.id, targetId].sort().join('-');
-          linkStrength.set(key, (linkStrength.get(key) || 0) + 1);
+    if (linkMode === 'colors') {
+      // Color-based linking: connect notes with the same color
+      const colorGroups = new Map();
+      processedNotes.forEach(note => {
+        const color = note.color || '#6B7280';
+        if (!colorGroups.has(color)) {
+          colorGroups.set(color, []);
+        }
+        colorGroups.get(color).push(note.id);
+      });
+
+      colorGroups.forEach(nodeIds => {
+        if (nodeIds.length > 1) {
+          for (let i = 0; i < nodeIds.length; i++) {
+            for (let j = i + 1; j < nodeIds.length; j++) {
+              const key = [nodeIds[i], nodeIds[j]].sort().join('-');
+              linkStrength.set(key, 2); // Strong connection for same color
+            }
+          }
         }
       });
-    });
+    } else {
+      // Tag-based linking (original logic)
+      processedNotes.forEach(note => {
+        (note.links || []).forEach(targetId => {
+          if (processedIds.has(targetId)) {
+            const key = [note.id, targetId].sort().join('-');
+            linkStrength.set(key, (linkStrength.get(key) || 0) + 1);
+          }
+        });
+      });
+    }
     
     // Optimized node creation with degree calculation
     const degreeMap = new Map();
@@ -51,36 +76,24 @@ const Graph = {
       label: (n.title && n.title.length > 20) ? n.title.substring(0, 17) + '...' : (n.title || n.id), 
       deg: degreeMap.get(n.id) || 0,
       tags: n.tags || [],
+      color: n.color || '#6B7280',
       // Add node properties for better visualization
-      group: this.getNodeGroup(n),
+      group: linkMode === 'colors' ? n.color : this.getNodeGroup(n),
       size: Math.max(3, Math.min(12, (degreeMap.get(n.id) || 0) + 3)),
       importance: this.calculateNodeImportance(n, processedNotes)
     }));
     
-    // Optimized link creation with limit
+    // Create links based on linkStrength map (generated above)
     const links = [];
-    const linkSet = new Set(); // Prevent duplicate links
-    
-    for(const n of processedNotes) {
-      if (links.length >= opts.maxLinks) break;
-      
-      for(const t of (n.links||[])) {
-        if(processedIds.has(t)) {
-          const linkId = [n.id, t].sort().join('-');
-          if (!linkSet.has(linkId)) {
-            linkSet.add(linkId);
-            const strength = linkStrength.get(linkId) || 1;
-            links.push({
-              source: n.id, 
-              target: t, 
-              strength: strength,
-              type: this.getRelationshipType(n, processedNotes.find(note => note.id === t)),
-              value: strength // For D3 force simulation
-            });
-          }
-        }
-      }
-    }
+    linkStrength.forEach((strength, linkId) => {
+      const [sourceId, targetId] = linkId.split('-');
+      links.push({
+        source: sourceId,
+        target: targetId,
+        strength,
+        value: Math.min(strength * 2, 10)
+      });
+    });
     
     const svg = d3.select(container).append('svg').attr('width', w).attr('height', h);
     const sim = d3.forceSimulation(nodes)
@@ -227,7 +240,12 @@ const Graph = {
   
   // Get color for node based on properties
   getNodeColor(node) {
-    // Color based on number of connections
+    // Use the note's assigned color if available
+    if (node.color) {
+      return node.color;
+    }
+    
+    // Fallback to connection-based coloring
     if (node.deg >= 5) return '#ef476f'; // Highly connected - red
     if (node.deg >= 3) return '#6ee7ff'; // Well connected - blue
     if (node.deg >= 1) return '#00d18f'; // Connected - green

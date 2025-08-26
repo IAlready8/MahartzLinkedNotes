@@ -64,69 +64,10 @@ const UI = {
 
   async initGraphPage() {
     console.log('Initializing Graph Page...');
-    this.bindGraphPageEvents();
-    await this.renderGraph();
-  },
-
-  bindGraphPageEvents() {
-    const linkByTags = el('#linkByTags');
-    const linkByColors = el('#linkByColors');
-
-    if(linkByTags) {
-      linkByTags.onclick = () => {
-        this.setGraphLinkMode('tags');
-        this.renderGraph();
-      };
-    }
-
-    if(linkByColors) {
-      linkByColors.onclick = () => {
-        this.setGraphLinkMode('colors');
-        this.renderGraph();
-      };
-    }
-  },
-
-  setGraphLinkMode(mode) {
-    this.state.graphLinkMode = mode;
-    localStorage.setItem('graphLinkMode', mode);
-
-    // Update button styles
-    const linkByTags = el('#linkByTags');
-    const linkByColors = el('#linkByColors');
-
-    if(mode === 'tags') {
-      if(linkByTags) {
-        linkByTags.className = 'px-3 py-1 rounded text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors';
-      }
-      if(linkByColors) {
-        linkByColors.className = 'px-3 py-1 rounded text-sm font-medium text-gray-300 hover:bg-gray-600 transition-colors';
-      }
-    } else {
-      if(linkByTags) {
-        linkByTags.className = 'px-3 py-1 rounded text-sm font-medium text-gray-300 hover:bg-gray-600 transition-colors';
-      }
-      if(linkByColors) {
-        linkByColors.className = 'px-3 py-1 rounded text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors';
-      }
-    }
-  },
-
-  async renderGraph() {
     const notes = await Store.allNotes();
     const graphContainer = el('#graphContainer');
-    
-    if (!graphContainer) return;
-
-    // Initialize graph link mode from storage
-    if (!this.state.graphLinkMode) {
-      this.state.graphLinkMode = localStorage.getItem('graphLinkMode') || 'tags';
-      this.setGraphLinkMode(this.state.graphLinkMode);
-    }
-
-    if (typeof Graph !== 'undefined') {
-        const linkMode = this.state.graphLinkMode || 'tags';
-        Graph.render(graphContainer, notes, { linkMode });
+    if (graphContainer && typeof Graph !== 'undefined') {
+        Graph.render(graphContainer, notes);
     } else {
         graphContainer.innerHTML = '<p class="text-center text-gray-400">Graph library not loaded or container not found.</p>';
     }
@@ -157,7 +98,7 @@ const UI = {
     window.addEventListener('keydown', (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') { 
         e.preventDefault(); 
-        if(window.location.hash === '#/' || window.location.hash === ''){
+        if(window.location.hash === '#/){
             this.save(); 
         }
       }
@@ -165,79 +106,12 @@ const UI = {
   },
 
   bindHomePageEvents() {
-    const saveBtn = el('#saveNoteInline');
-    const editor = el('#editor');
-    const title = el('#title');
-    
-    if(saveBtn) saveBtn.onclick = () => this.save();
-    if(editor) {
-      editor.addEventListener('input', debounce(() => {
-        const dirty = el('#dirty');
-        if(dirty) dirty.classList.remove('hidden');
+    el('#saveNoteInline').onclick = () => this.save();
+    el('#editor').addEventListener('input', debounce(() => {
+        el('#dirty').classList.remove('hidden');
         this.renderPreviewLive();
-      }, 250));
-    }
-    if(title) {
-      title.addEventListener('input', () => { 
-        const dirty = el('#dirty');
-        if(dirty) dirty.classList.remove('hidden');
-      });
-    }
-
-    // Color picker functionality
-    this.bindColorPicker();
-  },
-
-  bindColorPicker() {
-    const colorButton = el('#noteColorButton');
-    const colorMenu = el('#colorPickerMenu');
-    const colorOptions = els('.color-option');
-
-    if(colorButton) {
-      colorButton.onclick = (e) => {
-        e.stopPropagation();
-        colorMenu.classList.toggle('hidden');
-      };
-    }
-
-    // Close menu when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!colorMenu.contains(e.target) && !colorButton.contains(e.target)) {
-        colorMenu.classList.add('hidden');
-      }
-    });
-
-    // Handle color selection
-    colorOptions.forEach(option => {
-      option.onclick = (e) => {
-        e.stopPropagation();
-        const newColor = option.dataset.color;
-        this.setNoteColor(newColor);
-        colorMenu.classList.add('hidden');
-      };
-    });
-  },
-
-  async setNoteColor(color) {
-    if (!this.state.currentId) return;
-    
-    const note = await Store.get(this.state.currentId);
-    if (!note) return;
-
-    note.color = color;
-    note.updatedAt = nowISO();
-    await Store.upsert(note);
-
-    // Update the color button
-    const colorButton = el('#noteColorButton');
-    if(colorButton) colorButton.style.backgroundColor = color;
-
-    // Mark as dirty and refresh
-    const dirty = el('#dirty');
-    if(dirty) dirty.classList.remove('hidden');
-    await this.refreshHomePage();
-    if (this.bc) this.bc.postMessage({ type: 'sync' });
-    toast('Note color updated');
+    }, 250));
+    el('#title').addEventListener('input', () => { el('#dirty').classList.remove('hidden'); });
   },
   
   bindTagsPageEvents() {
@@ -246,20 +120,9 @@ const UI = {
   },
   
   bindSettingsPageEvents() {
-      const autoLink = el('#autoLink');
-      const analytics = el('#enableAnalytics');
-      const bc = el('#enableBC');
-      
-      if(autoLink) autoLink.onchange = (e) => this.state.autoLink = e.target.checked;
-      if(analytics) analytics.onchange = (e) => { 
-        this.state.analytics = e.target.checked; 
-        if(typeof Analytics !== 'undefined') Analytics.enabled = e.target.checked; 
-      };
-      if(bc) bc.onchange = (e) => { 
-        this.state.bc = e.target.checked; 
-        if(this.bc) this.bc.close(); 
-        this.bc = this.state.bc ? new BroadcastChannel('mahart-notes') : null; 
-      };
+      el('#autoLink').onchange = (e) => this.state.autoLink = e.target.checked;
+      el('#enableAnalytics').onchange = (e) => { this.state.analytics = e.target.checked; if(typeof Analytics !== 'undefined') Analytics.enabled = e.target.checked; };
+      el('#enableBC').onchange = (e) => { this.state.bc = e.target.checked; this.bc && this.bc.close(); this.bc = this.state.bc ? new BroadcastChannel('mahart-notes') : null; };
   },
 
   // --- CORE LOGIC ---
@@ -267,9 +130,9 @@ const UI = {
   async refreshCurrentPage() {
       const path = window.location.hash || '#/';
       console.log(`Refreshing page: ${path}`);
-      if (path === '#/' || path === '') await this.refreshHomePage();
+      if (path === '#/') await this.refreshHomePage();
       if (path === '#/tags') await this.renderTagManager();
-      if (path === '#/graph') await this.renderGraph();
+      if (path === '#/graph') await this.initGraphPage();
   },
 
   async refreshHomePage() {
@@ -295,14 +158,10 @@ const UI = {
 
     const titleEl = el('#title');
     const editorEl = el('#editor');
-    const colorButton = el('#noteColorButton');
-    
     if(titleEl) titleEl.value = n.title || '';
     if(editorEl) editorEl.value = n.body || '';
-    if(colorButton) colorButton.style.backgroundColor = n.color || '#6B7280';
     
-    const dirty = el('#dirty');
-    if(dirty) dirty.classList.add('hidden');
+    el('#dirty').classList.add('hidden');
     this.renderPreviewLive();
     this.renderNoteList(await Store.allNotes()); // Refresh list to show active note
   },
@@ -319,14 +178,9 @@ const UI = {
     if (!id) return;
 
     const n = await Store.get(id);
-    const titleEl = el('#title');
-    const editorEl = el('#editor');
-    
-    if(!titleEl || !editorEl) return;
-    
-    n.title = titleEl.value.trim() || '(untitled)';
-    n.body = editorEl.value;
-    n.tags = [...new Set((n.body.match(/#[a-z0-9_\-]+/gi) || []).map(t => t.toLowerCase()))];
+    n.title = el('#title').value.trim() || '(untitled)';
+    n.body = el('#editor').value;
+    n.tags = [...new Set((n.body.match(/#[a-z0-9_\-]+\/gi) || []).map(t => t.toLowerCase()))];
     
     if (this.state.autoLink) {
       const all = await Store.allNotes();
@@ -334,8 +188,7 @@ const UI = {
     }
     n.updatedAt = nowISO();
     await Store.upsert(n);
-    const dirty = el('#dirty');
-    if(dirty) dirty.classList.add('hidden');
+    el('#dirty').classList.add('hidden');
     toast('Saved');
     await this.refreshHomePage();
     if (this.bc) this.bc.postMessage({ type: 'sync' });
@@ -360,16 +213,13 @@ const UI = {
       div.onclick = () => this.openNote(n.id);
       box.appendChild(div);
     }
-    const noteCount = el('#noteCount');
-    if(noteCount) noteCount.textContent = notes.length;
+    el('#noteCount').textContent = notes.length;
   },
 
   renderPreviewLive() {
-    const editor = el('#editor');
+    const md = el('#editor')?.value;
     const preview = el('#preview');
-    if (!editor || !preview) return;
-    
-    const md = editor.value;
+    if (md === undefined || !preview) return;
     if(typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined'){
         preview.innerHTML = DOMPurify.sanitize(marked.parse(md));
     } else {
@@ -391,8 +241,7 @@ const UI = {
           div.innerHTML = `<span>${t}</span><span class="text-sm text-gray-400 bg-gray-600 px-2 rounded-full">${c}</span>`;
           tagBox.appendChild(div);
       }
-      const totalTagCount = el('#totalTagCount');
-      if(totalTagCount) totalTagCount.textContent = items.length;
+      el('#totalTagCount').textContent = items.length;
   },
   
   async createNewTagFromManager() {
@@ -408,8 +257,12 @@ const UI = {
 
   async seed() {
     console.log('Seeding database...');
-    const a = Note.create({ title: 'Welcome to Mahart Notes', tags: ['#welcome'], body: 'This is your first note. Select it from the list on the left.\n\n## Color-coded Notes\nYou can now assign colors to notes using the color button in the editor header. This helps organize your thoughts visually!', color: '#3B82F6' });
-    const b = Note.create({ title: 'How to use', tags: ['#guide'], body: '## Linking\nLink notes with [[Title]].\n\n## Tags\nAdd tags with #tags.\n\n## Graph Views\nVisit the Graph page to see your notes connected by tags or colors!', color: '#10B981' });
+    const a = Note.create({ title: 'Welcome to Mahart Notes', tags: ['#welcome'], body: 'This is your first note. Select it from the list on the left.' });
+    const b = Note.create({ title: 'How to use', tags: ['#guide'], body: '## Linking
+Link notes with [[Title]].
+
+## Tags
+Add tags with #tags.' });
     const all = [a, b];
     for (const n of all) Note.computeLinks(n, all);
     await Store.saveNotes(all);

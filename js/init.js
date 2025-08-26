@@ -30,6 +30,7 @@
             Analytics: typeof Analytics !== 'undefined',
             Graph: typeof Graph !== 'undefined',
             TagManager: typeof TagManager !== 'undefined',
+            Router: typeof Router !== 'undefined',
             UI: typeof UI !== 'undefined'
         };
         
@@ -57,7 +58,13 @@
         
         if (checkDependencies() && typeof UI !== 'undefined' && typeof UI.init === 'function') {
             console.log('Initializing Mahart Notes...');
-            UI.init().catch(error => {
+            UI.init().then(() => {
+                // Initialize router after UI is ready
+                if (typeof Router !== 'undefined') {
+                    console.log('Initializing router...');
+                    Router.init();
+                }
+            }).catch(error => {
                 console.error('App initialization failed:', error);
                 // Try to create a fallback UI
                 setTimeout(() => {

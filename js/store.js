@@ -422,9 +422,9 @@ const Store = {
 
 // Model helpers
 const Note = {
-  create({title='', body='', tags=[]}={}){
+  create({title='', body='', tags=[], color='#6B7280'}={}){
     const id = ULID();
-    return { id, title, body, tags: uniq(tags.map(t=>t.toLowerCase())), links:[], createdAt: nowISO(), updatedAt: nowISO() };
+    return { id, title, body, tags: uniq(tags.map(t=>t.toLowerCase())), links:[], color, createdAt: nowISO(), updatedAt: nowISO() };
   },
   computeLinks(note, all){
     const w = extractWikiLinks(note.body||'');

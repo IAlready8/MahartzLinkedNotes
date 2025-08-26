@@ -1,260 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Mahart Linked Notes - AI Project Showcase</title>
-  <link rel="stylesheet" href="css/styles.css"/>
-  <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
-  <style>
-    /* Custom AI showcase styles for complex gradients */
-    .ai-showcase-header {
-      background: linear-gradient(90deg, #0f1115, #151922);
-      @apply border-b border-border p-3 -m-3 mb-3 text-center;
-    }
-    
-    .ai-showcase-header h1 {
-      @apply text-accent text-3xl m-0;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahart Linked Notes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body class="bg-bg text-text font-sans h-full m-0">
-<div class="app-grid">
-  <div class="topbar">
-    <div class="flex gap-2">
-      <button id="newNote" class="btn">New Note (⌘/Ctrl+N)</button>
-    </div>
-    <button id="saveNote" class="btn">Save (⌘/Ctrl+S)</button>
-    <div class="flex-1 flex gap-2 relative">
-      <div class="flex-1 relative">
-        <input id="q" type="search" placeholder="Quick search (⌘/Ctrl+K): title, tags, body…" class="search-input" autocomplete="off"/>
-        <div id="searchSuggestions" class="search-suggestions hidden"></div>
-      </div>
-    </div>
-    <button id="tagsBtn" class="btn">Tags</button>
-    <button id="graphBtn" class="btn">Graph</button>
-    <button id="exportBtn" class="btn">Export</button>
-    <button id="importBtn" class="btn">Import</button>
-    <button id="settingsBtn" class="btn">Settings</button>
-  </div>
+<body class="bg-gray-900 text-gray-100 font-sans antialiased">
 
-  <div class="sidebar-left">
-    <div class="section">
-      <strong>Notes</strong> <span id="noteCount" class="badge">0</span>
-      <div id="noteList"></div>
-    </div>
-    <div class="section">
-      <strong>Tags</strong> <span id="tagCount" class="badge">0</span>
-      <div id="tagList"></div>
-    </div>
-    <div class="section">
-      <strong>Backlinks</strong>
-      <div id="backlinks"></div>
-    </div>
-  </div>
+    <div id="app-container" class="flex h-screen">
 
-  <div class="main-content">
-    <div class="card">
-      <h3 class="card-header flex items-center gap-2">
-        Editor <span id="dirty" class="badge hidden">unsaved</span>
-      </h3>
-      <div class="h-editor overflow-auto p-3">
-        <textarea id="editor" placeholder="# Title
+        <!-- Main Sidebar Navigation -->
+        <nav id="main-sidebar" class="w-60 bg-gray-800 text-white flex flex-col shadow-lg">
+            <div class="p-4 border-b border-gray-700">
+                <h1 class="text-xl font-bold text-center">MahartNotes</h1>
+            </div>
+            <ul class="flex-grow p-2">
+                <li class="mb-2"><a href="#/" class="flex items-center py-2 px-3 rounded hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-pencil-alt w-6 mr-3 text-center"></i>Editor</a></li>
+                <li class="mb-2"><a href="#/graph" class="flex items-center py-2 px-3 rounded hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-project-diagram w-6 mr-3 text-center"></i>Graph</a></li>
+                <li class="mb-2"><a href="#/tags" class="flex items-center py-2 px-3 rounded hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-tags w-6 mr-3 text-center"></i>Tags</a></li>
+                <li class="mb-2"><a href="#/ai" class="flex items-center py-2 px-3 rounded hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-robot w-6 mr-3 text-center"></i>AI Assistant</a></li>
+                <li class="mb-2"><a href="#/settings" class="flex items-center py-2 px-3 rounded hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-cog w-6 mr-3 text-center"></i>Settings</a></li>
+            </ul>
+            <div class="p-4 border-t border-gray-700 text-center text-xs text-gray-400">
+                Version 2.0
+            </div>
+        </nav>
 
-Write with **Markdown**.
-Link notes with [[Note Title]] or [[ID:xxxx]].
-Add tags with #tag anywhere.
-" class="editor-textarea"></textarea>
-        
-        <!-- Text Highlighting Controls -->
-        <div id="highlightControls" class="hidden p-3 bg-card-bg border border-card-border rounded-lg mt-2">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-text">Highlight Text</span>
-            <button onclick="UI.autoFixHighlights()" class="btn text-xs px-2 py-1 bg-btn-bg text-warning" title="Fix broken highlight syntax">Auto-Fix</button>
-          </div>
-          <div class="flex gap-1 mb-2">
-            <button onclick="UI.applyHighlight('red')" class="w-8 h-8 bg-red-500 rounded hover:bg-red-600" title="Red highlight"></button>
-            <button onclick="UI.applyHighlight('orange')" class="w-8 h-8 bg-orange-500 rounded hover:bg-orange-600" title="Orange highlight"></button>
-            <button onclick="UI.applyHighlight('yellow')" class="w-8 h-8 bg-yellow-500 rounded hover:bg-yellow-600" title="Yellow highlight"></button>
-            <button onclick="UI.applyHighlight('green')" class="w-8 h-8 bg-green-500 rounded hover:bg-green-600" title="Green highlight"></button>
-            <button onclick="UI.applyHighlight('blue')" class="w-8 h-8 bg-blue-500 rounded hover:bg-blue-600" title="Blue highlight"></button>
-            <button onclick="UI.applyHighlight('purple')" class="w-8 h-8 bg-purple-500 rounded hover:bg-purple-600" title="Purple highlight"></button>
-          </div>
-          <div>
-            <button onclick="UI.removeHighlight()" class="btn bg-danger text-white" title="Remove highlight">Remove</button>
-          </div>
-        </div>
-      </div>
-      <div class="flex gap-2 p-2 border-t border-card-border">
-        <input id="title" placeholder="Title" class="input-field flex-1"/>
-        <div id="enhanced-tags-input" class="relative bg-input-bg border border-input-border rounded-lg p-2 min-h-10">
-            <div class="tags-display" id="tagsDisplay"></div>
-            <input type="text" id="tagInput" class="bg-transparent border-none outline-none text-text" placeholder="Add tags..."/>
-            <div class="tag-suggestions" id="tagSuggestions"></div>
-        </div>
-        <button id="saveNoteInline" class="btn ml-2" title="Save note (⌘/Ctrl+S)">Save</button>
-      </div>
-      <div class="editor-status px-3 py-1 border-t border-card-border text-xs text-muted bg-editor-header" id="editorStatus">
-        <span>Words: 0</span> | <span>Chars: 0</span> | <span>Lines: 1</span> | <span>Tags: 0</span> | <span>Links: 0</span>
-      </div>
+        <!-- Main Content Area -->
+        <main id="main-content" class="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto bg-gray-900">
+
+            <!-- Page: Home/Editor -->
+            <div id="page-home" class="page h-full flex gap-4">
+                <!-- Left Column for Note List -->
+                <div class="w-1/3 max-w-sm bg-gray-800 rounded-lg p-4 flex flex-col shadow-inner">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold">Notes</h2>
+                        <span id="noteCount" class="text-sm font-medium text-gray-400 bg-gray-700 px-2 py-1 rounded-full"></span>
+                    </div>
+                    <div id="noteList" class="flex-grow overflow-y-auto -mr-4 pr-4">
+                        <!-- Note items will be rendered here by app.js -->
+                    </div>
+                </div>
+
+                <!-- Right Column for Editor/Preview -->
+                <div class="flex-grow grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="card flex flex-col">
+                      <h3 class="card-header flex items-center gap-2">
+                        Editor 
+                        <span id="dirty" class="badge hidden">unsaved</span>
+                        <div class="ml-auto flex items-center gap-2">
+                          <button id="noteColorButton" class="w-6 h-6 rounded-full border-2 border-gray-500 hover:border-gray-300 transition-colors cursor-pointer" style="background-color: #6B7280;" title="Set note color"></button>
+                          <div id="colorPickerMenu" class="hidden absolute top-12 right-4 bg-gray-800 border border-gray-600 rounded-lg p-2 shadow-lg z-50">
+                            <div class="grid grid-cols-4 gap-1">
+                              <button class="color-option w-6 h-6 rounded-full border border-gray-500 hover:border-white transition-colors" style="background-color: #6B7280;" data-color="#6B7280" title="Gray"></button>
+                              <button class="color-option w-6 h-6 rounded-full border border-gray-500 hover:border-white transition-colors" style="background-color: #3B82F6;" data-color="#3B82F6" title="Blue"></button>
+                              <button class="color-option w-6 h-6 rounded-full border border-gray-500 hover:border-white transition-colors" style="background-color: #10B981;" data-color="#10B981" title="Green"></button>
+                              <button class="color-option w-6 h-6 rounded-full border border-gray-500 hover:border-white transition-colors" style="background-color: #F59E0B;" data-color="#F59E0B" title="Amber"></button>
+                              <button class="color-option w-6 h-6 rounded-full border border-gray-500 hover:border-white transition-colors" style="background-color: #EF4444;" data-color="#EF4444" title="Red"></button>
+                              <button class="color-option w-6 h-6 rounded-full border border-gray-500 hover:border-white transition-colors" style="background-color: #8B5CF6;" data-color="#8B5CF6" title="Purple"></button>
+                              <button class="color-option w-6 h-6 rounded-full border border-gray-500 hover:border-white transition-colors" style="background-color: #F97316;" data-color="#F97316" title="Orange"></button>
+                              <button class="color-option w-6 h-6 rounded-full border border-gray-500 hover:border-white transition-colors" style="background-color: #06B6D4;" data-color="#06B6D4" title="Cyan"></button>
+                            </div>
+                          </div>
+                        </div>
+                      </h3>
+                      <div class="flex-grow h-editor overflow-auto p-1">
+                        <textarea id="editor" placeholder="# Title..." class="editor-textarea"></textarea>
+                      </div>
+                      <div class="flex gap-2 p-2 border-t border-card-border">
+                        <input id="title" placeholder="Note Title" class="input-field flex-1"/>
+                        <button id="saveNoteInline" class="btn ml-2" title="Save note (⌘/Ctrl+S)">Save</button>
+                      </div>
+                    </div>
+                    <div class="card flex flex-col">
+                      <h3 class="card-header">Live Preview</h3>
+                      <div id="preview" class="flex-grow h-editor overflow-auto p-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: Graph -->
+            <div id="page-graph" class="page hidden h-full">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-3xl font-bold text-white">Knowledge Graph</h2>
+                    <div class="flex items-center gap-4">
+                        <label class="text-white text-sm font-medium">Link by:</label>
+                        <div class="flex bg-gray-700 rounded-lg p-1">
+                            <button id="linkByTags" class="px-3 py-1 rounded text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors">Tags</button>
+                            <button id="linkByColors" class="px-3 py-1 rounded text-sm font-medium text-gray-300 hover:bg-gray-600 transition-colors">Colors</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="graphContainer" class="w-full h-[80vh] rounded bg-gray-800 border border-gray-700"></div>
+            </div>
+
+            <!-- Page: Tags -->
+            <div id="page-tags" class="page hidden">
+                <div class="card p-4 max-h-[80vh] overflow-auto">
+                    <div class="flex justify-between items-center mb-4">
+                      <h3 class="m-0 text-xl font-semibold text-text">Tag Management</h3>
+                    </div>
+                    <div class="mb-4">
+                      <div class="flex gap-2 mb-2">
+                        <input id="newTagInput" placeholder="Create new tag..." class="input-field flex-1">
+                        <button class="btn" onclick="UI.createNewTag()">Add Tag</button>
+                      </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row gap-4">
+                      <div class="flex-1">
+                        <h4 class="text-lg font-medium mb-2">All Tags <span id="totalTagCount" class="badge">0</span></h4>
+                        <div id="allTagsList" class="max-h-96 overflow-auto border border-card-border rounded-lg p-2"></div>
+                      </div>
+                      <div class="flex-1">
+                        <h4 class="text-lg font-medium mb-2">Tag Details</h4>
+                        <div id="tagDetails" class="border border-card-border rounded-lg p-3 min-h-48"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page: AI Assistant -->
+            <div id="page-ai" class="page hidden">
+                <h2 class="text-3xl font-bold mb-4 text-white">AI Assistant</h2>
+                 <div class="bg-gray-800 p-6 rounded-lg h-[80vh]">
+                    <p class="text-gray-400">The AI Assistant interface will be rendered here.</p>
+                 </div>
+            </div>
+
+            <!-- Page: Settings -->
+            <div id="page-settings" class="page hidden">
+                <div class="card p-4 min-w-[420px]">
+                    <h3 class="text-xl font-semibold text-text mb-4">Settings</h3>
+                    <label class="flex items-center justify-between py-2 text-sm">
+                      <span>Auto-link on save:</span>
+                      <input id="autoLink" type="checkbox" checked class="ml-2">
+                    </label>
+                    <label class="flex items-center justify-between py-2 text-sm">
+                      <span>Enable analytics:</span>
+                      <input id="enableAnalytics" type="checkbox" checked class="ml-2">
+                    </label>
+                    <label class="flex items-center justify-between py-2 text-sm">
+                      <span>Realtime multi-tab sync:</span>
+                      <input id="enableBC" type="checkbox" checked class="ml-2">
+                    </label>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <div class="card">
-      <h3 class="card-header">Live Preview</h3>
-      <div id="preview" class="h-editor overflow-auto p-3"></div>
-    </div>
-  </div>
-
-  <div class="sidebar-right">
-    <div class="section">
-      <div class="kpi-grid">
-        <div class="kpi-box"><div class="text-xs text-muted">Notes</div><div id="kpiNotes" class="text-xl"></div></div>
-        <div class="kpi-box"><div class="text-xs text-muted">Links/Note</div><div id="kpiLinks" class="text-xl"></div></div>
-        <div class="kpi-box"><div class="text-xs text-muted">% ≥2 Links</div><div id="kpiHealth" class="text-xl"></div></div>
-      </div>
-      <hr class="border-border my-3"/>
-      <canvas id="chartActivity" height="120"></canvas>
-      <hr class="border-border my-3"/>
-      <div id="miniGraph" class="min-h-32"></div>
+    <!-- Toast notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        Toast message
     </div>
 
-    <div class="section">
-      <strong>Performance</strong>
-      <div id="perfBox" class="code-block"></div>
-    </div>
-
-    <div class="section">
-      <strong>Events</strong>
-      <div id="eventLog" class="code-block max-h-40"></div>
-    </div>
-  </div>
-</div>
-
-<div id="toast" class="fixed bottom-4 right-4 bg-success text-white px-4 py-2 rounded-lg shadow-app transform translate-y-full opacity-0 transition-all duration-300">Saved</div>
-
-<!-- Tags Management Modal -->
-<dialog id="tagsModal" class="backdrop:bg-black backdrop:bg-opacity-50 bg-transparent border-none p-0">
-  <div class="card p-4 min-w-[600px] max-h-[80vh] overflow-auto">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="m-0 text-xl font-semibold text-text">Tag Management</h3>
-      <button class="btn px-2 py-1" onclick="el('#tagsModal').close()">×</button>
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
     
-    <div class="mb-4">
-      <div class="flex gap-2 mb-2">
-        <input id="newTagInput" placeholder="Create new tag (e.g., #project)" class="input-field flex-1">
-        <button class="btn" onclick="UI.createNewTag()">Add Tag</button>
-      </div>
-      <div class="text-xs text-muted">Tags are automatically created when you use #hashtags in notes</div>
-    </div>
-
-    <div class="flex gap-4">
-      <div class="flex-1">
-        <h4 class="text-lg font-medium mb-2">All Tags <span id="totalTagCount" class="badge">0</span></h4>
-        <div id="allTagsList" class="max-h-72 overflow-auto border border-card-border rounded-lg p-2"></div>
-      </div>
-      
-      <div class="flex-1">
-        <h4 class="text-lg font-medium mb-2">Tag Details</h4>
-        <div id="tagDetails" class="border border-card-border rounded-lg p-3 min-h-48">
-          <div class="text-muted text-center py-10">Select a tag to view details</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="mt-4 flex gap-2">
-      <button class="btn" onclick="UI.exportTags()">Export Tags</button>
-      <button class="btn bg-red-900 text-danger border-red-800" onclick="UI.cleanupUnusedTags()">Cleanup Unused</button>
-      <button class="btn ml-auto" onclick="el('#tagsModal').close()">Close</button>
-    </div>
-  </div>
-</dialog>
-
-<!-- Graph Visualization Modal -->
-<dialog id="graphModal" class="backdrop:bg-black backdrop:bg-opacity-50 bg-transparent border-none p-0">
-  <div class="card p-4 min-w-[800px] max-h-[80vh]">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="m-0 text-xl font-semibold text-text">Knowledge Graph</h3>
-      <button class="btn px-2 py-1" onclick="el('#graphModal').close()">×</button>
-    </div>
-    
-    <div class="mb-4">
-      <div class="flex gap-2">
-        <button class="btn" onclick="UI.renderGraph()">Refresh Graph</button>
-        <button class="btn" onclick="UI.centerGraph()">Center View</button>
-        <button class="btn" onclick="UI.exportGraph()">Export Image</button>
-      </div>
-    </div>
-
-    <div id="graphContainer" class="w-full h-[500px] border border-card-border rounded-lg bg-card-bg">
-      <div class="flex items-center justify-center h-full text-muted">
-        Graph will render here
-      </div>
-    </div>
-
-    <div class="mt-4">
-      <button class="btn" onclick="el('#graphModal').close()">Close</button>
-    </div>
-  </div>
-</dialog>
-
-<dialog id="settings" class="backdrop:bg-black backdrop:bg-opacity-50 bg-transparent border-none p-0">
-  <form method="dialog" class="card p-4 min-w-[420px]">
-    <h3 class="text-xl font-semibold text-text mb-4">Settings</h3>
-    <label class="flex items-center justify-between py-2 text-sm">
-      <span>Auto-link on save:</span>
-      <input id="autoLink" type="checkbox" checked class="ml-2">
-    </label>
-    <label class="flex items-center justify-between py-2 text-sm">
-      <span>Enable analytics:</span>
-      <input id="enableAnalytics" type="checkbox" checked class="ml-2">
-    </label>
-    <label class="flex items-center justify-between py-2 text-sm">
-      <span>Realtime multi-tab sync:</span>
-      <input id="enableBC" type="checkbox" checked class="ml-2">
-    </label>
-    <hr class="border-border my-4"/>
-    <button class="btn" value="cancel">Close</button>
-  </form>
-</dialog>
-
-<input id="importFile" type="file" accept="application/json" hidden/>
-
-<!-- Essential scripts only -->
-<script src="js/util.js"></script>
-<script src="js/store.js"></script>
-<script src="js/search.js"></script>
-<script src="js/analytics.js"></script>
-<script src="js/graph.js"></script>
-<script src="js/tags.js"></script>
-<script src="js/templates.js"></script>
-<script src="js/recommendations.js"></script>
-<script src="js/collaboration.js"></script>
-<script src="js/graph-analytics.js"></script>
-<script src="js/query-engine.js"></script>
-<script src="js/advanced-viz.js"></script>
-<script src="js/ai-assistant.js"></script>
-<script src="js/advanced-ui.js"></script>
-<script src="js/plugin-system.js"></script>
-<script src="js/data-management.js"></script>
-<script src="js/advanced-search.js"></script>
-<script src="js/advanced-editor.js"></script>
-<script src="js/monetization.js"></script>
-<script src="js/workspace.js"></script>
-<script src="js/themes.js"></script>
-<script src="js/presentation-generator.js"></script>
-<script src="js/smart-templates.js"></script>
-<script src="js/learning-mode.js"></script>
-<script src="js/theme-editor.js"></script>
-<script src="js/competitive-importers.js"></script>
-<script src="js/dynamic-dashboards.js"></script>
-<script src="js/app.js"></script>
-<script src="js/init.js"></script>
-
-
+    <script src="js/util.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/analytics.js"></script>
+    <script src="js/graph.js"></script>
+    <script src="js/tags.js"></script>
+    <script src="js/templates.js"></script>
+    <script src="js/recommendations.js"></script>
+    <script src="js/collaboration.js"></script>
+    <script src="js/graph-analytics.js"></script>
+    <script src="js/query-engine.js"></script>
+    <script src="js/advanced-viz.js"></script>
+    <script src="js/ai-assistant.js"></script>
+    <script src="js/advanced-ui.js"></script>
+    <script src="js/plugin-system.js"></script>
+    <script src="js/data-management.js"></script>
+    <script src="js/advanced-search.js"></script>
+    <script src="js/advanced-editor.js"></script>
+    <script src="js/monetization.js"></script>
+    <script src="js/workspace.js"></script>
+    <script src="js/themes.js"></script>
+    <script src="js/presentation-generator.js"></script>
+    <script src="js/smart-templates.js"></script>
+    <script src="js/learning-mode.js"></script>
+    <script src="js/theme-editor.js"></script>
+    <script src="js/competitive-importers.js"></script>
+    <script src="js/dynamic-dashboards.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/init.js"></script>
 </body>
 </html>
