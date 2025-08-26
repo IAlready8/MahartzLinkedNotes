@@ -12,21 +12,101 @@
 
     <div id="app-container" class="flex h-screen">
 
-        <!-- Main Sidebar Navigation -->
-        <nav id="main-sidebar" class="w-60 bg-gray-800 text-white flex flex-col shadow-lg">
-            <div class="p-4 border-b border-gray-700">
-                <h1 class="text-xl font-bold text-center">MahartNotes</h1>
+        <!-- Enhanced Compact Resizable Sidebar -->
+        <nav id="main-sidebar" class="w-52 bg-gray-800 text-white flex flex-col shadow-lg transition-all duration-300 resize-x min-w-[200px] max-w-[400px] relative">
+            <!-- Sidebar Header with Controls -->
+            <div class="p-3 border-b border-gray-700 flex items-center justify-between">
+                <h1 class="text-lg font-bold truncate">MahartNotes</h1>
+                <div class="flex items-center gap-1">
+                    <button id="sidebar-search" class="p-1 rounded hover:bg-gray-700 transition-colors" title="Quick Search (⌘K)">
+                        <i class="fas fa-search text-xs"></i>
+                    </button>
+                    <button id="sidebar-collapse" class="p-1 rounded hover:bg-gray-700 transition-colors" title="Collapse Sidebar">
+                        <i class="fas fa-chevron-left text-xs"></i>
+                    </button>
+                </div>
             </div>
-            <ul class="flex-grow p-2">
-                <li class="mb-2"><a href="#/" class="flex items-center py-2 px-3 rounded hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-pencil-alt w-6 mr-3 text-center"></i>Editor</a></li>
-                <li class="mb-2"><a href="#/graph" class="flex items-center py-2 px-3 rounded hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-project-diagram w-6 mr-3 text-center"></i>Graph</a></li>
-                <li class="mb-2"><a href="#/tags" class="flex items-center py-2 px-3 rounded hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-tags w-6 mr-3 text-center"></i>Tags</a></li>
-                <li class="mb-2"><a href="#/ai" class="flex items-center py-2 px-3 rounded hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-robot w-6 mr-3 text-center"></i>AI Assistant</a></li>
-                <li class="mb-2"><a href="#/settings" class="flex items-center py-2 px-3 rounded hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-cog w-6 mr-3 text-center"></i>Settings</a></li>
-            </ul>
-            <div class="p-4 border-t border-gray-700 text-center text-xs text-gray-400">
-                Version 2.0
+
+            <!-- Quick Actions Bar -->
+            <div class="px-2 py-2 border-b border-gray-700 flex gap-1">
+                <button id="new-note-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded text-xs transition-colors" title="New Note (⌘N)">
+                    <i class="fas fa-plus mr-1"></i>Note
+                </button>
+                <button id="command-palette-btn" class="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs transition-colors" title="Commands (⌘P)">
+                    <i class="fas fa-terminal"></i>
+                </button>
             </div>
+
+            <!-- Main Navigation -->
+            <div class="flex-grow overflow-y-auto">
+                <!-- Core Section -->
+                <div class="border-b border-gray-700">
+                    <div class="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">Core</div>
+                    <ul class="p-1">
+                        <li><a href="#/" class="nav-item flex items-center py-1.5 px-2 rounded text-sm hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-pencil-alt w-4 mr-2 text-center text-xs"></i><span class="truncate">Editor</span><kbd class="ml-auto text-xs bg-gray-700 px-1 rounded">⌘E</kbd></a></li>
+                        <li><a href="#/graph" class="nav-item flex items-center py-1.5 px-2 rounded text-sm hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-project-diagram w-4 mr-2 text-center text-xs"></i><span class="truncate">Graph</span><kbd class="ml-auto text-xs bg-gray-700 px-1 rounded">⌘G</kbd></a></li>
+                        <li><a href="#/search" class="nav-item flex items-center py-1.5 px-2 rounded text-sm hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-search w-4 mr-2 text-center text-xs"></i><span class="truncate">Search</span><kbd class="ml-auto text-xs bg-gray-700 px-1 rounded">⌘F</kbd></a></li>
+                        <li><a href="#/tags" class="nav-item flex items-center py-1.5 px-2 rounded text-sm hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-tags w-4 mr-2 text-center text-xs"></i><span class="truncate">Tags</span><kbd class="ml-auto text-xs bg-gray-700 px-1 rounded">⌘T</kbd></a></li>
+                    </ul>
+                </div>
+
+                <!-- Analytics & Insights -->
+                <div class="border-b border-gray-700">
+                    <div class="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">Analytics</div>
+                    <ul class="p-1">
+                        <li><a href="#/analytics" class="nav-item flex items-center py-1.5 px-2 rounded text-sm hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-chart-line w-4 mr-2 text-center text-xs"></i><span class="truncate">Dashboard</span></a></li>
+                        <li><a href="#/insights" class="nav-item flex items-center py-1.5 px-2 rounded text-sm hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-lightbulb w-4 mr-2 text-center text-xs"></i><span class="truncate">Insights</span></a></li>
+                        <li><a href="#/timeline" class="nav-item flex items-center py-1.5 px-2 rounded text-sm hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-clock w-4 mr-2 text-center text-xs"></i><span class="truncate">Timeline</span></a></li>
+                    </ul>
+                </div>
+
+                <!-- Tools & Productivity -->
+                <div class="border-b border-gray-700">
+                    <div class="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">Tools</div>
+                    <ul class="p-1">
+                        <li><a href="#/templates" class="nav-item flex items-center py-1.5 px-2 rounded text-sm hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-file-alt w-4 mr-2 text-center text-xs"></i><span class="truncate">Templates</span></a></li>
+                        <li><a href="#/presentations" class="nav-item flex items-center py-1.5 px-2 rounded text-sm hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-presentation w-4 mr-2 text-center text-xs"></i><span class="truncate">Presentations</span></a></li>
+                        <li><a href="#/export" class="nav-item flex items-center py-1.5 px-2 rounded text-sm hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-download w-4 mr-2 text-center text-xs"></i><span class="truncate">Export Hub</span></a></li>
+                        <li><a href="#/backup" class="nav-item flex items-center py-1.5 px-2 rounded text-sm hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-shield-alt w-4 mr-2 text-center text-xs"></i><span class="truncate">Backup</span></a></li>
+                    </ul>
+                </div>
+
+                <!-- AI & Automation -->
+                <div class="border-b border-gray-700">
+                    <div class="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">AI & Auto</div>
+                    <ul class="p-1">
+                        <li><a href="#/ai" class="nav-item flex items-center py-1.5 px-2 rounded text-sm hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-robot w-4 mr-2 text-center text-xs"></i><span class="truncate">AI Assistant</span></a></li>
+                        <li><a href="#/recommendations" class="nav-item flex items-center py-1.5 px-2 rounded text-sm hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-magic w-4 mr-2 text-center text-xs"></i><span class="truncate">Suggestions</span></a></li>
+                        <li><a href="#/learning" class="nav-item flex items-center py-1.5 px-2 rounded text-sm hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-graduation-cap w-4 mr-2 text-center text-xs"></i><span class="truncate">Learning</span></a></li>
+                    </ul>
+                </div>
+
+                <!-- Workspace & Settings -->
+                <div>
+                    <div class="px-2 py-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">System</div>
+                    <ul class="p-1">
+                        <li><a href="#/workspace" class="nav-item flex items-center py-1.5 px-2 rounded text-sm hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-layer-group w-4 mr-2 text-center text-xs"></i><span class="truncate">Workspace</span></a></li>
+                        <li><a href="#/themes" class="nav-item flex items-center py-1.5 px-2 rounded text-sm hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-palette w-4 mr-2 text-center text-xs"></i><span class="truncate">Themes</span></a></li>
+                        <li><a href="#/plugins" class="nav-item flex items-center py-1.5 px-2 rounded text-sm hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-plug w-4 mr-2 text-center text-xs"></i><span class="truncate">Plugins</span></a></li>
+                        <li><a href="#/settings" class="nav-item flex items-center py-1.5 px-2 rounded text-sm hover:bg-blue-600 transition-colors duration-200"><i class="fas fa-cog w-4 mr-2 text-center text-xs"></i><span class="truncate">Settings</span></a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Sidebar Footer with Status -->
+            <div class="p-2 border-t border-gray-700">
+                <div class="flex items-center justify-between text-xs text-gray-400">
+                    <span>v2.1.0</span>
+                    <div class="flex items-center gap-1">
+                        <div id="sync-status" class="w-2 h-2 bg-green-500 rounded-full" title="Synced"></div>
+                        <span id="note-counter">0 notes</span>
+                    </div>
+                </div>
+                <div class="mt-1 text-xs text-gray-500 truncate" id="current-workspace">Default Workspace</div>
+            </div>
+
+            <!-- Resize Handle -->
+            <div id="sidebar-resize-handle" class="absolute top-0 right-0 w-1 h-full bg-gray-600 opacity-0 hover:opacity-100 cursor-col-resize transition-opacity" title="Drag to resize"></div>
         </nav>
 
         <!-- Main Content Area -->
