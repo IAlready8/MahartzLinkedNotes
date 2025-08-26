@@ -113,51 +113,185 @@
         <main id="main-content" class="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto bg-gray-900">
 
             <!-- Page: Home/Editor -->
-            <div id="page-home" class="page h-full flex gap-4">
-                <!-- Left Column for Note List -->
-                <div class="w-1/3 max-w-sm bg-gray-800 rounded-lg p-4 flex flex-col shadow-inner">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-bold">Notes</h2>
-                        <span id="noteCount" class="text-sm font-medium text-gray-400 bg-gray-700 px-2 py-1 rounded-full"></span>
+            <div id="page-home" class="page h-full flex gap-6">
+                <!-- Enhanced Note Explorer -->
+                <div class="w-80 flex flex-col">
+                    <!-- Note Explorer Header -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center">
+                                    <i class="fas fa-folder-open text-white text-lg"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-lg font-bold text-white">Knowledge Base</h2>
+                                    <p class="text-sm text-gray-400">Your digital brain</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span id="noteCount" class="px-3 py-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-full text-sm font-medium text-blue-300"></span>
+                                <button class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-300 flex items-center justify-center group" title="Add Note">
+                                    <i class="fas fa-plus text-sm text-white group-hover:scale-110 transition-transform"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div id="noteList" class="flex-grow overflow-y-auto -mr-4 pr-4">
-                        <!-- Note items will be rendered here by app.js -->
+
+                    <!-- Notes List -->
+                    <div class="card flex-1">
+                        <div class="card-header">
+                            <h3 class="text-base font-semibold text-white">Recent Notes</h3>
+                            <div class="flex items-center gap-2">
+                                <button class="w-6 h-6 rounded-md bg-white/10 hover:bg-white/20 transition-all duration-300 flex items-center justify-center" title="Search">
+                                    <i class="fas fa-search text-xs text-white"></i>
+                                </button>
+                                <button class="w-6 h-6 rounded-md bg-white/10 hover:bg-white/20 transition-all duration-300 flex items-center justify-center" title="Sort">
+                                    <i class="fas fa-sort text-xs text-white"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div id="noteList" class="space-y-2 max-h-[calc(100vh-400px)] overflow-y-auto">
+                                <!-- Note items will be rendered here by app.js -->
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Right Column for Editor/Preview -->
-                <div class="flex-grow grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <div class="card flex flex-col">
-                      <h3 class="card-header flex items-center gap-2">
-                        Editor 
-                        <span id="dirty" class="badge hidden">unsaved</span>
-                        <div class="ml-auto flex items-center gap-2">
-                          <button id="noteColorButton" class="w-6 h-6 rounded-full border-2 border-gray-500 hover:border-gray-300 transition-colors cursor-pointer" style="background-color: #6B7280;" title="Set note color"></button>
-                          <div id="colorPickerMenu" class="hidden absolute top-12 right-4 bg-gray-800 border border-gray-600 rounded-lg p-2 shadow-lg z-50">
-                            <div class="grid grid-cols-4 gap-1">
-                              <button class="color-option w-6 h-6 rounded-full border border-gray-500 hover:border-white transition-colors" style="background-color: #6B7280;" data-color="#6B7280" title="Gray"></button>
-                              <button class="color-option w-6 h-6 rounded-full border border-gray-500 hover:border-white transition-colors" style="background-color: #3B82F6;" data-color="#3B82F6" title="Blue"></button>
-                              <button class="color-option w-6 h-6 rounded-full border border-gray-500 hover:border-white transition-colors" style="background-color: #10B981;" data-color="#10B981" title="Green"></button>
-                              <button class="color-option w-6 h-6 rounded-full border border-gray-500 hover:border-white transition-colors" style="background-color: #F59E0B;" data-color="#F59E0B" title="Amber"></button>
-                              <button class="color-option w-6 h-6 rounded-full border border-gray-500 hover:border-white transition-colors" style="background-color: #EF4444;" data-color="#EF4444" title="Red"></button>
-                              <button class="color-option w-6 h-6 rounded-full border border-gray-500 hover:border-white transition-colors" style="background-color: #8B5CF6;" data-color="#8B5CF6" title="Purple"></button>
-                              <button class="color-option w-6 h-6 rounded-full border border-gray-500 hover:border-white transition-colors" style="background-color: #F97316;" data-color="#F97316" title="Orange"></button>
-                              <button class="color-option w-6 h-6 rounded-full border border-gray-500 hover:border-white transition-colors" style="background-color: #06B6D4;" data-color="#06B6D4" title="Cyan"></button>
+                <!-- Enhanced Editor & Preview -->
+                <div class="flex-1 grid grid-cols-1 xl:grid-cols-2 gap-6">
+                    <!-- Premium Editor Panel -->
+                    <div class="card flex flex-col premium-glow">
+                        <div class="card-header">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                                    <i class="fas fa-edit text-white text-sm"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white">Markdown Editor</h3>
+                                    <span id="dirty" class="text-xs text-orange-400 hidden">• Unsaved changes</span>
+                                </div>
                             </div>
-                          </div>
+                            <div class="flex items-center gap-3">
+                                <!-- Word Count -->
+                                <div class="text-xs text-gray-400">
+                                    <span id="wordCount">0</span> words
+                                </div>
+                                <!-- Color Picker -->
+                                <div class="relative">
+                                    <button id="noteColorButton" class="w-8 h-8 rounded-lg border-2 border-white/20 hover:border-white/40 transition-all duration-300 cursor-pointer shadow-lg hover:scale-110" style="background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);" title="Set note color"></button>
+                                    <div id="colorPickerMenu" class="hidden absolute top-10 right-0 p-3 z-50">
+                                        <div class="grid grid-cols-4 gap-2">
+                                            <button class="color-option" style="background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);" data-color="#6B7280" title="Gray"></button>
+                                            <button class="color-option" style="background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);" data-color="#3B82F6" title="Blue"></button>
+                                            <button class="color-option" style="background: linear-gradient(135deg, #10B981 0%, #047857 100%);" data-color="#10B981" title="Green"></button>
+                                            <button class="color-option" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);" data-color="#F59E0B" title="Amber"></button>
+                                            <button class="color-option" style="background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);" data-color="#EF4444" title="Red"></button>
+                                            <button class="color-option" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);" data-color="#8B5CF6" title="Purple"></button>
+                                            <button class="color-option" style="background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);" data-color="#F97316" title="Orange"></button>
+                                            <button class="color-option" style="background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);" data-color="#06B6D4" title="Cyan"></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                      </h3>
-                      <div class="flex-grow h-editor overflow-auto p-1">
-                        <textarea id="editor" placeholder="# Title..." class="editor-textarea"></textarea>
-                      </div>
-                      <div class="flex gap-2 p-2 border-t border-card-border">
-                        <input id="title" placeholder="Note Title" class="input-field flex-1"/>
-                        <button id="saveNoteInline" class="btn ml-2" title="Save note (⌘/Ctrl+S)">Save</button>
-                      </div>
+
+                        <!-- Editor Content -->
+                        <div class="flex-1 p-6">
+                            <div class="h-full relative">
+                                <textarea id="editor" placeholder="# Start writing your thoughts...
+
+Use **bold** and *italic* text.
+Create [links](url) and add code blocks.
+
+## Organize with headers
+- Create lists
+- Link with [[Other Notes]]
+- Add #tags" class="editor-textarea h-full"></textarea>
+
+                                <!-- Editor Toolbar -->
+                                <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between bg-black/30 backdrop-blur-lg rounded-lg p-3 border border-white/10">
+                                    <div class="flex items-center gap-2">
+                                        <button class="editor-tool" title="Bold (⌘B)">
+                                            <i class="fas fa-bold"></i>
+                                        </button>
+                                        <button class="editor-tool" title="Italic (⌘I)">
+                                            <i class="fas fa-italic"></i>
+                                        </button>
+                                        <button class="editor-tool" title="Link (⌘L)">
+                                            <i class="fas fa-link"></i>
+                                        </button>
+                                        <button class="editor-tool" title="Code (⌘`)">
+                                            <i class="fas fa-code"></i>
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs text-gray-400">Auto-save enabled</span>
+                                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Editor Footer -->
+                        <div class="border-t border-white/10 p-4">
+                            <div class="flex gap-3">
+                                <input id="title" placeholder="Enter note title..." class="input-field flex-1 text-lg font-medium"/>
+                                <button id="saveNoteInline" class="btn-primary px-6 py-2 font-semibold" title="Save note (⌘S)">
+                                    <i class="fas fa-save mr-2"></i>Save
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card flex flex-col">
-                      <h3 class="card-header">Live Preview</h3>
-                      <div id="preview" class="flex-grow h-editor overflow-auto p-3"></div>
+
+                    <!-- Premium Live Preview Panel -->
+                    <div class="card flex flex-col premium-glow">
+                        <div class="card-header">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center">
+                                    <i class="fas fa-eye text-white text-sm"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white">Live Preview</h3>
+                                    <p class="text-xs text-gray-400">Real-time markdown rendering</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-300 flex items-center justify-center" title="Export">
+                                    <i class="fas fa-download text-sm text-white"></i>
+                                </button>
+                                <button class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-300 flex items-center justify-center" title="Print">
+                                    <i class="fas fa-print text-sm text-white"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Preview Content -->
+                        <div class="flex-1 p-6">
+                            <div id="preview" class="h-full overflow-y-auto prose prose-invert prose-blue max-w-none">
+                                <div class="text-center py-12">
+                                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center">
+                                        <i class="fas fa-file-alt text-2xl text-blue-400"></i>
+                                    </div>
+                                    <p class="text-gray-400 text-lg">Start writing to see live preview</p>
+                                    <p class="text-gray-500 text-sm mt-2">Your markdown will be rendered here in real-time</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Preview Footer -->
+                        <div class="border-t border-white/10 p-4">
+                            <div class="flex items-center justify-between text-sm text-gray-400">
+                                <div class="flex items-center gap-4">
+                                    <span>Characters: <span id="charCount">0</span></span>
+                                    <span>Reading time: <span id="readingTime">0 min</span></span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                                    <span>Live sync</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -897,9 +1031,16 @@
         </div>
     </div>
 
-    <!-- Toast notification -->
-    <div id="toast" class="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
-        Toast message
+    <!-- Premium Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 px-6 py-4 rounded-xl transform translate-y-20 opacity-0 transition-all duration-500 z-50 max-w-sm">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-check text-white text-sm"></i>
+            </div>
+            <div class="flex-1">
+                <p class="font-medium text-white">Toast message</p>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
