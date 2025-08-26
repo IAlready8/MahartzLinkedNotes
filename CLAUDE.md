@@ -25,9 +25,12 @@ python -m http.server 8000
 # 2. Wikilinks resolve correctly ([[Note Title]] and [[ID:xxxx]])  
 # 3. Tags display and filter properly
 # 4. Search returns relevant results
-# 5. Graph visualization renders
-# 6. Multi-tab sync works (open multiple tabs)
-# 7. Export/import preserves data
+# 5. Graph visualization renders with both link modes
+# 6. Color picker assigns and persists colors
+# 7. Page navigation works via sidebar links
+# 8. Graph mode toggle switches between tag/color linking
+# 9. Multi-tab sync works (open multiple tabs)
+# 10. Export/import preserves data and colors
 ```
 
 ### Keyboard Shortcuts
@@ -60,12 +63,20 @@ python -m http.server 8000
 
 ## Core Architecture
 
-### Modular MVC Pattern
-The application uses a modular architecture with clear separation of concerns:
+### Router-Based SPA Architecture
+The application uses a client-side router with page-based architecture:
 
-- **UI Layer** (`app.js`): Event handling, DOM manipulation, user interaction orchestration
+- **Router Layer** (`router.js`): Hash-based navigation system managing page transitions
+- **UI Layer** (`app.js`): Page-specific event handling and modular initialization
 - **Data Layer** (`store.js`): IndexedDB persistence via localforage, CRUD operations, import/export
 - **Feature Modules**: Search engine, graph visualization, analytics, tag management
+
+### Page Structure
+- **Editor Page** (`#/`): Main note editing interface with sidebar note list
+- **Graph Page** (`#/graph`): Knowledge graph visualization with dual linking modes
+- **Tags Page** (`#/tags`): Tag management and organization interface
+- **AI Page** (`#/ai`): AI assistant interface
+- **Settings Page** (`#/settings`): Application preferences and configuration
 
 ### Data Flow
 ```
@@ -80,6 +91,7 @@ Note: {
   body: string,      // Markdown content
   tags: string[],    // Normalized hashtags (#tag format)
   links: string[],   // Computed array of linked note IDs
+  color: string,     // Hex color code for visual organization (default: '#6B7280')
   createdAt: string, // ISO timestamp
   updatedAt: string  // ISO timestamp
 }
@@ -108,8 +120,9 @@ The enhanced tag system (in `tags.js`) provides:
 
 ### Graph Visualization
 - **D3.js force simulation**: Physics-based node positioning
-- **Node sizing**: Proportional to link count (degree centrality)
-- **Interactive**: Drag nodes, click to open notes
+- **Dual linking modes**: Tag-based (wikilinks/shared tags) and color-based (shared colors)
+- **Node coloring**: Uses assigned note colors or falls back to connection-based coloring
+- **Interactive**: Drag nodes, click to open notes, toggle between link modes
 - **Performance**: Optimized for ~100-500 notes
 
 ### Storage Strategy
@@ -122,32 +135,19 @@ The enhanced tag system (in `tags.js`) provides:
 
 ```
 /
-├── index.html              # Single-page application entry point with comprehensive UI
-├── css/styles.css          # Complete styling for unified platform
+├── index.html              # Multi-page SPA with Tailwind CSS and clean sidebar navigation
+├── css/styles.css          # Combined Tailwind output and custom styles
 ├── js/
-│   ├── app.js             # Main UI orchestration and event handling
-│   ├── store.js           # Data persistence and CRUD operations  
+│   ├── router.js          # Client-side hash-based router for SPA navigation
+│   ├── app.js             # Page-specific UI orchestration and event handling
+│   ├── store.js           # Data persistence and CRUD operations with color support
 │   ├── search.js          # Full-text search with token scoring
-│   ├── graph.js           # D3-based force-directed visualization
+│   ├── graph.js           # D3-based visualization with dual linking modes
 │   ├── analytics.js       # Performance monitoring and usage metrics
 │   ├── tags.js            # Enhanced tag management with categories
 │   ├── util.js            # Common utilities (debounce, DOM helpers, etc.)
-│   ├── advanced-editor.js # Advanced editing features, versioning, export/import
-│   ├── advanced-search.js # Enhanced search with filters and suggestions
-│   ├── advanced-ui.js     # Command palette, modals, enhanced UX
-│   ├── advanced-viz.js    # Advanced graph visualizations and analytics
-│   ├── ai-assistant.js    # AI-powered assistance and suggestions
-│   ├── collaboration.js   # Multi-user collaboration features
-│   ├── data-management.js # Backup, sync, and data management
-│   ├── graph-analytics.js # Graph analysis and network metrics
-│   ├── init.js           # Application initialization and module loading
-│   ├── monetization.js   # Premium features and subscription management
-│   ├── plugin-system.js  # Extensible plugin architecture
-│   ├── query-engine.js   # Advanced query processing
-│   ├── recommendations.js # Content recommendations and suggestions
-│   ├── templates.js      # Note templates and scaffolding
-│   ├── themes.js         # Theme management and customization
-│   └── workspace.js      # Workspace management and environments
+│   ├── init.js            # Application initialization and module loading
+│   └── [advanced modules] # 20+ feature modules for extended functionality
 ├── data/
 │   ├── meta.json          # Application metadata
 │   └── claude_prompts.md  # Development prompts and context
@@ -189,15 +189,26 @@ The application loads modern libraries from CDN for enhanced functionality:
 
 ### Graph Visualization Changes
 - **D3.js knowledge required**: Force simulation with custom physics parameters
-- **Node sizing logic**: Based on `links.length` property of notes
+- **Dual linking modes**: Tag-based uses wikilinks/shared tags, color-based connects same-colored notes
+- **Node coloring**: Always uses note.color property when available
+- **Link generation**: Different algorithms based on linkMode option ('tags' or 'colors')
 - **Event handling**: Click handlers for note opening, drag for repositioning
 - **Performance considerations**: May need optimization for >500 notes
+
+### Color-Coded Organization System
+- **Color assignment**: 8 predefined colors accessible via editor header button
+- **Visual clustering**: Notes with same color automatically link in color mode
+- **Persistent storage**: Colors saved in note.color property
+- **macOS-style picker**: Circular color swatches in dropdown menu
+- **Graph integration**: Toggle between tag-based and color-based linking
 
 ## Advanced Features Architecture
 
 ### Module Loading Strategy
-The application uses progressive enhancement with conditional module loading:
-- **Core modules**: Always loaded (`app.js`, `store.js`, `search.js`, `util.js`)
+The application uses progressive enhancement with page-based conditional loading:
+- **Router system**: Hash-based navigation with page-specific initialization
+- **Core modules**: Always loaded (`router.js`, `app.js`, `store.js`, `search.js`, `util.js`)
+- **Page-specific loading**: Features initialize only when their page is active
 - **Feature modules**: Conditionally initialized via `typeof ModuleName !== 'undefined'` checks
 - **Initialization sequence**: Controlled by `init.js` for proper dependency resolution
 
@@ -259,10 +270,26 @@ The application uses progressive enhancement with conditional module loading:
 
 ## Common Development Patterns
 
+### Adding New Pages
+```javascript
+// Define new page in router system
+definePage('#/newpage', {
+  pageId: 'page-newpage',
+  onLoad: UI.initNewPage.bind(UI)
+});
+
+// Add page initializer in app.js
+async initNewPage() {
+  console.log('Initializing New Page...');
+  this.bindNewPageEvents();
+  // Page-specific initialization logic
+}
+```
+
 ### Adding New UI Components
 ```javascript
-// Follow existing pattern in app.js with conditional module loading
-bind() {
+// Follow page-specific binding pattern in app.js
+bindNewPageEvents() {
   const newButton = el('#newButton');
   if (newButton) newButton.onclick = () => this.newAction();
 }
@@ -271,7 +298,7 @@ async newAction() {
   // Perform action with error handling
   try {
     await this.performAction();
-    await this.refresh(); // Update all UI components
+    await this.refreshCurrentPage(); // Update current page components
     if(this.bc) this.bc.postMessage({type:'sync'}); // Notify other tabs
     
     // Notify other systems conditionally
@@ -287,13 +314,21 @@ async newAction() {
 
 ### Working with Notes
 ```javascript
-// Always use Store methods for persistence
-const note = Note.create({title: 'New Note', tags: ['#tag1']});
+// Always use Store methods for persistence, color defaults to gray
+const note = Note.create({
+  title: 'New Note', 
+  tags: ['#tag1'], 
+  color: '#3B82F6' // Optional: blue color
+});
 await Store.upsert(note);
 
 // Recompute links after content changes
 const notes = await Store.allNotes();
 Note.computeLinks(note, notes);
+
+// Update note color
+note.color = '#10B981'; // Green
+await Store.upsert(note);
 ```
 
 ### Extending Tag Functionality
