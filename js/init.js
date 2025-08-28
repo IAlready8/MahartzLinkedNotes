@@ -63,15 +63,31 @@
                 if (typeof Router !== 'undefined') {
                     console.log('Initializing router...');
                     Router.init();
+                } else if (typeof initRouter === 'function') {
+                    console.log('Initializing router (legacy)...');
+                    initRouter();
+                }
+                console.log('✅ Application successfully initialized');
+                
+                // Initialize analytics on startup if available
+                if (typeof Analytics !== 'undefined' && Analytics.init) {
+                    Analytics.init();
+                }
+                
+                // Set initial sync status
+                const syncStatus = document.getElementById('sync-status');
+                if (syncStatus) {
+                    syncStatus.className = 'w-2 h-2 bg-green-500 rounded-full';
+                    syncStatus.title = 'Application ready';
                 }
             }).catch(error => {
                 console.error('App initialization failed:', error);
-                // Try to create a fallback UI
-                setTimeout(() => {
-                    if (typeof UI !== 'undefined') {
-                        UI.createFallbackNote().catch(console.error);
-                    }
-                }, 1000);
+                // Show error to user
+                const syncStatus = document.getElementById('sync-status');
+                if (syncStatus) {
+                    syncStatus.className = 'w-2 h-2 bg-red-500 rounded-full';
+                    syncStatus.title = 'Initialization error';
+                }
             });
         } else {
             console.log(`Dependencies not ready (attempt ${attempt}), retrying in ${Math.min(attempt * 50, 500)}ms...`);

@@ -71,3 +71,12 @@ function initRouter() {
     
     handleRouteChange();
 }
+
+// Export Router object for external use
+const Router = {
+    init: initRouter,
+    definePage,
+    handleRouteChange,
+    hideAllPages,
+    pages
+};

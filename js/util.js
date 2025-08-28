@@ -10,7 +10,7 @@ const nowISO = () => new Date().toISOString();
 const debounce = (fn, ms=300)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms)}};
 const el = (sel,root=document)=>root.querySelector(sel);
 const els = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
-const toast = (msg)=>{const t=el('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1200);}
+const toast = (msg)=>{const t=el('#toast'); if(t){t.textContent=msg; t.style.transform='translateY(0)'; t.style.opacity='1'; setTimeout(()=>{t.style.transform='translateY(20px)'; t.style.opacity='0';},3000);}}
 const tokenize = (s)=> (s||'').toLowerCase().match(/[a-z0-9#_]+/g)||[];
 const uniq = (a)=>Array.from(new Set(a));
 const parseTags = (s)=> uniq((s||'').split(/[, ]+/).map(t=>t.trim()).filter(Boolean).map(t=> t.startsWith('#')?t.toLowerCase():'#'+t.toLowerCase()));

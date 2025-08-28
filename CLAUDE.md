@@ -10,11 +10,13 @@ Mahart Linked Notes is an advanced client-side knowledge management platform tha
 
 ### Running the Application
 ```bash
-# Open the application (no build process required)
-open index.html
-# Or serve via local web server for better debugging
-python -m http.server 8000
+# Serve via local web server (recommended for development)
+npm run dev
+# This runs: python3 -m http.server 8000
 # Then open http://localhost:8000
+
+# Alternative: Open directly in browser (basic functionality)
+open index.html
 ```
 
 ### Testing the Application
@@ -48,6 +50,17 @@ python -m http.server 8000
 
 # Theme and UI
 ⌘/Ctrl+Shift+T # Cycle themes
+```
+
+### CSS Development
+```bash
+# Watch and rebuild CSS during development
+npm run build-css
+# This runs: tailwindcss -i ./css/tailwind-input.css -o ./css/tailwind-output.css --watch
+
+# Build minified CSS for production
+npm run build-css-prod
+# This runs: tailwindcss -i ./css/tailwind-input.css -o ./css/tailwind-output.css --minify
 ```
 
 ### Development Tools
@@ -154,14 +167,21 @@ The enhanced tag system (in `tags.js`) provides:
 └── README.md              # Basic project documentation
 ```
 
-## External Dependencies
+## Dependencies
 
+### Development Dependencies (package.json)
+- **TailwindCSS**: Utility-first CSS framework with typography and forms plugins
+- **@tailwindcss/typography**: Rich text styling for rendered markdown
+- **@tailwindcss/forms**: Consistent form styling across browsers
+
+### Runtime Dependencies (CDN)
 The application loads modern libraries from CDN for enhanced functionality:
 - **LocalForage**: IndexedDB wrapper with localStorage fallback
 - **Marked.js**: Markdown parsing and rendering
 - **DOMPurify**: XSS protection for rendered content  
 - **Chart.js**: Analytics charts and data visualization
 - **D3.js**: Force-directed graph visualization and network analysis
+- **ULID**: Unique lexicographically sortable identifiers
 
 ## Development Guidelines
 
@@ -206,11 +226,12 @@ The application loads modern libraries from CDN for enhanced functionality:
 
 ### Module Loading Strategy
 The application uses progressive enhancement with page-based conditional loading:
-- **Router system**: Hash-based navigation with page-specific initialization
+- **Initialization layer** (`init.js`): Dependency checking and graceful app startup with retry logic
+- **Router system**: Hash-based navigation with page-specific initialization and one-time loading
 - **Core modules**: Always loaded (`router.js`, `app.js`, `store.js`, `search.js`, `util.js`)
 - **Page-specific loading**: Features initialize only when their page is active
 - **Feature modules**: Conditionally initialized via `typeof ModuleName !== 'undefined'` checks
-- **Initialization sequence**: Controlled by `init.js` for proper dependency resolution
+- **Error handling**: Fallback UI creation and detailed error reporting for failed initialization
 
 ### Enhanced UI System (`advanced-ui.js`)
 - **Command Palette**: ⌘/Ctrl+P for quick actions and navigation
