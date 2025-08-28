@@ -1,10 +1,10 @@
 // Modern entry point for Mahart Linked Notes
 import './styles/main.css'
-import { initializeApp } from './app.js'
-import { setupRouter } from './router.js'
-import { initializeStore } from './stores/noteStore.js'
-import { initializeAnalytics } from './utils/analytics.js'
-import { registerServiceWorker } from './utils/serviceWorker.js'
+import { initializeApp } from '@/app.js'
+import { setupRouter } from '@/router.js'
+import { initializeStore } from '@/stores/noteStore.js'
+import { initializeAnalytics } from '@/utils/analytics.js'
+import { registerServiceWorker } from '@/utils/serviceWorker.js'
 
 // Version info
 console.log(`Mahart Linked Notes v${__APP_VERSION__}`)
