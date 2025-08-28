@@ -37,7 +37,7 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
   wait: number,
   immediate = false
 ): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null
+  let timeout: number | null = null
   
   return (...args: Parameters<T>) => {
     const later = () => {
