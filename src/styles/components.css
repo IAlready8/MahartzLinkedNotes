@@ -1,0 +1,178 @@
+/* Component styles for Mahart Linked Notes */
+
+@layer components {
+  /* Button variants */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+  }
+  
+  .btn-default {
+    @apply btn bg-primary text-primary-foreground hover:bg-primary/90;
+  }
+  
+  .btn-destructive {
+    @apply btn bg-destructive text-destructive-foreground hover:bg-destructive/90;
+  }
+  
+  .btn-outline {
+    @apply btn border border-input bg-background hover:bg-accent hover:text-accent-foreground;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-secondary text-secondary-foreground hover:bg-secondary/80;
+  }
+  
+  .btn-ghost {
+    @apply btn hover:bg-accent hover:text-accent-foreground;
+  }
+  
+  .btn-link {
+    @apply btn text-primary underline-offset-4 hover:underline;
+  }
+  
+  .btn-sm {
+    @apply h-9 rounded-md px-3;
+  }
+  
+  .btn-lg {
+    @apply h-11 rounded-md px-8;
+  }
+  
+  .btn-icon {
+    @apply h-10 w-10;
+  }
+  
+  /* Input styles */
+  .input {
+    @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  
+  /* Card styles */
+  .card {
+    @apply rounded-lg border bg-card text-card-foreground shadow-sm;
+  }
+  
+  .card-header {
+    @apply flex flex-col space-y-1.5 p-6;
+  }
+  
+  .card-title {
+    @apply text-2xl font-semibold leading-none tracking-tight;
+  }
+  
+  .card-description {
+    @apply text-sm text-muted-foreground;
+  }
+  
+  .card-content {
+    @apply p-6 pt-0;
+  }
+  
+  .card-footer {
+    @apply flex items-center p-6 pt-0;
+  }
+  
+  /* Dialog/Modal styles */
+  .dialog-overlay {
+    @apply fixed inset-0 z-50 bg-background/80 backdrop-blur-sm;
+  }
+  
+  .dialog-content {
+    @apply fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg translate-x-1/2 translate-y-1/2 gap-4 border bg-background p-6 shadow-lg duration-200 sm:rounded-lg;
+  }
+  
+  /* Badge styles */
+  .badge {
+    @apply inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+  }
+  
+  .badge-default {
+    @apply badge border-transparent bg-primary text-primary-foreground hover:bg-primary/80;
+  }
+  
+  .badge-secondary {
+    @apply badge border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80;
+  }
+  
+  .badge-destructive {
+    @apply badge border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80;
+  }
+  
+  .badge-outline {
+    @apply badge text-foreground;
+  }
+  
+  /* Navigation styles */
+  .nav-item {
+    @apply flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring;
+  }
+  
+  .nav-item.active {
+    @apply bg-accent text-accent-foreground;
+  }
+  
+  /* Scroll area styles */
+  .scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+  
+  .scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+  
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+  
+  /* Separator styles */
+  .separator {
+    @apply shrink-0 bg-border;
+  }
+  
+  .separator-horizontal {
+    @apply separator h-px w-full;
+  }
+  
+  .separator-vertical {
+    @apply separator h-full w-px;
+  }
+  
+  /* Switch styles */
+  .switch {
+    @apply peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input;
+  }
+  
+  .switch-thumb {
+    @apply pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0;
+  }
+  
+  /* Toast styles */
+  .toast {
+    @apply group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 shadow-lg transition-all;
+  }
+  
+  .toast-destructive {
+    @apply toast destructive border-destructive bg-destructive text-destructive-foreground;
+  }
+  
+  /* Loading spinner */
+  .spinner {
+    @apply animate-spin rounded-full border-2 border-muted border-t-primary;
+  }
+  
+  /* Skeleton loader */
+  .skeleton {
+    @apply animate-pulse rounded-md bg-muted;
+  }
+}

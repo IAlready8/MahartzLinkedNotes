@@ -2,16 +2,59 @@
   "name": "mahart-linked-notes",
   "version": "2.0.0",
   "description": "Advanced client-side knowledge management platform with AI assistance",
-  "main": "index.html",
+  "type": "module",
+  "main": "src/main.js",
   "scripts": {
-    "dev": "python3 -m http.server 8000",
-    "build-css": "tailwindcss -i ./css/tailwind-input.css -o ./css/tailwind-output.css --watch",
-    "build-css-prod": "tailwindcss -i ./css/tailwind-input.css -o ./css/tailwind-output.css --minify"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:e2e": "playwright test",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css,md}\"",
+    "type-check": "tsc --noEmit",
+    "build-css": "tailwindcss -i ./src/styles/tailwind-input.css -o ./src/styles/tailwind-output.css --watch",
+    "build-css-prod": "tailwindcss -i ./src/styles/tailwind-input.css -o ./src/styles/tailwind-output.css --minify",
+    "legacy:dev": "python3 -m http.server 8000"
+  },
+  "dependencies": {
+    "localforage": "^1.10.0",
+    "marked": "^9.1.6",
+    "dompurify": "^3.1.6",
+    "chart.js": "^4.4.3",
+    "d3": "^7.9.0",
+    "monaco-editor": "^0.44.0",
+    "fuse.js": "^7.0.0",
+    "date-fns": "^2.30.0",
+    "lodash-es": "^4.17.21",
+    "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@types/d3": "^7.4.3",
+    "@types/dompurify": "^3.0.5",
+    "@types/lodash-es": "^4.17.12",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "@vitejs/plugin-legacy": "^5.2.0",
+    "@vitest/ui": "^1.0.4",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.55.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-prettier": "^5.0.1",
+    "playwright": "^1.40.1",
+    "postcss": "^8.4.32",
+    "prettier": "^3.1.1",
     "tailwindcss": "^3.4.0",
-    "@tailwindcss/typography": "^0.5.0",
-    "@tailwindcss/forms": "^0.5.0"
+    "@tailwindcss/typography": "^0.5.10",
+    "@tailwindcss/forms": "^0.5.7",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.8",
+    "vite-plugin-pwa": "^0.17.4",
+    "vitest": "^1.0.4",
+    "workbox-window": "^7.0.0"
   },
   "keywords": [
     "knowledge-management",
@@ -19,8 +62,13 @@
     "zettelkasten",
     "ai-assistant",
     "client-side",
-    "javascript"
+    "javascript",
+    "typescript",
+    "vite"
   ],
   "author": "Mahart Linked Notes",
-  "license": "MIT"
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }
