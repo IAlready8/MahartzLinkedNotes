@@ -1,0 +1,224 @@
+/* Editor styles for Mahart Linked Notes */
+
+@layer components {
+  /* Monaco Editor container */
+  .monaco-editor-container {
+    @apply h-full w-full border border-border rounded-md overflow-hidden;
+  }
+  
+  /* Legacy textarea editor */
+  .editor-textarea {
+    @apply w-full h-full resize-none border-0 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-0;
+    font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Cascadia Code', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  
+  /* Editor header */
+  .editor-header {
+    @apply flex items-center justify-between p-3 border-b border-border bg-card;
+  }
+  
+  .editor-title {
+    @apply text-lg font-semibold text-foreground;
+  }
+  
+  .editor-actions {
+    @apply flex items-center gap-2;
+  }
+  
+  /* Editor content area */
+  .editor-content {
+    @apply flex-1 overflow-hidden;
+  }
+  
+  /* Split view */
+  .editor-split {
+    @apply grid grid-cols-2 gap-4 h-full;
+  }
+  
+  @media (max-width: 1024px) {
+    .editor-split {
+      @apply grid-cols-1;
+    }
+  }
+  
+  /* Editor panels */
+  .editor-panel {
+    @apply flex flex-col bg-card border border-border rounded-md overflow-hidden;
+  }
+  
+  .editor-panel-header {
+    @apply px-4 py-2 border-b border-border bg-muted/50 text-sm font-medium text-foreground;
+  }
+  
+  .editor-panel-content {
+    @apply flex-1 overflow-auto scrollbar;
+  }
+  
+  /* Preview panel */
+  .preview-panel {
+    @apply prose prose-sm dark:prose-invert max-w-none p-4;
+  }
+  
+  /* Markdown content styles */
+  .markdown-content {
+    @apply prose prose-gray dark:prose-invert max-w-none;
+  }
+  
+  .markdown-content h1 {
+    @apply text-2xl font-bold text-foreground mb-4;
+  }
+  
+  .markdown-content h2 {
+    @apply text-xl font-semibold text-foreground mb-3;
+  }
+  
+  .markdown-content h3 {
+    @apply text-lg font-medium text-foreground mb-2;
+  }
+  
+  .markdown-content p {
+    @apply text-foreground mb-3 leading-relaxed;
+  }
+  
+  .markdown-content ul, .markdown-content ol {
+    @apply text-foreground mb-3 ml-6;
+  }
+  
+  .markdown-content li {
+    @apply mb-1;
+  }
+  
+  .markdown-content code {
+    @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-foreground;
+  }
+  
+  .markdown-content pre {
+    @apply bg-muted p-4 rounded-md overflow-x-auto;
+  }
+  
+  .markdown-content pre code {
+    @apply bg-transparent p-0;
+  }
+  
+  .markdown-content blockquote {
+    @apply border-l-4 border-border pl-4 italic text-muted-foreground;
+  }
+  
+  .markdown-content table {
+    @apply w-full border-collapse;
+  }
+  
+  .markdown-content th, .markdown-content td {
+    @apply border border-border px-3 py-2 text-left;
+  }
+  
+  .markdown-content th {
+    @apply bg-muted font-medium;
+  }
+  
+  /* Wikilink styles */
+  .wikilink {
+    @apply text-accent hover:text-accent/80 underline decoration-dotted cursor-pointer transition-colors;
+  }
+  
+  .wikilink.resolved {
+    @apply text-primary hover:text-primary/80;
+  }
+  
+  .wikilink.unresolved {
+    @apply text-muted-foreground hover:text-foreground;
+  }
+  
+  /* Tag styles */
+  .tag {
+    @apply inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors cursor-pointer;
+  }
+  
+  .tag.category-content { @apply bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-100; }
+  .tag.category-method { @apply bg-green-100 text-green-900 dark:bg-green-900 dark:text-green-100; }
+  .tag.category-project { @apply bg-purple-100 text-purple-900 dark:bg-purple-900 dark:text-purple-100; }
+  .tag.category-meta { @apply bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100; }
+  .tag.category-domain { @apply bg-yellow-100 text-yellow-900 dark:bg-yellow-900 dark:text-yellow-100; }
+  .tag.category-status { @apply bg-red-100 text-red-900 dark:bg-red-900 dark:text-red-100; }
+  .tag.category-priority { @apply bg-orange-100 text-orange-900 dark:bg-orange-900 dark:text-orange-100; }
+  .tag.category-source { @apply bg-cyan-100 text-cyan-900 dark:bg-cyan-900 dark:text-cyan-100; }
+  
+  /* Color picker */
+  .color-picker {
+    @apply relative;
+  }
+  
+  .color-picker-trigger {
+    @apply w-8 h-8 rounded-full border-2 border-border cursor-pointer hover:border-primary transition-colors;
+  }
+  
+  .color-picker-dropdown {
+    @apply absolute top-full left-0 mt-1 p-2 bg-popover border border-border rounded-md shadow-lg z-50;
+  }
+  
+  .color-picker-grid {
+    @apply grid grid-cols-4 gap-1;
+  }
+  
+  .color-option {
+    @apply w-6 h-6 rounded-full border border-border cursor-pointer hover:scale-110 transition-transform;
+  }
+  
+  /* Status indicators */
+  .status-indicator {
+    @apply inline-flex items-center gap-1 text-xs;
+  }
+  
+  .status-saved {
+    @apply text-green-600 dark:text-green-400;
+  }
+  
+  .status-unsaved {
+    @apply text-yellow-600 dark:text-yellow-400;
+  }
+  
+  .status-error {
+    @apply text-red-600 dark:text-red-400;
+  }
+  
+  /* Editor toolbar */
+  .editor-toolbar {
+    @apply flex items-center gap-1 p-2 border-b border-border bg-muted/30;
+  }
+  
+  .toolbar-group {
+    @apply flex items-center gap-1;
+  }
+  
+  .toolbar-separator {
+    @apply w-px h-6 bg-border mx-2;
+  }
+  
+  .toolbar-button {
+    @apply p-2 rounded hover:bg-accent hover:text-accent-foreground transition-colors;
+  }
+  
+  .toolbar-button.active {
+    @apply bg-accent text-accent-foreground;
+  }
+  
+  /* Find and replace */
+  .find-replace-panel {
+    @apply absolute top-0 right-0 bg-popover border border-border rounded-md shadow-lg p-4 z-40 min-w-80;
+  }
+  
+  .find-replace-input {
+    @apply input mb-2;
+  }
+  
+  .find-replace-actions {
+    @apply flex items-center gap-2;
+  }
+  
+  /* Minimap */
+  .editor-minimap {
+    @apply absolute top-0 right-0 w-20 h-full bg-muted/50 border-l border-border;
+  }
+}
