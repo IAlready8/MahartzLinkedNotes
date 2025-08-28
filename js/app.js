@@ -673,13 +673,68 @@ const UI = {
       }, 300));
     }
 
-    // Bind filter buttons
-    const filterButtons = els('#page-search .flex button');
-    filterButtons.forEach(btn => {
+    // Bind search filter buttons (All, Title Only, Content, Tags)
+    const filterButtons = els('#page-search .flex.gap-2.mt-3 button');
+    filterButtons.forEach((btn, index) => {
       btn.onclick = () => {
-        filterButtons.forEach(b => b.className = 'px-3 py-1 bg-gray-700 text-gray-300 rounded text-sm hover:bg-gray-600');
+        // Remove active state from all buttons
+        filterButtons.forEach(b => {
+          b.className = 'px-3 py-1 bg-gray-700 text-gray-300 rounded text-sm hover:bg-gray-600';
+        });
+        // Add active state to clicked button
         btn.className = 'px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700';
-        this.setSearchFilter(btn.textContent);
+        
+        const filterType = btn.textContent.trim();
+        console.log(`Search filter set to: ${filterType}`);
+        this.setSearchFilter(filterType);
+        
+        // Re-run search with new filter if there's a query
+        const query = searchInput?.value.trim();
+        if (query) {
+          this.performAdvancedSearch(query, filterType);
+        }
+      };
+    });
+
+    // Bind date range selector
+    const dateSelect = el('#page-search select');
+    if (dateSelect) {
+      dateSelect.addEventListener('change', (e) => {
+        console.log(`Date filter set to: ${e.target.value}`);
+        this.setDateFilter(e.target.value);
+        
+        // Re-run search if there's a query
+        const query = searchInput?.value.trim();
+        if (query) {
+          this.performAdvancedSearch(query);
+        }
+      });
+    }
+
+    // Bind color filter buttons
+    const colorButtons = els('#page-search .flex.gap-1.flex-wrap button');
+    colorButtons.forEach(btn => {
+      btn.onclick = () => {
+        // Toggle active state
+        const isActive = btn.classList.contains('border-white');
+        
+        if (isActive) {
+          btn.classList.remove('border-white');
+          btn.classList.add('border-gray-500');
+        } else {
+          btn.classList.add('border-white');
+          btn.classList.remove('border-gray-500');
+        }
+        
+        const color = btn.style.backgroundColor;
+        console.log(`Color filter toggled: ${color}`);
+        this.toggleColorFilter(color);
+        
+        // Re-run search if there's a query
+        const query = searchInput?.value.trim();
+        if (query) {
+          this.performAdvancedSearch(query);
+        }
       };
     });
   },
@@ -701,34 +756,126 @@ const UI = {
   },
 
   bindTemplatesPageEvents() {
-    const templateButtons = els('#page-templates .bg-gray-800 button');
+    // Bind "Use Template" buttons
+    const templateButtons = els('#page-templates button');
     templateButtons.forEach(btn => {
-      btn.onclick = () => {
-        const templateCard = btn.closest('.bg-gray-800');
-        const templateName = templateCard.querySelector('h3').textContent;
-        this.applyTemplate(templateName);
-      };
+      if (btn.textContent.includes('Use Template')) {
+        btn.onclick = () => {
+          const templateCard = btn.closest('.bg-gray-800');
+          const templateName = templateCard.querySelector('h3').textContent.trim();
+          console.log(`Applying template: ${templateName}`);
+          this.applyTemplate(templateName);
+        };
+      }
     });
+
+    // Make entire template cards clickable
+    const templateCards = els('#page-templates .bg-gray-800');
+    templateCards.forEach(card => {
+      const button = card.querySelector('button');
+      if (button) {
+        card.onclick = (e) => {
+          // Only trigger if not clicking the button directly
+          if (e.target !== button && !button.contains(e.target)) {
+            button.click();
+          }
+        };
+        
+        // Add visual feedback
+        card.addEventListener('mouseenter', () => {
+          card.style.transform = 'translateY(-2px)';
+          card.style.boxShadow = '0 8px 25px rgba(0,0,0,0.3)';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'translateY(0)';
+          card.style.boxShadow = 'none';
+        });
+      }
+    });
+
+    console.log(`Bound events for ${templateButtons.length} template buttons and ${templateCards.length} template cards`);
   },
 
   bindPresentationsPageEvents() {
+    // Bind generate presentation button
     const generateBtn = el('#page-presentations button');
     if (generateBtn && generateBtn.textContent.includes('Generate')) {
-      generateBtn.onclick = () => this.generatePresentation();
+      generateBtn.onclick = () => {
+        const titleInput = el('#page-presentations input[type="text"]');
+        const title = titleInput?.value.trim();
+        
+        if (!title) {
+          toast('Please enter a presentation title');
+          titleInput?.focus();
+          return;
+        }
+        
+        console.log(`Generating presentation: ${title}`);
+        this.generatePresentation(title);
+      };
     }
+
+    // Load notes list for selection
+    this.loadPresentationNotesList();
+
+    console.log('Presentation page events bound');
   },
 
   bindExportPageEvents() {
+    // Bind all export buttons
     const exportButtons = els('#page-export button');
     exportButtons.forEach(btn => {
-      if (btn.textContent.includes('Markdown')) {
-        btn.onclick = () => this.exportMarkdown();
-      } else if (btn.textContent.includes('JSON')) {
-        btn.onclick = () => this.exportJSON();
-      } else if (btn.textContent.includes('PDF')) {
-        btn.onclick = () => this.exportPDF();
+      const buttonText = btn.textContent.trim();
+      
+      if (buttonText.includes('Export Markdown')) {
+        btn.onclick = () => {
+          console.log('Exporting to Markdown...');
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Exporting...';
+          btn.disabled = true;
+          
+          setTimeout(() => {
+            this.exportMarkdown();
+            btn.innerHTML = 'Export Markdown';
+            btn.disabled = false;
+          }, 1000);
+        };
+      } else if (buttonText.includes('Export JSON')) {
+        btn.onclick = () => {
+          console.log('Exporting to JSON...');
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Exporting...';
+          btn.disabled = true;
+          
+          setTimeout(() => {
+            this.exportJSON();
+            btn.innerHTML = 'Export JSON';
+            btn.disabled = false;
+          }, 1000);
+        };
+      } else if (buttonText.includes('Export PDF')) {
+        btn.onclick = () => {
+          console.log('Exporting to PDF...');
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Exporting...';
+          btn.disabled = true;
+          
+          setTimeout(() => {
+            this.exportPDF();
+            btn.innerHTML = 'Export PDF';
+            btn.disabled = false;
+          }, 1500);
+        };
+      } else if (buttonText.includes('Download')) {
+        btn.onclick = () => {
+          console.log('Downloading previous export...');
+          this.downloadPreviousExport();
+        };
       }
     });
+
+    // Load export history
+    this.loadExportHistory();
+
+    console.log(`Bound events for ${exportButtons.length} export buttons`);
   },
 
   bindBackupPageEvents() {
@@ -748,92 +895,198 @@ const UI = {
   },
 
   bindRecommendationsPageEvents() {
+    // Load initial recommendations
+    this.loadRecommendations();
+
+    // Bind Apply and Dismiss buttons
     const applyButtons = els('#page-recommendations button');
     applyButtons.forEach(btn => {
-      if (btn.textContent === 'Apply') {
+      const buttonText = btn.textContent.trim();
+      
+      if (buttonText === 'Apply') {
         btn.onclick = () => {
           const recommendation = btn.closest('.bg-gray-700');
-          this.applyRecommendation(recommendation);
+          const recommendationType = recommendation.querySelector('h4').textContent;
+          console.log(`Applying recommendation: ${recommendationType}`);
+          this.applyRecommendation(recommendation, recommendationType);
         };
-      } else if (btn.textContent === 'Dismiss') {
+      } else if (buttonText === 'Dismiss') {
         btn.onclick = () => {
           const recommendation = btn.closest('.bg-gray-700');
+          const recommendationType = recommendation.querySelector('h4').textContent;
+          console.log(`Dismissing recommendation: ${recommendationType}`);
           this.dismissRecommendation(recommendation);
         };
       }
     });
+
+    // Bind recommendation settings checkboxes
+    const settingsCheckboxes = els('#page-recommendations input[type="checkbox"]');
+    settingsCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', (e) => {
+        const settingName = e.target.previousElementSibling.textContent;
+        console.log(`Recommendation setting "${settingName}" ${e.target.checked ? 'enabled' : 'disabled'}`);
+        this.updateRecommendationSettings(settingName, e.target.checked);
+      });
+    });
+
+    console.log(`Recommendations page events bound - ${applyButtons.length} buttons, ${settingsCheckboxes.length} settings`);
   },
 
   bindLearningPageEvents() {
+    // Initialize quiz data
+    this.initializeLearningQuiz();
+
+    // Bind answer buttons
     const answerButtons = els('#page-learning .bg-gray-600');
-    answerButtons.forEach(btn => {
-      btn.onclick = () => this.selectAnswer(btn);
-    });
-
-    const navigationButtons = els('#page-learning .flex button');
-    navigationButtons.forEach(btn => {
-      if (btn.textContent === 'Previous') {
-        btn.onclick = () => this.previousQuestion();
-      } else if (btn.textContent === 'Next') {
-        btn.onclick = () => this.nextQuestion();
-      }
-    });
-  },
-
-  bindWorkspacePageEvents() {
-    const switchButtons = els('#page-workspace button');
-    switchButtons.forEach(btn => {
-      if (btn.textContent === 'Switch') {
-        btn.onclick = () => {
-          const workspace = btn.closest('.bg-gray-700').querySelector('h4').textContent;
-          this.switchWorkspace(workspace);
-        };
-      } else if (btn.textContent === 'Create Workspace') {
-        btn.onclick = () => this.createWorkspace();
-      }
-    });
-  },
-
-  bindThemesPageEvents() {
-    const themeOptions = els('#page-themes .cursor-pointer');
-    themeOptions.forEach(option => {
-      option.onclick = () => {
-        const themeName = option.querySelector('h4').textContent;
-        this.applyTheme(themeName);
+    answerButtons.forEach((btn, index) => {
+      btn.onclick = () => {
+        console.log(`Answer ${index + 1} selected`);
+        this.selectAnswer(btn, index);
       };
     });
 
+    // Bind navigation buttons
+    const previousBtn = el('#page-learning button[class*="bg-gray-600"]');
+    const nextBtn = el('#page-learning button[class*="bg-blue-600"]');
+    
+    if (previousBtn) {
+      previousBtn.onclick = () => {
+        console.log('Previous question');
+        this.previousQuestion();
+      };
+    }
+    
+    if (nextBtn) {
+      nextBtn.onclick = () => {
+        console.log('Next question');
+        this.nextQuestion();
+      };
+    }
+
+    console.log(`Learning page events bound - ${answerButtons.length} answer buttons`);
+  },
+
+  bindWorkspacePageEvents() {
+    // Bind Switch workspace buttons
+    const switchButtons = els('#page-workspace button');
+    switchButtons.forEach(btn => {
+      const buttonText = btn.textContent.trim();
+      
+      if (buttonText === 'Switch') {
+        btn.onclick = () => {
+          const workspace = btn.closest('.bg-gray-700').querySelector('h4').textContent;
+          console.log(`Switching to workspace: ${workspace}`);
+          this.switchWorkspace(workspace);
+        };
+      } else if (buttonText === 'Create Workspace') {
+        btn.onclick = () => {
+          console.log('Creating new workspace');
+          this.createWorkspace();
+        };
+      }
+    });
+
+    // Load workspace data
+    this.loadWorkspaceData();
+
+    console.log(`Workspace page events bound - ${switchButtons.length} buttons`);
+  },
+
+  bindThemesPageEvents() {
+    // Bind clickable theme options
+    const themeOptions = els('#page-themes .cursor-pointer');
+    themeOptions.forEach(option => {
+      option.onclick = () => {
+        const themeName = option.querySelector('h4').textContent.trim();
+        console.log(`Applying theme: ${themeName}`);
+        this.applyTheme(themeName);
+        this.updateThemeSelection(option);
+      };
+    });
+
+    // Bind custom theme button
     const customThemeBtn = el('#page-themes button');
     if (customThemeBtn && customThemeBtn.textContent.includes('Apply Custom Theme')) {
-      customThemeBtn.onclick = () => this.applyCustomTheme();
+      customThemeBtn.onclick = () => {
+        console.log('Applying custom theme');
+        this.applyCustomTheme();
+      };
     }
+
+    // Bind color input changes for live preview
+    const colorInputs = els('#page-themes input[type="color"]');
+    const textInputs = els('#page-themes input[type="text"]');
+    
+    colorInputs.forEach((colorInput, index) => {
+      const textInput = textInputs[index];
+      
+      colorInput.addEventListener('input', (e) => {
+        if (textInput) {
+          textInput.value = e.target.value;
+        }
+        this.previewCustomTheme();
+      });
+      
+      if (textInput) {
+        textInput.addEventListener('input', (e) => {
+          if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+            colorInput.value = e.target.value;
+            this.previewCustomTheme();
+          }
+        });
+      }
+    });
+
+    console.log(`Themes page events bound - ${themeOptions.length} theme options, ${colorInputs.length} color inputs`);
   },
 
   bindPluginsPageEvents() {
+    // Bind all plugin management buttons
     const pluginButtons = els('#page-plugins button');
     pluginButtons.forEach(btn => {
-      if (btn.textContent === 'Configure') {
+      const buttonText = btn.textContent.trim();
+      
+      if (buttonText === 'Install Plugin') {
+        // Main install plugin button
         btn.onclick = () => {
-          const plugin = btn.closest('.flex').querySelector('h4').textContent;
+          console.log('Opening plugin installation dialog');
+          this.openPluginInstallDialog();
+        };
+      } else if (buttonText === 'Configure') {
+        btn.onclick = () => {
+          const pluginContainer = btn.closest('.flex.items-center.justify-between');
+          const plugin = pluginContainer.querySelector('h4').textContent.trim();
+          console.log(`Configuring plugin: ${plugin}`);
           this.configurePlugin(plugin);
         };
-      } else if (btn.textContent === 'Activate') {
+      } else if (buttonText === 'Activate') {
         btn.onclick = () => {
-          const plugin = btn.closest('.flex').querySelector('h4').textContent;
+          const pluginContainer = btn.closest('.flex.items-center.justify-between');
+          const plugin = pluginContainer.querySelector('h4').textContent.trim();
+          console.log(`Activating plugin: ${plugin}`);
           this.activatePlugin(plugin);
         };
-      } else if (btn.textContent === 'Install') {
+      } else if (buttonText === 'Install') {
+        // Individual plugin install buttons in the store
         btn.onclick = () => {
-          const plugin = btn.closest('.border').querySelector('h4').textContent;
+          const pluginCard = btn.closest('.border.border-gray-600');
+          const plugin = pluginCard.querySelector('h4').textContent.trim();
+          console.log(`Installing plugin: ${plugin}`);
           this.installPlugin(plugin);
         };
       }
     });
+
+    // Load plugin data
+    this.loadPluginData();
+
+    console.log(`Plugins page events bound - ${pluginButtons.length} buttons`);
   },
 
   // --- PAGE ACTION METHODS ---
 
-  performAdvancedSearch(query) {
+  performAdvancedSearch(query, filterType = 'All') {
     const resultsContainer = el('#search-results');
     if (!resultsContainer || !query.trim()) {
       if (resultsContainer) resultsContainer.innerHTML = '<p class="text-gray-400 text-center py-8">Enter a search term to see results</p>';
@@ -841,37 +1094,79 @@ const UI = {
     }
     
     if (typeof AdvancedSearch !== 'undefined') {
-      AdvancedSearch.performSearch(query);
+      AdvancedSearch.performSearch(query, filterType);
     } else {
-      // Fallback to basic search
-      this.performBasicSearch(query, resultsContainer);
+      // Enhanced fallback search with filters
+      this.performBasicSearch(query, resultsContainer, filterType);
     }
   },
 
-  async performBasicSearch(query, container) {
-    const notes = await Store.allNotes();
-    const results = notes.filter(note => 
-      note.title.toLowerCase().includes(query.toLowerCase()) ||
-      note.body.toLowerCase().includes(query.toLowerCase()) ||
-      note.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()))
-    );
+  async performBasicSearch(query, container, filterType = 'All') {
+    let notes = await Store.allNotes();
+    
+    // Apply date filter if set
+    if (this.searchFilters?.dateRange && this.searchFilters.dateRange !== 'All Time') {
+      notes = this.filterNotesByDate(notes, this.searchFilters.dateRange);
+    }
+    
+    // Apply color filter if set
+    if (this.searchFilters?.colors && this.searchFilters.colors.length > 0) {
+      notes = notes.filter(note => this.searchFilters.colors.includes(note.color || '#6B7280'));
+    }
+
+    // Apply search query with filter type
+    const queryLower = query.toLowerCase();
+    const results = notes.filter(note => {
+      switch (filterType) {
+        case 'Title Only':
+          return note.title.toLowerCase().includes(queryLower);
+        case 'Content':
+          return note.body.toLowerCase().includes(queryLower);
+        case 'Tags':
+          return note.tags.some(tag => tag.toLowerCase().includes(queryLower));
+        default: // 'All'
+          return note.title.toLowerCase().includes(queryLower) ||
+                 note.body.toLowerCase().includes(queryLower) ||
+                 note.tags.some(tag => tag.toLowerCase().includes(queryLower));
+      }
+    });
 
     if (results.length === 0) {
-      container.innerHTML = '<p class="text-gray-400 text-center py-8">No results found</p>';
+      container.innerHTML = `
+        <div class="text-center py-8">
+          <p class="text-gray-400">No results found</p>
+          <p class="text-gray-500 text-sm mt-2">Try adjusting your search filters or query</p>
+        </div>
+      `;
       return;
     }
 
     const html = results.map(note => `
-      <div class="p-3 hover:bg-gray-700 rounded cursor-pointer border-b border-gray-700" onclick="UI.openNoteFromSearch('${note.id}')">
-        <h4 class="font-medium text-white">${note.title}</h4>
-        <p class="text-gray-300 text-sm mt-1 line-clamp-2">${note.body.substring(0, 150)}...</p>
-        <div class="flex gap-1 mt-2">
-          ${note.tags.map(tag => `<span class="text-xs bg-gray-600 px-2 py-1 rounded">${tag}</span>`).join('')}
+      <div class="p-4 hover:bg-gray-700 rounded-lg cursor-pointer border border-gray-600 mb-3 transition-all duration-200" onclick="UI.openNoteFromSearch('${note.id}')">
+        <div class="flex items-start justify-between">
+          <div class="flex-grow">
+            <h4 class="font-medium text-white mb-1">${note.title}</h4>
+            <p class="text-gray-300 text-sm leading-relaxed">${note.body.substring(0, 200)}${note.body.length > 200 ? '...' : ''}</p>
+            ${note.tags.length > 0 ? `
+              <div class="flex gap-1 mt-3 flex-wrap">
+                ${note.tags.map(tag => `<span class="text-xs bg-gray-600 hover:bg-gray-500 px-2 py-1 rounded transition-colors">${tag}</span>`).join('')}
+              </div>
+            ` : ''}
+          </div>
+          <div class="ml-4 flex-shrink-0">
+            <div class="w-4 h-4 rounded-full border border-gray-500" style="background-color: ${note.color || '#6B7280'}" title="Note color"></div>
+            <div class="text-xs text-gray-500 mt-1">${new Date(note.updatedAt).toLocaleDateString()}</div>
+          </div>
         </div>
       </div>
     `).join('');
 
-    container.innerHTML = html;
+    container.innerHTML = `
+      <div class="mb-4">
+        <p class="text-gray-400 text-sm">Found ${results.length} result${results.length !== 1 ? 's' : ''} for "${query}"</p>
+      </div>
+      ${html}
+    `;
   },
 
   openNoteFromSearch(noteId) {
@@ -880,8 +1175,69 @@ const UI = {
   },
 
   setSearchFilter(filter) {
-    console.log(`Setting search filter: ${filter}`);
-    // Implementation depends on AdvancedSearch module
+    if (!this.searchFilters) {
+      this.searchFilters = { 
+        type: 'All', 
+        dateRange: 'All Time',
+        colors: []
+      };
+    }
+    this.searchFilters.type = filter;
+    console.log(`Search filter set to: ${filter}`);
+  },
+
+  setDateFilter(dateRange) {
+    if (!this.searchFilters) {
+      this.searchFilters = { 
+        type: 'All', 
+        dateRange: 'All Time',
+        colors: []
+      };
+    }
+    this.searchFilters.dateRange = dateRange;
+    console.log(`Date filter set to: ${dateRange}`);
+  },
+
+  toggleColorFilter(color) {
+    if (!this.searchFilters) {
+      this.searchFilters = { 
+        type: 'All', 
+        dateRange: 'All Time',
+        colors: []
+      };
+    }
+    
+    const colorIndex = this.searchFilters.colors.indexOf(color);
+    if (colorIndex === -1) {
+      this.searchFilters.colors.push(color);
+    } else {
+      this.searchFilters.colors.splice(colorIndex, 1);
+    }
+    console.log(`Color filters: ${this.searchFilters.colors.join(', ')}`);
+  },
+
+  filterNotesByDate(notes, dateRange) {
+    const now = new Date();
+    const cutoffDate = new Date();
+    
+    switch (dateRange) {
+      case 'Last 7 Days':
+        cutoffDate.setDate(now.getDate() - 7);
+        break;
+      case 'Last 30 Days':
+        cutoffDate.setDate(now.getDate() - 30);
+        break;
+      case 'Last 90 Days':
+        cutoffDate.setDate(now.getDate() - 90);
+        break;
+      default:
+        return notes;
+    }
+    
+    return notes.filter(note => {
+      const noteDate = new Date(note.updatedAt || note.createdAt);
+      return noteDate >= cutoffDate;
+    });
   },
 
   loadAnalyticsDashboard() {
@@ -1028,13 +1384,90 @@ Summary of findings
     return templates[templateName] || `# ${templateName}\n\nTemplate content here...`;
   },
 
-  generatePresentation() {
-    console.log('Generating presentation...');
-    if (typeof PresentationGenerator !== 'undefined') {
-      PresentationGenerator.generate();
-    } else {
-      alert('Presentation generator not available yet');
+  async loadPresentationNotesList() {
+    const notesList = el('#presentation-notes-list');
+    if (!notesList) return;
+
+    const notes = await Store.allNotes();
+    if (notes.length === 0) {
+      notesList.innerHTML = '<p class="text-gray-400">No notes available</p>';
+      return;
     }
+
+    const html = notes.map(note => `
+      <label class="flex items-center py-2 px-2 hover:bg-gray-600 rounded cursor-pointer">
+        <input type="checkbox" class="mr-3 rounded" value="${note.id}">
+        <div class="flex-grow">
+          <div class="font-medium text-white text-sm">${note.title}</div>
+          <div class="text-gray-400 text-xs">${note.tags.join(', ')}</div>
+        </div>
+      </label>
+    `).join('');
+
+    notesList.innerHTML = html;
+  },
+
+  generatePresentation(title) {
+    console.log(`Generating presentation: ${title}`);
+    
+    // Get selected notes
+    const checkboxes = els('#presentation-notes-list input[type="checkbox"]:checked');
+    const selectedNoteIds = Array.from(checkboxes).map(cb => cb.value);
+    
+    if (selectedNoteIds.length === 0) {
+      toast('Please select at least one note');
+      return;
+    }
+
+    if (typeof PresentationGenerator !== 'undefined') {
+      PresentationGenerator.generate(title, selectedNoteIds);
+    } else {
+      // Create a simple presentation preview
+      this.createSimplePresentation(title, selectedNoteIds);
+    }
+  },
+
+  async createSimplePresentation(title, noteIds) {
+    const notes = await Store.allNotes();
+    const selectedNotes = notes.filter(note => noteIds.includes(note.id));
+    
+    // Create a new note with presentation content
+    const presentationContent = `# ${title}
+
+*Generated on ${new Date().toLocaleDateString()}*
+
+---
+
+${selectedNotes.map((note, index) => `
+## Slide ${index + 1}: ${note.title}
+
+${note.body}
+
+---
+`).join('\n')}
+
+## Thank You
+
+*Presentation created from ${selectedNotes.length} notes*
+`;
+
+    const presentationNote = {
+      id: ULID(),
+      title: `Presentation: ${title}`,
+      body: presentationContent,
+      tags: ['#presentation', '#generated'],
+      color: '#8B5CF6',
+      createdAt: nowISO(),
+      updatedAt: nowISO(),
+      links: []
+    };
+
+    await Store.upsert(presentationNote);
+    toast(`Presentation "${title}" created as a new note`);
+    
+    // Navigate to the new presentation note
+    window.location.hash = '#/';
+    setTimeout(() => this.openNote(presentationNote.id), 200);
   },
 
   exportMarkdown() {
@@ -1073,8 +1506,40 @@ Summary of findings
     this.downloadFile('notes-backup.json', data);
   },
 
-  downloadFile(filename, content) {
-    const blob = new Blob([content], { type: 'text/plain' });
+  loadExportHistory() {
+    // This would normally load from localStorage or a database
+    // For now, just update the display with current data
+    this.updateExportHistoryDisplay();
+  },
+
+  async updateExportHistoryDisplay() {
+    const notes = await Store.allNotes();
+    const historyContainer = el('#page-export .bg-gray-700');
+    
+    if (historyContainer) {
+      const noteCount = notes.length;
+      const estimatedSize = Math.round((JSON.stringify(notes).length / 1024) * 100) / 100;
+      
+      historyContainer.innerHTML = `
+        <div class="flex items-center justify-between">
+          <div>
+            <h4 class="font-medium text-white">Current Data</h4>
+            <p class="text-gray-400 text-sm">JSON • ${estimatedSize} KB • ${noteCount} notes • Ready to export</p>
+          </div>
+          <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700" onclick="UI.exportJSON()">Export Now</button>
+        </div>
+      `;
+    }
+  },
+
+  downloadPreviousExport() {
+    // For demo, just export current data
+    this.exportJSON();
+    toast('Downloading current data');
+  },
+
+  downloadFile(filename, content, type = 'text/plain') {
+    const blob = new Blob([content], { type });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -1083,6 +1548,26 @@ Summary of findings
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    
+    // Store export history
+    this.addToExportHistory(filename, type, content.length);
+  },
+
+  addToExportHistory(filename, type, size) {
+    const history = JSON.parse(localStorage.getItem('exportHistory') || '[]');
+    history.unshift({
+      filename,
+      type,
+      size,
+      timestamp: Date.now()
+    });
+    
+    // Keep only last 10 exports
+    if (history.length > 10) {
+      history.splice(10);
+    }
+    
+    localStorage.setItem('exportHistory', JSON.stringify(history));
   },
 
   createBackup() {
@@ -1107,29 +1592,254 @@ Summary of findings
     element.remove();
   },
 
-  selectAnswer(button) {
+  initializeLearningQuiz() {
+    if (!this.quizState) {
+      this.quizState = {
+        currentQuestion: 0,
+        totalQuestions: 5,
+        selectedAnswers: {},
+        score: 0
+      };
+    }
+  },
+
+  selectAnswer(button, answerIndex) {
     // Remove selection from other buttons
-    const allAnswers = els('#page-learning .bg-gray-600');
+    const allAnswers = els('#page-learning .space-y-3 button');
     allAnswers.forEach(btn => {
       btn.className = 'w-full p-3 text-left bg-gray-600 hover:bg-gray-500 rounded transition-colors text-white';
     });
     
     // Highlight selected answer
     button.className = 'w-full p-3 text-left bg-blue-600 hover:bg-blue-500 rounded transition-colors text-white';
+    
+    // Store the selected answer
+    this.quizState.selectedAnswers[this.quizState.currentQuestion] = answerIndex;
+    
+    // Enable next button
+    const nextBtn = el('#page-learning button[class*="bg-blue-600"]:last-of-type');
+    if (nextBtn) {
+      nextBtn.disabled = false;
+      nextBtn.style.opacity = '1';
+    }
+    
+    toast(`Answer ${answerIndex + 1} selected`);
   },
 
   previousQuestion() {
-    console.log('Previous question');
+    if (this.quizState.currentQuestion > 0) {
+      this.quizState.currentQuestion--;
+      this.updateQuizDisplay();
+    }
   },
 
   nextQuestion() {
-    console.log('Next question');
+    if (this.quizState.currentQuestion < this.quizState.totalQuestions - 1) {
+      this.quizState.currentQuestion++;
+      this.updateQuizDisplay();
+    } else {
+      this.finishQuiz();
+    }
+  },
+
+  updateQuizDisplay() {
+    // Update question counter
+    const questionText = el('#page-learning h4');
+    if (questionText) {
+      questionText.textContent = `Question ${this.quizState.currentQuestion + 1} of ${this.quizState.totalQuestions}`;
+    }
+
+    // Update progress dots
+    const dots = els('#page-learning .flex.gap-2 .rounded-full');
+    dots.forEach((dot, index) => {
+      if (index === this.quizState.currentQuestion) {
+        dot.className = 'w-3 h-3 bg-blue-600 rounded-full';
+      } else if (index < this.quizState.currentQuestion) {
+        dot.className = 'w-3 h-3 bg-green-600 rounded-full';
+      } else {
+        dot.className = 'w-3 h-3 bg-gray-600 rounded-full';
+      }
+    });
+
+    // Update button states
+    const prevBtn = el('#page-learning button[class*="bg-gray-600"]');
+    const nextBtn = el('#page-learning button[class*="bg-blue-600"]:last-of-type');
+    
+    if (prevBtn) {
+      prevBtn.disabled = this.quizState.currentQuestion === 0;
+      prevBtn.style.opacity = this.quizState.currentQuestion === 0 ? '0.5' : '1';
+    }
+    
+    if (nextBtn) {
+      const hasAnswer = this.quizState.selectedAnswers.hasOwnProperty(this.quizState.currentQuestion);
+      nextBtn.disabled = !hasAnswer;
+      nextBtn.style.opacity = hasAnswer ? '1' : '0.5';
+      
+      if (this.quizState.currentQuestion === this.quizState.totalQuestions - 1) {
+        nextBtn.textContent = 'Finish Quiz';
+      } else {
+        nextBtn.textContent = 'Next';
+      }
+    }
+
+    // Clear answer selections
+    const answerButtons = els('#page-learning .space-y-3 button');
+    answerButtons.forEach(btn => {
+      btn.className = 'w-full p-3 text-left bg-gray-600 hover:bg-gray-500 rounded transition-colors text-white';
+    });
+  },
+
+  finishQuiz() {
+    const totalAnswered = Object.keys(this.quizState.selectedAnswers).length;
+    toast(`Quiz completed! You answered ${totalAnswered} out of ${this.quizState.totalQuestions} questions.`);
+    
+    // Reset quiz
+    this.quizState = null;
+    this.updateQuizDisplay();
+  },
+
+  loadRecommendations() {
+    // This would normally load from an AI service
+    this.generateMockRecommendations();
+  },
+
+  async generateMockRecommendations() {
+    const notes = await Store.allNotes();
+    const recommendationsList = el('#recommendations-list');
+    
+    if (!recommendationsList || notes.length < 2) return;
+
+    const recommendations = [
+      {
+        title: 'Create Missing Link',
+        description: `Consider linking "${notes[0]?.title}" and "${notes[1]?.title}" - they share common themes.`,
+        type: 'link'
+      },
+      {
+        title: 'Tag Suggestion',
+        description: `Your recent notes about projects could benefit from the #planning tag.`,
+        type: 'tag'
+      },
+      {
+        title: 'Content Enhancement',
+        description: `Add more details to your notes about methodology for better searchability.`,
+        type: 'content'
+      }
+    ];
+
+    const html = recommendations.map(rec => `
+      <div class="bg-gray-700 rounded-lg p-4">
+        <div class="flex items-start justify-between">
+          <div>
+            <h4 class="font-medium text-white mb-2">${rec.title}</h4>
+            <p class="text-gray-300 text-sm">${rec.description}</p>
+          </div>
+          <div class="flex gap-2">
+            <button class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700">Apply</button>
+            <button class="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700">Dismiss</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    recommendationsList.innerHTML = html;
+    
+    // Re-bind events for the new buttons
+    this.bindRecommendationsPageEvents();
+  },
+
+  applyRecommendation(element, type) {
+    console.log(`Applying recommendation: ${type}`);
+    
+    // Visual feedback
+    element.style.transform = 'scale(0.95)';
+    element.style.opacity = '0.7';
+    
+    setTimeout(() => {
+      element.style.transform = 'scale(1)';
+      element.style.opacity = '0.5';
+      
+      // Update button text
+      const applyBtn = element.querySelector('button[class*="bg-green"]');
+      if (applyBtn) {
+        applyBtn.textContent = 'Applied';
+        applyBtn.className = 'px-3 py-1 bg-gray-500 text-white text-sm rounded cursor-not-allowed';
+        applyBtn.disabled = true;
+      }
+      
+      toast(`Recommendation "${type}" applied successfully`);
+    }, 200);
+  },
+
+  dismissRecommendation(element) {
+    // Fade out animation
+    element.style.transition = 'all 0.3s ease';
+    element.style.transform = 'translateX(100px)';
+    element.style.opacity = '0';
+    
+    setTimeout(() => {
+      element.remove();
+      toast('Recommendation dismissed');
+    }, 300);
+  },
+
+  updateRecommendationSettings(settingName, enabled) {
+    const settings = JSON.parse(localStorage.getItem('recommendationSettings') || '{}');
+    settings[settingName] = enabled;
+    localStorage.setItem('recommendationSettings', JSON.stringify(settings));
+    
+    toast(`${settingName} ${enabled ? 'enabled' : 'disabled'}`);
+  },
+
+  loadWorkspaceData() {
+    // Load workspace statistics
+    this.updateWorkspaceStats();
+  },
+
+  async updateWorkspaceStats() {
+    const notes = await Store.allNotes();
+    const workspaceCards = els('#page-workspace .bg-gray-700');
+    
+    workspaceCards.forEach(card => {
+      const statsElement = card.querySelector('.text-gray-400');
+      if (statsElement && statsElement.textContent.includes('•')) {
+        // Update note count for active workspace
+        statsElement.textContent = `Personal knowledge base • ${notes.length} notes`;
+      }
+    });
   },
 
   switchWorkspace(workspaceName) {
     console.log(`Switching to workspace: ${workspaceName}`);
-    const currentWorkspace = el('#current-workspace');
-    if (currentWorkspace) currentWorkspace.textContent = workspaceName;
+    
+    // Update workspace selection UI
+    const workspaceCards = els('#page-workspace .bg-gray-700');
+    workspaceCards.forEach(card => {
+      const cardTitle = card.querySelector('h4').textContent.trim();
+      const statusSpan = card.querySelector('span');
+      const button = card.querySelector('button');
+      
+      if (cardTitle === workspaceName) {
+        // Set as active
+        card.className = 'bg-gray-700 rounded-lg p-4 border-l-4 border-blue-500';
+        if (statusSpan) {
+          statusSpan.textContent = 'Active';
+          statusSpan.className = 'px-2 py-1 bg-blue-600 text-white text-xs rounded';
+        }
+        if (button) button.style.display = 'none';
+      } else {
+        // Set as inactive
+        card.className = 'bg-gray-700 rounded-lg p-4';
+        if (statusSpan) {
+          statusSpan.style.display = 'none';
+        }
+        if (button) {
+          button.style.display = 'block';
+          button.textContent = 'Switch';
+        }
+      }
+    });
+    
     toast(`Switched to ${workspaceName}`);
   },
 
@@ -1137,12 +1847,59 @@ Summary of findings
     const nameInput = el('#page-workspace input[type="text"]');
     const descInput = el('#page-workspace textarea');
     
-    if (nameInput && nameInput.value.trim()) {
-      console.log(`Creating workspace: ${nameInput.value}`);
-      toast('Workspace created');
-      nameInput.value = '';
-      if (descInput) descInput.value = '';
+    const name = nameInput?.value.trim();
+    const description = descInput?.value.trim();
+    
+    if (!name) {
+      toast('Please enter a workspace name');
+      nameInput?.focus();
+      return;
     }
+    
+    console.log(`Creating workspace: ${name}`);
+    
+    // Create new workspace card
+    const workspaceContainer = el('#page-workspace .space-y-3');
+    if (workspaceContainer) {
+      const newWorkspaceHTML = `
+        <div class="bg-gray-700 rounded-lg p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h4 class="font-medium text-white">${name}</h4>
+              <p class="text-gray-400 text-sm">${description || 'New workspace'} • 0 notes</p>
+            </div>
+            <button class="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-500">Switch</button>
+          </div>
+        </div>
+      `;
+      
+      workspaceContainer.insertAdjacentHTML('beforeend', newWorkspaceHTML);
+      
+      // Re-bind events for the new button
+      this.bindWorkspacePageEvents();
+    }
+    
+    toast('Workspace created successfully');
+    nameInput.value = '';
+    if (descInput) descInput.value = '';
+  },
+
+  updateThemeSelection(selectedOption) {
+    // Remove border from all theme options
+    const allOptions = els('#page-themes .border-2, #page-themes .border');
+    allOptions.forEach(option => {
+      if (option.classList.contains('border-2')) {
+        option.className = option.className.replace('border-2 border-blue-500', 'border border-gray-600');
+      }
+    });
+    
+    // Add blue border to selected option
+    selectedOption.className = selectedOption.className.replace('border border-gray-600', 'border-2 border-blue-500');
+  },
+
+  previewCustomTheme() {
+    // This would normally apply a live preview
+    console.log('Previewing custom theme...');
   },
 
   applyTheme(themeName) {
@@ -1159,34 +1916,166 @@ Summary of findings
     toast('Custom theme applied');
   },
 
+  loadPluginData() {
+    // Update plugin status and information
+    this.updatePluginStats();
+  },
+
+  updatePluginStats() {
+    // This would normally load from plugin registry
+    console.log('Plugin data loaded');
+  },
+
+  openPluginInstallDialog() {
+    // Create a simple modal for plugin installation
+    const modalHTML = `
+      <div id="plugin-install-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+          <h3 class="text-xl font-semibold text-white mb-4">Install Plugin</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm text-gray-300 mb-2">Plugin URL or Name</label>
+              <input type="text" placeholder="Enter plugin name or URL" class="w-full p-3 bg-gray-700 border border-gray-600 rounded text-white">
+            </div>
+            <div class="flex gap-3">
+              <button onclick="UI.installPluginFromDialog()" class="flex-1 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Install</button>
+              <button onclick="UI.closePluginDialog()" class="flex-1 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+  },
+
+  installPluginFromDialog() {
+    const modal = el('#plugin-install-modal');
+    const input = modal.querySelector('input');
+    const pluginName = input?.value.trim();
+    
+    if (!pluginName) {
+      toast('Please enter a plugin name');
+      return;
+    }
+    
+    // Simulate installation
+    toast(`Installing ${pluginName}...`);
+    setTimeout(() => {
+      toast(`${pluginName} installed successfully`);
+      this.addInstalledPlugin(pluginName);
+      this.closePluginDialog();
+    }, 2000);
+  },
+
+  addInstalledPlugin(pluginName) {
+    const installedContainer = el('#page-plugins .space-y-4');
+    if (installedContainer) {
+      const pluginHTML = `
+        <div class="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
+          <div class="flex items-center">
+            <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center mr-3">
+              <i class="fas fa-puzzle-piece text-white"></i>
+            </div>
+            <div>
+              <h4 class="font-medium text-white">${pluginName}</h4>
+              <p class="text-gray-400 text-sm">Custom installed plugin</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-1 bg-gray-600 text-white text-xs rounded">Inactive</span>
+            <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">Activate</button>
+          </div>
+        </div>
+      `;
+      installedContainer.insertAdjacentHTML('beforeend', pluginHTML);
+      
+      // Re-bind events
+      this.bindPluginsPageEvents();
+    }
+  },
+
+  closePluginDialog() {
+    const modal = el('#plugin-install-modal');
+    if (modal) {
+      modal.remove();
+    }
+  },
+
   configurePlugin(pluginName) {
     console.log(`Configuring plugin: ${pluginName}`);
-    alert(`Configure ${pluginName} - Settings panel would open here`);
+    
+    // Create simple configuration dialog
+    const configHTML = `
+      <div id="plugin-config-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+          <h3 class="text-xl font-semibold text-white mb-4">Configure ${pluginName}</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="flex items-center justify-between py-2">
+                <span class="text-gray-300">Enable notifications</span>
+                <input type="checkbox" checked>
+              </label>
+              <label class="flex items-center justify-between py-2">
+                <span class="text-gray-300">Auto-sync</span>
+                <input type="checkbox">
+              </label>
+            </div>
+            <div class="flex gap-3">
+              <button onclick="UI.savePluginConfig('${pluginName}')" class="flex-1 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+              <button onclick="UI.closePluginDialog()" class="flex-1 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', configHTML);
+  },
+
+  savePluginConfig(pluginName) {
+    toast(`${pluginName} configuration saved`);
+    const modal = el('#plugin-config-modal');
+    if (modal) modal.remove();
   },
 
   activatePlugin(pluginName) {
     console.log(`Activating plugin: ${pluginName}`);
     const button = event.target;
-    button.textContent = 'Configure';
-    button.className = 'px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-500';
-    
-    // Update status
     const statusSpan = button.parentElement.querySelector('span');
-    if (statusSpan) {
-      statusSpan.textContent = 'Active';
-      statusSpan.className = 'px-2 py-1 bg-green-600 text-white text-xs rounded';
-    }
     
-    toast(`${pluginName} activated`);
+    // Visual feedback
+    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Activating...';
+    button.disabled = true;
+    
+    setTimeout(() => {
+      // Update button and status
+      button.textContent = 'Configure';
+      button.className = 'px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-500';
+      button.disabled = false;
+      
+      if (statusSpan) {
+        statusSpan.textContent = 'Active';
+        statusSpan.className = 'px-2 py-1 bg-green-600 text-white text-xs rounded';
+      }
+      
+      toast(`${pluginName} activated successfully`);
+    }, 1500);
   },
 
   installPlugin(pluginName) {
     console.log(`Installing plugin: ${pluginName}`);
     const button = event.target;
-    button.textContent = 'Installed';
+    
+    // Visual feedback
+    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Installing...';
     button.disabled = true;
-    button.className = 'w-full py-1 bg-green-600 text-white text-xs rounded cursor-not-allowed';
-    toast(`${pluginName} installed`);
+    
+    setTimeout(() => {
+      button.textContent = 'Installed';
+      button.className = 'w-full py-1 bg-green-600 text-white text-xs rounded cursor-not-allowed';
+      toast(`${pluginName} installed successfully`);
+    }, 2000);
   },
 
   updateNavigation(currentPath) {
