@@ -2261,7 +2261,8 @@ ${note.body}
     console.log('Seeding database...');
     const a = Note.create({ title: 'Welcome to Mahart Notes', tags: ['#welcome'], body: 'This is your first note. Select it from the list on the left.\n\n## Color-coded Notes\nYou can now assign colors to notes using the color button in the editor header. This helps organize your thoughts visually!', color: '#3B82F6' });
     const b = Note.create({ title: 'How to use', tags: ['#guide'], body: '## Linking\nLink notes with [[Title]].\n\n## Tags\nAdd tags with #tags.\n\n## Graph Views\nVisit the Graph page to see your notes connected by tags or colors!', color: '#10B981' });
-    const all = [a, b];
+    const c = Note.create({ title: 'Advanced Features', tags: ['#features', '#advanced'], body: '## New in v2.1\n\n- **Enhanced Search**: Use advanced filters and search operators\n- **Analytics Dashboard**: Track your knowledge growth\n- **Smart Templates**: Quick-start templates for different note types\n- **AI Recommendations**: Get suggestions for connecting ideas\n- **Learning Mode**: Quiz yourself on your notes\n\nExplore these features from the enhanced sidebar!', color: '#8B5CF6' });
+    const all = [a, b, c];
     for (const n of all) Note.computeLinks(n, all);
     await Store.saveNotes(all);
   },
