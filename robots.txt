@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://your-mahart-linked-notes-domain.com/sitemap.xml
