@@ -22,65 +22,58 @@
     <meta name="theme-color" content="#1e293b">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     
-    <!-- Design System Styles -->
-    <link rel="stylesheet" href="/src/styles/design-tokens.css">
-    <link rel="stylesheet" href="/src/styles/components.css">
-    <!-- Professional Business Style -->
-    <link rel="stylesheet" href="/css/professional-business.css">
+    <!-- Modern Dark Theme Styles -->
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
-<body class="font-primary bg-gray-50 text-gray-900 antialiased" data-theme="light">
+<body class="font-primary" data-theme="dark">
     <!-- Loading Screen -->
-    <div id="app-loading" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-50">
-        <div class="text-center">
-            <div class="mb-4">
-                <div class="spinner spinner-lg text-primary-600"></div>
-            </div>
-            <h2 class="text-lg font-semibold text-neutral-900 mb-2">Loading Mahart Notes</h2>
-            <p class="text-sm text-neutral-600">Initializing your knowledge workspace...</p>
+    <div id="app-loading">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h2 style="font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); color: var(--color-text-primary); margin-bottom: var(--space-sm);">Loading Mahart Notes</h2>
+            <p style="font-size: var(--font-size-sm); color: var(--color-text-muted);">Initializing your knowledge workspace...</p>
         </div>
     </div>
 
     <!-- Main Application Container -->
-    <div id="app" class="hidden h-screen flex overflow-hidden">
+    <div id="app" class="hidden">
         <!-- Sidebar Navigation -->
-        <nav id="sidebar" data-testid="sidebar" class="sidebar">
+        <nav id="sidebar" data-testid="sidebar">
             <!-- Sidebar Header -->
             <header class="sidebar-header">
-                <div class="flex items-center justify-between">
-                    <h1 class="text-xl font-bold text-neutral-900 truncate">Mahart Notes</h1>
-                    <div class="flex items-center gap-2">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-md);">
+                    <h1>Mahart Notes</h1>
+                    <div style="display: flex; align-items: center; gap: var(--space-sm);">
                         <!-- Sync Status Indicator -->
-                        <div class="flex items-center gap-2">
-                            <div id="sync-status" class="w-2 h-2 bg-gray-500 rounded-full" title="Application status"></div>
-                        </div>
+                        <div id="sync-status" style="width: 8px; height: 8px; background: var(--color-accent-success); border-radius: 50%; box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);" title="Application status"></div>
                         <!-- Menu Toggle for Mobile -->
-                        <button id="mobile-menu-toggle" data-testid="mobile-menu-toggle" class="btn-ghost p-2 lg:hidden">
+                        <button id="mobile-menu-toggle" data-testid="mobile-menu-toggle" class="btn btn-ghost btn-icon lg:hidden">
                             <i class="fas fa-bars"></i>
                         </button>
                     </div>
                 </div>
                 
                 <!-- Quick Actions -->
-                <div class="flex gap-2 mt-4">
-                    <button id="new-note-btn" data-testid="new-note-btn" class="btn-primary flex-1">
+                <div class="quick-actions">
+                    <button id="new-note-btn" data-testid="new-note-btn" class="btn btn-primary" style="flex: 1;">
                         <i class="fas fa-plus"></i>
                         <span>New Note</span>
                     </button>
-                    <button id="search-toggle-btn" class="btn-secondary">
+                    <button id="search-toggle-btn" class="btn btn-secondary btn-icon">
                         <i class="fas fa-search"></i>
                     </button>
                 </div>
                 
                 <!-- Search Bar -->
-                <div id="search-container" class="relative mt-4">
-                    <div class="relative">
+                <div id="search-container" class="search-container">
+                    <div class="search-input-wrapper">
                         <i class="search-icon fas fa-search"></i>
                         <input 
                             type="text" 
                             id="search-input" 
                             data-testid="search-input"
                             class="search-input" 
-                            placeholder="Search notes... (Ctrl+K)"
+                            placeholder="Search notes... (⌘K)"
                         >
                     </div>
                     <div id="search-results" data-testid="search-results" class="search-results hidden"></div>
@@ -93,22 +86,22 @@
                     <a href="#/" data-route="#/" class="sidebar-nav-item">
                         <i class="fas fa-edit"></i>
                         <span>Editor</span>
-                        <kbd class="ml-auto text-xs bg-neutral-100 px-2 py-1 rounded">⌘E</kbd>
+                        <kbd>⌘E</kbd>
                     </a>
                     <a href="#/graph" data-route="#/graph" class="sidebar-nav-item">
                         <i class="fas fa-project-diagram"></i>
                         <span>Knowledge Graph</span>
-                        <kbd class="ml-auto text-xs bg-neutral-100 px-2 py-1 rounded">⌘G</kbd>
+                        <kbd>⌘G</kbd>
                     </a>
                     <a href="#/tags" data-route="#/tags" class="sidebar-nav-item">
                         <i class="fas fa-tags"></i>
                         <span>Tag Management</span>
-                        <kbd class="ml-auto text-xs bg-neutral-100 px-2 py-1 rounded">⌘T</kbd>
+                        <kbd>⌘T</kbd>
                     </a>
                     <a href="#/ai" data-route="#/ai" class="sidebar-nav-item">
                         <i class="fas fa-brain"></i>
                         <span>AI Assistant</span>
-                        <kbd class="ml-auto text-xs bg-neutral-100 px-2 py-1 rounded">⌘A</kbd>
+                        <kbd>⌘A</kbd>
                     </a>
                     <a href="#/settings" data-route="#/settings" class="sidebar-nav-item">
                         <i class="fas fa-cog"></i>
@@ -117,12 +110,12 @@
                 </nav>
                 
                 <!-- Note List -->
-                <div class="mt-6">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="text-sm font-semibold text-neutral-600 uppercase tracking-wide">Notes</h3>
-                        <span id="note-count" data-testid="note-count" class="text-xs text-neutral-500">0 notes</span>
+                <div>
+                    <div class="note-list-header">
+                        <h3 class="note-list-title">Notes</h3>
+                        <span id="note-count" data-testid="note-count" class="note-count">0 notes</span>
                     </div>
-                    <div id="note-list" data-testid="note-list" class="space-y-1">
+                    <div id="note-list" data-testid="note-list" class="note-list">
                         <!-- Note items will be populated here -->
                     </div>
                 </div>
@@ -130,14 +123,12 @@
             
             <!-- Sidebar Footer -->
             <footer class="sidebar-footer">
-                <div class="text-xs text-neutral-500 text-center">
-                    <div>v2.0.0</div>
-                    <div class="mt-1">
-                        <button id="theme-toggle" class="text-neutral-400 hover:text-neutral-600">
-                            <i class="fas fa-palette"></i>
-                            Theme
-                        </button>
-                    </div>
+                <div style="text-align: center; font-size: var(--font-size-xs); color: var(--color-text-muted);">
+                    <div style="margin-bottom: var(--space-xs);">v2.0.0</div>
+                    <button id="theme-toggle" class="btn btn-ghost btn-sm">
+                        <i class="fas fa-palette"></i>
+                        <span>Theme</span>
+                    </button>
                 </div>
             </footer>
         </nav>
@@ -145,166 +136,178 @@
         <!-- Main Content Area -->
         <main class="flex-1 flex flex-col overflow-hidden">
             <!-- Editor Page -->
-            <div id="page-editor" class="page hidden flex-1 flex overflow-hidden">
-                <div class="flex-1 flex flex-col">
-                    <!-- Editor Toolbar -->
-                    <div class="border-b border-neutral-200 bg-white px-6 py-3 sticky top-0 z-10">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-4">
-                                <input 
-                                    type="text" 
-                                    id="note-title" 
-                                    data-testid="note-title"
-                                    class="text-xl font-semibold bg-transparent border-none outline-none text-neutral-900 placeholder-neutral-500" 
-                                    placeholder="Untitled Note"
-                                >
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span id="save-status" class="text-sm text-neutral-500"></span>
-                                <button id="save-btn" class="btn-primary btn-sm">
-                                    <i class="fas fa-save"></i>
-                                    Save
-                                </button>
-                            </div>
-                        </div>
-                        <!-- Format Toolbar -->
-                        <div id="format-toolbar" class="mt-3 flex flex-wrap items-center gap-2">
-                            <button id="btn-bold" class="btn-secondary btn-sm" title="Bold (Ctrl+B)"><i class="fas fa-bold"></i><span class="ml-1">Bold</span></button>
-                            <button id="btn-italic" class="btn-secondary btn-sm" title="Italic (Ctrl+I)"><i class="fas fa-italic"></i><span class="ml-1">Italic</span></button>
-                            <span class="mx-1 text-neutral-300">|</span>
-                            <button id="btn-h1" class="btn-secondary btn-sm" title="Heading 1"><span class="font-semibold">H1</span></button>
-                            <button id="btn-h2" class="btn-secondary btn-sm" title="Heading 2"><span class="font-semibold">H2</span></button>
-                            <button id="btn-h3" class="btn-secondary btn-sm" title="Heading 3"><span class="font-semibold">H3</span></button>
-                            <span class="mx-1 text-neutral-300">|</span>
-                            <button id="btn-link" class="btn-secondary btn-sm" title="Link"><i class="fas fa-link"></i><span class="ml-1">Link</span></button>
-                            <button id="btn-wikilink" class="btn-secondary btn-sm" title="Wikilink"><i class="fas fa-bookmark"></i><span class="ml-1">Wikilink</span></button>
-                            <button id="btn-check" class="btn-secondary btn-sm" title="Checklist"><i class="fas fa-square"></i><span class="ml-1">Task</span></button>
-                            <button id="btn-code" class="btn-secondary btn-sm" title="Code block"><i class="fas fa-code"></i><span class="ml-1">Code</span></button>
-                            <button id="btn-quote" class="btn-secondary btn-sm" title="Quote"><i class="fas fa-quote-left"></i><span class="ml-1">Quote</span></button>
-                            <span class="mx-1 text-neutral-300">|</span>
-                            <button id="btn-toggle-preview" class="btn-secondary btn-sm" title="Show/Hide Preview"><i class="fas fa-eye"></i><span class="ml-1">Preview</span></button>
-                            <button id="btn-toggle-editor-mode" class="btn-secondary btn-sm" title="Switch Editor (Monaco/Text)"><i class="fas fa-pen"></i><span class="ml-1">Editor</span></button>
-                            <button id="btn-outline" class="btn-secondary btn-sm" title="Toggle Outline"><i class="fas fa-list"></i><span class="ml-1">Outline</span></button>
-                            <button id="btn-command-palette" class="btn-secondary btn-sm" title="Command Palette (Ctrl+Shift+P)"><i class="fas fa-terminal"></i><span class="ml-1">Command</span></button>
-                        </div>
+            <div id="page-editor" class="page active">
+                <!-- Editor Header -->
+                <div class="editor-header">
+                    <div class="editor-title-section">
+                        <input 
+                            type="text" 
+                            id="note-title" 
+                            data-testid="note-title"
+                            class="note-title-input" 
+                            placeholder="Untitled Note"
+                        >
+                    </div>
+                    <div class="editor-actions">
+                        <span id="save-status" class="save-status"></span>
+                        <button id="save-btn" class="btn btn-primary btn-sm">
+                            <i class="fas fa-save"></i>
+                            <span>Save</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Editor Toolbar -->
+                <div class="editor-toolbar">
+                    <button id="btn-bold" class="btn btn-sm" title="Bold (Ctrl+B)"><i class="fas fa-bold"></i></button>
+                    <button id="btn-italic" class="btn btn-sm" title="Italic (Ctrl+I)"><i class="fas fa-italic"></i></button>
+                    <div style="width: 1px; height: 20px; background: var(--color-border-primary); margin: 0 var(--space-xs);"></div>
+                    <button id="btn-h1" class="btn btn-sm" title="Heading 1"><span style="font-weight: var(--font-weight-semibold);">H1</span></button>
+                    <button id="btn-h2" class="btn btn-sm" title="Heading 2"><span style="font-weight: var(--font-weight-semibold);">H2</span></button>
+                    <button id="btn-h3" class="btn btn-sm" title="Heading 3"><span style="font-weight: var(--font-weight-semibold);">H3</span></button>
+                    <div style="width: 1px; height: 20px; background: var(--color-border-primary); margin: 0 var(--space-xs);"></div>
+                    <button id="btn-link" class="btn btn-sm" title="Link"><i class="fas fa-link"></i></button>
+                    <button id="btn-wikilink" class="btn btn-sm" title="Wikilink"><i class="fas fa-bookmark"></i></button>
+                    <button id="btn-check" class="btn btn-sm" title="Checklist"><i class="fas fa-square"></i></button>
+                    <button id="btn-code" class="btn btn-sm" title="Code block"><i class="fas fa-code"></i></button>
+                    <button id="btn-quote" class="btn btn-sm" title="Quote"><i class="fas fa-quote-left"></i></button>
+                    <div style="width: 1px; height: 20px; background: var(--color-border-primary); margin: 0 var(--space-xs);"></div>
+                    <button id="btn-toggle-preview" class="btn btn-sm" title="Show/Hide Preview"><i class="fas fa-eye"></i></button>
+                    <button id="btn-toggle-editor-mode" class="btn btn-sm" title="Switch Editor Mode"><i class="fas fa-pen"></i></button>
+                    <button id="btn-outline" class="btn btn-sm" title="Toggle Outline"><i class="fas fa-list"></i></button>
+                    <button id="btn-command-palette" class="btn btn-sm" title="Command Palette (⌘⇧P)"><i class="fas fa-terminal"></i></button>
+                </div>
+                    
+                <!-- Editor Content -->
+                <div class="editor-content">
+                    <!-- Editor Panel -->
+                    <div class="editor-pane">
+                        <textarea 
+                            id="note-body" 
+                            data-testid="note-body"
+                            class="editor-textarea" 
+                            placeholder="Start writing your note..."
+                        ></textarea>
                     </div>
                     
-                    <!-- Editor Content -->
-                    <div class="flex-1 flex">
-                        <!-- Editor Panel -->
-                        <div class="flex-1 flex flex-col">
-                            <div class="flex-1 relative">
-                                <textarea 
-                                    id="note-body" 
-                                    data-testid="note-body"
-                                    class="w-full h-full p-6 resize-none bg-white border-none outline-none text-neutral-900 placeholder-neutral-500 font-mono" 
-                                    placeholder="Start writing your note..."
-                                ></textarea>
+                    <!-- Splitter -->
+                    <div id="editor-splitter" class="editor-splitter" role="separator" aria-label="Resize editor/preview" aria-orientation="vertical" tabindex="0"></div>
+                    
+                    <!-- Preview Panel -->
+                    <div id="preview-panel" class="preview-pane">
+                        <div class="preview-content">
+                            <div id="note-preview" data-testid="note-preview" class="preview">
+                                <!-- Rendered markdown preview -->
                             </div>
                         </div>
-                        <!-- Splitter -->
-                        <div id="editor-splitter" class="splitter" role="separator" aria-label="Resize editor/preview" aria-orientation="vertical" tabindex="0"></div>
-                        
-                        <!-- Preview Panel -->
-                        <div id="preview-panel" class="w-1/2 border-l border-neutral-200 bg-neutral-50 overflow-y-auto">
-                            <div class="p-6">
-                                <div id="note-preview" data-testid="note-preview" class="prose prose-neutral max-w-none">
-                                    <!-- Rendered markdown preview -->
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Outline Panel -->
-                        <aside id="outline-panel" class="w-64 border-l border-neutral-200 bg-white overflow-y-auto hidden">
-                            <div class="p-4">
-                                <div class="flex items-center justify-between mb-2">
-                                    <h3 class="text-sm font-semibold text-neutral-700">Outline <span id="outline-count" class="text-xs text-neutral-500 ml-2">0</span></h3>
-                                    <div id="outline-controls" class="flex items-center gap-2">
-                                        <button id="outline-collapse-all" class="btn-ghost btn-xs" title="Collapse all"><i class="fas fa-compress-alt"></i></button>
-                                        <button id="outline-expand-all" class="btn-ghost btn-xs" title="Expand all"><i class="fas fa-expand-alt"></i></button>
-                                        <label class="text-xs text-neutral-500" for="outline-level">Level</label>
-                                        <select id="outline-level" class="select btn-xs" title="Collapse to level">
-                                            <option value="0">All</option>
-                                            <option value="1">H1</option>
-                                            <option value="2">H2</option>
-                                            <option value="3">H3</option>
-                                            <option value="4">H4</option>
-                                            <option value="5">H5</option>
-                                            <option value="6">H6</option>
-                                        </select>
-                                        <button id="outline-cycle-level" class="btn-ghost btn-xs" title="Cycle outline levels"><i class="fas fa-list-ol"></i></button>
-                                        <button id="outline-reset" class="btn-ghost btn-xs" title="Reset outline (show all, clear collapse)"><i class="fas fa-undo"></i></button>
-                                    </div>
-                                </div>
-                                <div class="mb-2 flex items-center gap-2">
-                                    <input id="outline-search" class="input text-xs py-1" placeholder="Filter headings..." />
-                                    <div class="text-[11px] text-neutral-500">
-                                        Shortcuts: ⌘⇧O toggle, ⌘⌥0–6 level
-                                    </div>
-                                </div>
-                                <nav id="outline-list" class="space-y-1 text-sm text-neutral-700"></nav>
-                            </div>
-                        </aside>
                     </div>
+
+                    <!-- Outline Panel -->
+                    <aside id="outline-panel" class="hidden" style="width: 256px; border-left: 1px solid var(--color-border-primary); background: var(--color-bg-secondary); overflow-y: auto;">
+                        <div style="padding: var(--space-md);">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-sm);">
+                                <h3 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); color: var(--color-text-secondary);">Outline <span id="outline-count" style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-left: var(--space-xs);">0</span></h3>
+                            </div>
+                            <nav id="outline-list" style="display: flex; flex-direction: column; gap: var(--space-xs); font-size: var(--font-size-sm); color: var(--color-text-secondary);"></nav>
+                        </div>
+                    </aside>
                 </div>
             </div>
 
             <!-- Graph Page -->
-            <div id="page-graph" class="page hidden flex-1">
-                <div id="graph-container" data-testid="graph-container" class="w-full h-full">
-                    <svg id="graph-svg" class="w-full h-full"></svg>
+            <div id="page-graph" class="page">
+                <div id="graph-container" data-testid="graph-container" style="width: 100%; height: 100%; position: relative;">
+                    <svg id="graph-svg" style="width: 100%; height: 100%;"></svg>
+                    <div class="graph-controls">
+                        <button class="btn btn-sm" title="Toggle Link Mode"><i class="fas fa-exchange-alt"></i></button>
+                        <button class="btn btn-sm" title="Center Graph"><i class="fas fa-compress-arrows-alt"></i></button>
+                        <button class="btn btn-sm" title="Reset Zoom"><i class="fas fa-search-minus"></i></button>
+                    </div>
+                    <div class="graph-legend">
+                        <div style="font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-primary); margin-bottom: var(--space-xs);">Legend</div>
+                        <div style="font-size: var(--font-size-xs); color: var(--color-text-muted);">Nodes: Notes • Links: Connections</div>
+                    </div>
                 </div>
             </div>
 
             <!-- Tags Page -->
-            <div id="page-tags" class="page hidden flex-1 p-6">
+            <div id="page-tags" class="page" style="padding: var(--space-xl);">
                 <div data-testid="tags-container">
-                    <h2 class="text-2xl font-bold text-neutral-900 mb-6">Tag Management</h2>
-                    <div id="tag-list" data-testid="tag-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <!-- Tags will be populated here -->
+                    <h2 style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--color-text-primary); margin-bottom: var(--space-xl);">Tag Management</h2>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">All Tags</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="tag-list" data-testid="tag-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--space-md);">
+                                <!-- Tags will be populated here -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- AI Page -->
-            <div id="page-ai" class="page hidden flex-1 p-6">
+            <div id="page-ai" class="page" style="padding: var(--space-xl);">
                 <div>
-                    <h2 class="text-2xl font-bold text-neutral-900 mb-6">AI Assistant</h2>
-                    <p class="text-neutral-600">AI features will be available here.</p>
+                    <h2 style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--color-text-primary); margin-bottom: var(--space-xl);">AI Assistant</h2>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">AI Chat</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="ai-chat-container" style="min-height: 400px; display: flex; flex-direction: column;">
+                                <div id="ai-messages" style="flex: 1; margin-bottom: var(--space-md); padding: var(--space-md); background: var(--color-bg-primary); border-radius: var(--radius-md);">
+                                    <p style="color: var(--color-text-muted); text-align: center;">Start a conversation with your AI assistant...</p>
+                                </div>
+                                <div style="display: flex; gap: var(--space-sm);">
+                                    <input type="text" id="ai-input" class="form-input" placeholder="Ask me anything about your notes..." style="flex: 1;" />
+                                    <button id="ai-send" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane"></i>
+                                        <span>Send</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Settings Page -->
-            <div id="page-settings" class="page hidden flex-1 p-6">
+            <div id="page-settings" class="page" style="padding: var(--space-xl);">
                 <div>
-                    <h2 class="text-2xl font-bold text-neutral-900 mb-6">Settings</h2>
-                    <div class="card max-w-2xl">
-                        <div class="card-body space-y-6">
-                            <div class="form-group">
-                                <label class="form-label">Theme</label>
-                                <select id="theme-select" class="select">
-                                    <option value="light">Light</option>
-                                    <option value="dark">Dark</option>
-                                    <option value="system">System</option>
-                                </select>
+                    <h2 style="font-size: var(--font-size-3xl); font-weight: var(--font-weight-bold); color: var(--color-text-primary); margin-bottom: var(--space-xl);">Settings</h2>
+                    <div style="max-width: 600px;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Preferences</h3>
                             </div>
-                            
-                            <div class="flex gap-4">
-                                <button id="export-btn" data-testid="export-btn" class="btn-secondary">
-                                    <i class="fas fa-download"></i>
-                                    Export Data
-                                </button>
-                                <button id="import-btn" class="btn-secondary">
-                                    <i class="fas fa-upload"></i>
-                                    Import Data
-                                </button>
-                            </div>
-                            
-                            <div class="border-t pt-6">
-                                <button id="clear-data-btn" data-testid="clear-data-btn" class="btn-error">
-                                    <i class="fas fa-trash"></i>
-                                    Clear All Data
-                                </button>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label class="form-label">Theme</label>
+                                    <select id="theme-select" class="form-select">
+                                        <option value="dark">Dark</option>
+                                        <option value="light">Light</option>
+                                        <option value="system">System</option>
+                                    </select>
+                                </div>
+                                
+                                <div style="display: flex; gap: var(--space-sm); margin-bottom: var(--space-lg);">
+                                    <button id="export-btn" data-testid="export-btn" class="btn btn-secondary">
+                                        <i class="fas fa-download"></i>
+                                        <span>Export Data</span>
+                                    </button>
+                                    <button id="import-btn" class="btn btn-secondary">
+                                        <i class="fas fa-upload"></i>
+                                        <span>Import Data</span>
+                                    </button>
+                                </div>
+                                
+                                <div style="border-top: 1px solid var(--color-border-primary); padding-top: var(--space-lg);">
+                                    <button id="clear-data-btn" data-testid="clear-data-btn" class="btn btn-error">
+                                        <i class="fas fa-trash"></i>
+                                        <span>Clear All Data</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -344,7 +347,22 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
     <script src="https://unpkg.com/ulid@2.3.0/lib/index.umd.js"></script>
 
-    <!-- Main Application Entry Point -->
-    <script type="module" src="/src/main.js"></script>
+    <!-- Main Application Scripts -->
+    <script src="js/util.js"></script>
+    <script src="js/ui-enhancements.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/graph.js"></script>
+    <script src="js/tags.js"></script>
+    <script src="js/analytics.js"></script>
+    <script src="js/modern-app.js"></script>
+    <script>
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof Init !== 'undefined') {
+                Init.start();
+            }
+        });
+    </script>
 </body>
 </html>

@@ -5,7 +5,7 @@ import '../css/styles.css';
 import { Store } from './modules/store.js';
 import { Search } from './modules/search.js';
 import { Router } from './modules/router.js';
-import { UI } from './modules/app.js';
+import { UI } from './modules/ui.js';
 import { initUtils } from './modules/util.js';
 
 // Performance monitoring
