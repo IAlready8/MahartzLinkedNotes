@@ -15,17 +15,7 @@ import { CompetitiveImporters } from './competitive-importers.js';
 import { DataManagement } from './data-management.js';
 import { SmartTemplates } from './smart-templates.js';
 import { PresentationGenerator } from './presentation-generator.js';
-import { DataManagement } from './data-management.js';
-import { Recommendations } from './recommendations.js';
-import { LearningMode } from './learning-mode.js';
-import { WorkspaceManager } from './workspace-manager.js';
-import { ThemeManager } from './themes.js';
-import { PluginSystem } from './plugin-system.js';
-import { definePage, initRouter } from './router.js';
-import { el, els, debounce, nowISO, ULID } from './util.js';
-import { ToastManager, LoadingManager, ContextMenu, TooltipManager, ProgressBar, AdvancedSearchUI, KeyboardShortcuts, StatusBar } from './advanced-ui-components.js';
 
-export const UI = {
   state: { currentId: null, autoLink: true, analytics: true, bc: true },
   bc: null,
 
