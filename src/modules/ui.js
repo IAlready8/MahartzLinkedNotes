@@ -13,9 +13,20 @@ import { Collaboration } from './collaboration.js';
 import { CommandPaletteExtensions } from './command-palette-extensions.js';
 import { CompetitiveImporters } from './competitive-importers.js';
 import { DataManagement } from './data-management.js';
+import { DataSync } from './data-sync.js';
+import { DynamicDashboards } from './dynamic-dashboards.js';
 import { SmartTemplates } from './smart-templates.js';
 import { PresentationGenerator } from './presentation-generator.js';
+import { Recommendations } from './recommendations.js';
+import { LearningMode } from './learning-mode.js';
+import { WorkspaceManager } from './workspace-manager.js';
+import { ThemeManager } from './themes.js';
+import { PluginSystem } from './plugin-system.js';
+import { definePage, initRouter } from './router.js';
+import { el, els, debounce, nowISO, ULID } from './util.js';
+import { ToastManager, LoadingManager, ContextMenu, TooltipManager, ProgressBar, AdvancedSearchUI, KeyboardShortcuts, StatusBar } from './advanced-ui-components.js';
 
+export const UI = {
   state: { currentId: null, autoLink: true, analytics: true, bc: true },
   bc: null,
 
@@ -631,7 +642,7 @@ import { PresentationGenerator } from './presentation-generator.js';
   },
 
   async setNoteColor(color) {
-    if (!this.state.currentId) return;
+    if (!this.state.currentId) return; 
     
     const note = await Store.get(this.state.currentId);
     if (!note) return;
@@ -899,8 +910,6 @@ import { PresentationGenerator } from './presentation-generator.js';
     connectButtons.forEach(btn => {
       if (btn.textContent === 'Connect' && btn.closest('.border').querySelector('h4').textContent === 'Google Drive') {
         btn.onclick = () => this.connectGoogleDrive();
-      } else if (btn.textContent === 'Connect' && btn.closest('.border').querySelector('h4').textContent === 'Dropbox') {
-        btn.onclick = () => this.connectDropbox();
       }
     });
   },
@@ -920,13 +929,6 @@ import { PresentationGenerator } from './presentation-generator.js';
           const recommendationType = recommendation.querySelector('h4').textContent;
           console.log(`Applying recommendation: ${recommendationType}`);
           this.applyRecommendation(recommendation, recommendationType);
-        };
-      } else if (buttonText === 'Dismiss') {
-        btn.onclick = () => {
-          const recommendation = btn.closest('.bg-gray-700');
-          const recommendationType = recommendation.querySelector('h4').textContent;
-          console.log(`Dismissing recommendation: ${recommendationType}`);
-          this.dismissRecommendation(recommendation);
         };
       }
     });
@@ -1241,8 +1243,6 @@ import { PresentationGenerator } from './presentation-generator.js';
   loadAnalyticsDashboard() {
     if (typeof Analytics !== 'undefined') {
       Analytics.loadDashboard();
-    } else {
-      this.loadBasicAnalytics();
     }
   },
 
@@ -1457,16 +1457,12 @@ Template content here...`;
   exportJSON() {
     if (typeof DataManagement !== 'undefined') {
       DataManagement.exportJSON();
-    } else {
-      this.basicExportJSON();
     }
   },
 
   exportPDF() {
     if (typeof DataManagement !== 'undefined') {
       DataManagement.exportPDF();
-    } else {
-      alert('PDF export not available yet');
     }
   },
 
