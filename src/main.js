@@ -15,7 +15,7 @@ import { Performance } from './modules/performance.js';
 import { initStreetStyle } from './modules/street-style.js';
 
 // Service Worker for Offline Support
-import { registerServiceWorker } from './modules/service-worker.js';
+// import { registerServiceWorker } from './modules/service-worker.js';
 
 // Advanced features (optional) are disabled for build stability.
 // If needed, re-enable or migrate them into src/modules/* with proper exports.

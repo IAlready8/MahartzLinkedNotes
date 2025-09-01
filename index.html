@@ -218,10 +218,28 @@
                         <aside id="outline-panel" class="w-64 border-l border-neutral-200 bg-white overflow-y-auto hidden">
                             <div class="p-4">
                                 <div class="flex items-center justify-between mb-2">
-                                    <h3 class="text-sm font-semibold text-neutral-700">Outline</h3>
-                                    <div id="outline-controls" class="flex gap-1">
+                                    <h3 class="text-sm font-semibold text-neutral-700">Outline <span id="outline-count" class="text-xs text-neutral-500 ml-2">0</span></h3>
+                                    <div id="outline-controls" class="flex items-center gap-2">
                                         <button id="outline-collapse-all" class="btn-ghost btn-xs" title="Collapse all"><i class="fas fa-compress-alt"></i></button>
                                         <button id="outline-expand-all" class="btn-ghost btn-xs" title="Expand all"><i class="fas fa-expand-alt"></i></button>
+                                        <label class="text-xs text-neutral-500" for="outline-level">Level</label>
+                                        <select id="outline-level" class="select btn-xs" title="Collapse to level">
+                                            <option value="0">All</option>
+                                            <option value="1">H1</option>
+                                            <option value="2">H2</option>
+                                            <option value="3">H3</option>
+                                            <option value="4">H4</option>
+                                            <option value="5">H5</option>
+                                            <option value="6">H6</option>
+                                        </select>
+                                        <button id="outline-cycle-level" class="btn-ghost btn-xs" title="Cycle outline levels"><i class="fas fa-list-ol"></i></button>
+                                        <button id="outline-reset" class="btn-ghost btn-xs" title="Reset outline (show all, clear collapse)"><i class="fas fa-undo"></i></button>
+                                    </div>
+                                </div>
+                                <div class="mb-2 flex items-center gap-2">
+                                    <input id="outline-search" class="input text-xs py-1" placeholder="Filter headings..." />
+                                    <div class="text-[11px] text-neutral-500">
+                                        Shortcuts: ⌘⇧O toggle, ⌘⌥0–6 level
                                     </div>
                                 </div>
                                 <nav id="outline-list" class="space-y-1 text-sm text-neutral-700"></nav>

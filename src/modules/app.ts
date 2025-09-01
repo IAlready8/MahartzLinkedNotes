@@ -19,6 +19,7 @@ class ApplicationManager {
   private isInitialized = false;
   private autoSaveEnabled = true;
   private saveTimeout: number | null = null;
+  private collapsedOutline: Set<string> = new Set();
   // Slash menu state
   private slashMenuEl: HTMLElement | null = null;
   private slashActive = false;
@@ -273,6 +274,36 @@ class ApplicationManager {
 
     // Toggle outline
     onClick('btn-outline', () => this.toggleOutlinePanel());
+    const collapseAllBtn = el('#outline-collapse-all');
+    const expandAllBtn = el('#outline-expand-all');
+    const levelSelect = el('#outline-level') as HTMLSelectElement | null;
+    const cycleBtn = el('#outline-cycle-level');
+    const resetBtn = el('#outline-reset');
+    if (collapseAllBtn) collapseAllBtn.addEventListener('click', () => this.collapseAllOutline());
+    if (expandAllBtn) expandAllBtn.addEventListener('click', () => this.expandAllOutline());
+    if (levelSelect) {
+      levelSelect.addEventListener('change', () => this.updateOutline());
+    }
+    if (cycleBtn && levelSelect) {
+      cycleBtn.addEventListener('click', () => {
+        const seq = [0, 1, 2, 3];
+        const curr = parseInt(levelSelect.value || '0', 10) || 0;
+        const next = seq[(seq.indexOf(curr) + 1) % seq.length];
+        this.setOutlineLevel(next);
+      });
+    }
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => this.resetOutline());
+    }
+    // Apply saved open state
+    const outlinePanel = el('#outline-panel') as HTMLElement | null;
+    try {
+      const savedOpen = localStorage.getItem(`outlineOpen:${this.currentNote?.id || 'global'}`) === '1';
+      if (outlinePanel && savedOpen) {
+        outlinePanel.classList.remove('hidden');
+        this.updateOutline();
+      }
+    } catch {}
 
     // Toggle editor mode
     onClick('btn-toggle-editor-mode', () => this.toggleEditorMode());
@@ -346,9 +377,16 @@ class ApplicationManager {
       { id: 'tpl-meeting', label: 'Template: Meeting Notes', run: () => insertAtCursor(`# Meeting Notes\n\n## Attendees\n- \n\n## Agenda\n1. \n\n## Notes\n- \n\n## Action Items\n- [ ] \n`) },
       { id: 'tpl-project', label: 'Template: Project Brief', run: () => insertAtCursor(`# Project Brief\n\n## Goal\n- \n\n## Tasks\n- [ ] \n\n## Resources\n- \n\n## Timeline\n- Start: {{date}}\n- Due: {{date:14d}}\n`) },
       { id: 'tpl-research', label: 'Template: Research Note', run: () => insertAtCursor(`# Research: {{title}}\n\n## Source\n- \n\n## Key Points\n- \n\n## Questions\n- \n\n## Summary\n- \n`) },
-      // Notes and navigation
-      { id: 'toggle-outline', icon: 'fa-list', label: 'View: Toggle Outline', run: () => this.toggleOutlinePanel() },
-      { id: 'duplicate-note', icon: 'fa-copy', label: 'Note: Duplicate Current', run: () => this.duplicateCurrentNote() },
+        // Notes and navigation
+        { id: 'toggle-outline', icon: 'fa-list', label: 'View: Toggle Outline', run: () => this.toggleOutlinePanel() },
+        { id: 'outline-cycle', icon: 'fa-list-ol', label: 'Outline: Cycle Level', run: () => this.cycleOutlineLevel() },
+        { id: 'outline-reset', icon: 'fa-undo', label: 'Outline: Reset', run: () => this.resetOutline() },
+        { id: 'outline-level-0', icon: 'fa-list-ol', label: 'Outline: Show All', run: () => this.setOutlineLevel(0) },
+        { id: 'outline-level-1', icon: 'fa-list-ol', label: 'Outline: Level H1', run: () => this.setOutlineLevel(1) },
+        { id: 'outline-level-2', icon: 'fa-list-ol', label: 'Outline: Level H2', run: () => this.setOutlineLevel(2) },
+        { id: 'outline-level-3', icon: 'fa-list-ol', label: 'Outline: Level H3', run: () => this.setOutlineLevel(3) },
+        { id: 'outline-level-4', icon: 'fa-list-ol', label: 'Outline: Level H4', run: () => this.setOutlineLevel(4) },
+        { id: 'duplicate-note', icon: 'fa-copy', label: 'Note: Duplicate Current', run: () => this.duplicateCurrentNote() },
       { id: 'goto-editor', icon: 'fa-edit', label: 'Navigate: Editor', run: () => { window.location.hash = '#/'; } },
       { id: 'goto-graph', icon: 'fa-project-diagram', label: 'Navigate: Graph', run: () => { window.location.hash = '#/graph'; } },
       { id: 'goto-tags', icon: 'fa-hashtag', label: 'Navigate: Tags', run: () => { window.location.hash = '#/tags'; } },
@@ -498,6 +536,19 @@ class ApplicationManager {
           searchInput.focus();
           searchInput.select();
         }
+      }
+
+      // Ctrl/Cmd + Shift + O - Toggle outline
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'o') {
+        e.preventDefault();
+        this.toggleOutlinePanel();
+      }
+
+      // Ctrl/Cmd + Alt + [0-6] - Set outline level
+      if ((e.ctrlKey || e.metaKey) && e.altKey && /^[0-6]$/.test(e.key)) {
+        e.preventDefault();
+        const lvl = parseInt(e.key, 10);
+        this.setOutlineLevel(lvl);
       }
 
       // Ctrl/Cmd + Shift + E - Toggle editor mode
@@ -723,6 +774,7 @@ class ApplicationManager {
         this.ensureHeadingIds();
       }
       this.updateOutline();
+      this.scrollToHashHeadingIfPresent();
     }
   }
 
@@ -754,17 +806,23 @@ class ApplicationManager {
     const previewPanel = el('#preview-panel') as HTMLElement | null;
     const outlinePanel = el('#outline-panel') as HTMLElement | null;
     if (!list || !previewPanel || !outlinePanel || outlinePanel.classList.contains('hidden')) return;
+    this.loadCollapsedOutline();
     const headings = Array.from(previewPanel.querySelectorAll('h1, h2, h3, h4, h5, h6')) as HTMLElement[];
     if (headings.length === 0) {
       list.innerHTML = '<div class="text-xs text-neutral-400">No headings</div>';
       return;
     }
-    const items = headings.map(h => {
-      const level = parseInt(h.tagName.substring(1), 10);
+    const levels = headings.map(h => parseInt(h.tagName.substring(1), 10));
+    const items = headings.map((h, i) => {
+      const level = levels[i];
       const indent = Math.max(0, level - 1);
       const text = h.innerText || '';
       const id = h.id;
-      return `<button class="outline-item" data-target="${id}" style="padding-left:${indent * 12}px">${text}</button>`;
+      const hasChildren = i < headings.length - 1 && levels[i + 1] > level;
+      const isCollapsed = this.collapsedOutline.has(id);
+      const toggle = hasChildren ? `<span class="mr-1 inline-block w-4 text-neutral-400" data-collapse="${id}"><i class="fas ${isCollapsed ? 'fa-chevron-right' : 'fa-chevron-down'}"></i></span>` : `<span class="inline-block w-4"></span>`;
+      const copyBtn = `<button class="btn-ghost btn-xs ml-1" title="Copy link" data-copy="${id}"><i class="fas fa-link"></i></button>`;
+      return `<div class="flex items-center" data-index="${i}" data-level="${level}" data-id="${id}">${toggle}<button class="outline-item flex-1" data-target="${id}" style="padding-left:${indent * 12}px">${text}</button>${copyBtn}</div>`;
     }).join('');
     list.innerHTML = items;
     list.querySelectorAll('button[data-target]').forEach(btn => {
@@ -779,17 +837,173 @@ class ApplicationManager {
           const current = previewPanel.scrollTop;
           const offset = rect.top - containerTop + current - 8;
           previewPanel.scrollTo({ top: offset, behavior: 'smooth' });
+          this.updateHashHeading(targetId);
         }
       });
     });
+    // Collapse toggles
+    list.querySelectorAll('[data-collapse]').forEach(t => {
+      t.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = (e.currentTarget as HTMLElement).dataset.collapse as string;
+        if (!id) return;
+        if (this.collapsedOutline.has(id)) this.collapsedOutline.delete(id); else this.collapsedOutline.add(id);
+        this.saveCollapsedOutline();
+        this.updateOutline();
+      });
+    });
+    // Apply collapsed visibility
+    const rows = Array.from(list.querySelectorAll('[data-index]')) as HTMLElement[];
+    const rowLevels = rows.map(r => parseInt(r.dataset.level || '1', 10));
+    rows.forEach((row, idx) => {
+      let hide = false;
+      for (let a = idx - 1; a >= 0; a--) {
+        if (rowLevels[a] < rowLevels[idx]) {
+          const ancId = rows[a].dataset.id as string;
+          if (this.collapsedOutline.has(ancId)) { hide = true; break; }
+        }
+      }
+      row.style.display = hide ? 'none' : '';
+    });
+    // Apply level filter: hide deeper than selected level
+    const levelSelect = el('#outline-level') as HTMLSelectElement | null;
+    const maxLevel = levelSelect ? parseInt(levelSelect.value || '0', 10) || 0 : 0;
+    if (maxLevel > 0) {
+      rows.forEach((row) => {
+        const lvl = parseInt(row.dataset.level || '1', 10);
+        if (lvl > maxLevel) row.style.display = 'none';
+      });
+    }
+    // Update header count visible/total
+    const countEl = el('#outline-count');
+    if (countEl) {
+      const visible = rows.filter(r => r.style.display !== 'none').length;
+      countEl.textContent = `${visible}/${rows.length}`;
+    }
     this.bindOutlineScroll();
     this.highlightActiveOutline();
+    // Copy link handlers
+    list.querySelectorAll('[data-copy]').forEach(b => {
+      b.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = (e.currentTarget as HTMLElement).dataset.copy as string;
+        if (!id) return;
+        const url = `${location.origin}${location.pathname}#/note/${encodeURIComponent(this.currentNote?.id || '')}&h=${encodeURIComponent(id)}`;
+        if (navigator.clipboard?.writeText) {
+          navigator.clipboard.writeText(url).then(() => toast('Heading link copied', 'success'));
+        }
+      });
+    });
+    // Keyboard navigation for outline list
+    list.addEventListener('keydown', (e: KeyboardEvent) => {
+      const items = Array.from(list.querySelectorAll('button.outline-item')) as HTMLElement[];
+      const visible = items.filter(it => (it.parentElement as HTMLElement).style.display !== 'none');
+      if (visible.length === 0) return;
+      const active = document.activeElement as HTMLElement | null;
+      let idx = visible.indexOf(active || visible[0]);
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        idx = Math.min(idx + 1, visible.length - 1);
+        visible[idx].focus();
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        idx = Math.max(idx - 1, 0);
+        visible[idx].focus();
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        (visible[idx] as HTMLButtonElement).click();
+      }
+    });
+  }
+
+  private collapseAllOutline(): void {
+    const previewPanel = el('#preview-panel') as HTMLElement | null;
+    if (!previewPanel) return;
+    const headings = Array.from(previewPanel.querySelectorAll('h1, h2, h3, h4, h5, h6')) as HTMLElement[];
+    const levels = headings.map(h => parseInt(h.tagName.substring(1), 10));
+    this.collapsedOutline.clear();
+    for (let i = 0; i < headings.length; i++) {
+      if (i < headings.length - 1 && levels[i + 1] > levels[i]) {
+        this.collapsedOutline.add(headings[i].id);
+      }
+    }
+    this.saveCollapsedOutline();
+    this.updateOutline();
+  }
+
+  private expandAllOutline(): void {
+    this.collapsedOutline.clear();
+    this.saveCollapsedOutline();
+    this.updateOutline();
+  }
+
+  private setOutlineLevel(level: number): void {
+    const levelSelect = el('#outline-level') as HTMLSelectElement | null;
+    if (levelSelect) {
+      levelSelect.value = String(level);
+      try { localStorage.setItem(`outlineLevel:${this.currentNote?.id || 'global'}`, String(level)); } catch {}
+    }
+    const outlinePanel = el('#outline-panel') as HTMLElement | null;
+    if (outlinePanel && outlinePanel.classList.contains('hidden')) {
+      outlinePanel.classList.remove('hidden');
+    }
+    this.updateOutline();
+  }
+
+  private cycleOutlineLevel(): void {
+    const levelSelect = el('#outline-level') as HTMLSelectElement | null;
+    const seq = [0, 1, 2, 3];
+    const curr = levelSelect ? parseInt(levelSelect.value || '0', 10) || 0 : 0;
+    const next = seq[(seq.indexOf(curr) + 1) % seq.length];
+    this.setOutlineLevel(next);
+  }
+
+  private outlineKeys() {
+    const id = this.currentNote?.id || 'global';
+    return {
+      collapsed: `outlineCollapsed:${id}`,
+      level: `outlineLevel:${id}`,
+      open: `outlineOpen:${id}`
+    };
+  }
+
+  private loadCollapsedOutline(): void {
+    try {
+      const { collapsed } = this.outlineKeys();
+      const raw = localStorage.getItem(collapsed);
+      this.collapsedOutline = new Set<string>(raw ? JSON.parse(raw) : []);
+    } catch {
+      this.collapsedOutline = new Set();
+    }
+  }
+
+  private saveCollapsedOutline(): void {
+    try {
+      const { collapsed } = this.outlineKeys();
+      localStorage.setItem(collapsed, JSON.stringify(Array.from(this.collapsedOutline)));
+    } catch {}
+  }
+
+  private resetOutline(): void {
+    // Clear collapsed
+    this.collapsedOutline.clear();
+    this.saveCollapsedOutline();
+    // Reset level to All
+    const levelSelect = el('#outline-level') as HTMLSelectElement | null;
+    if (levelSelect) {
+      levelSelect.value = '0';
+      try { localStorage.setItem(this.outlineKeys().level, '0'); } catch {}
+    }
+    this.updateOutline();
   }
 
   private toggleOutlinePanel(): void {
     const outlinePanel = el('#outline-panel') as HTMLElement | null;
     if (!outlinePanel) return;
     const hidden = outlinePanel.classList.toggle('hidden');
+    try { localStorage.setItem(`outlineOpen:${this.currentNote?.id || 'global'}`, hidden ? '0' : '1'); } catch {}
     if (!hidden) this.updateOutline();
   }
 
@@ -920,7 +1134,13 @@ class ApplicationManager {
       { id: 'code', label: 'Code Block', run: () => this.applyWrapInline('```\n','\n```') },
       { id: 'link', label: 'Link', run: () => this.applyWrapInline('[','](url)') },
       { id: 'wikilink', label: 'Wikilink', run: () => this.applyWrapInline('[[',']]') },
-      { id: 'outline', label: 'Toggle Outline', run: () => this.toggleOutlinePanel() }
+      { id: 'outline', label: 'Toggle Outline', run: () => this.toggleOutlinePanel() },
+      { id: 'outline-cycle', label: 'Outline: Cycle Level', run: () => this.cycleOutlineLevel() },
+      { id: 'outline-reset', label: 'Outline: Reset', run: () => this.resetOutline() },
+      { id: 'outline-all', label: 'Outline: Show All', run: () => this.setOutlineLevel(0) },
+      { id: 'outline-h1', label: 'Outline: Level H1', run: () => this.setOutlineLevel(1) },
+      { id: 'outline-h2', label: 'Outline: Level H2', run: () => this.setOutlineLevel(2) },
+      { id: 'outline-h3', label: 'Outline: Level H3', run: () => this.setOutlineLevel(3) }
     ];
   }
 
@@ -934,7 +1154,7 @@ class ApplicationManager {
       .map(x => x.c);
     const items = scored;
     if (this.slashSelectionIndex >= items.length) this.slashSelectionIndex = Math.max(items.length - 1, 0);
-    const iconFor = (id: string) => ({ h1:'fa-heading', h2:'fa-heading', h3:'fa-heading', bold:'fa-bold', italic:'fa-italic', check:'fa-square', quote:'fa-quote-left', code:'fa-code', link:'fa-link', wikilink:'fa-bookmark', outline:'fa-list' } as Record<string,string>)[id] || 'fa-circle';
+    const iconFor = (id: string) => ({ h1:'fa-heading', h2:'fa-heading', h3:'fa-heading', bold:'fa-bold', italic:'fa-italic', check:'fa-square', quote:'fa-quote-left', code:'fa-code', link:'fa-link', wikilink:'fa-bookmark', outline:'fa-list', 'outline-all':'fa-list-ol', 'outline-h1':'fa-list-ol', 'outline-h2':'fa-list-ol', 'outline-h3':'fa-list-ol', 'outline-cycle':'fa-list-ol', 'outline-reset':'fa-undo' } as Record<string,string>)[id] || 'fa-circle';
     this.slashMenuEl.innerHTML = (items.map((c, i) => `<div class="dropdown-item ${i===this.slashSelectionIndex?'bg-neutral-100':''}" data-idx="${i}"><i class="fas ${iconFor(c.id)} mr-2"></i>${c.label}</div>`).join('')) || '<div class="text-sm text-neutral-500 px-4 py-2">No commands</div>';
     this.slashMenuEl.querySelectorAll('[data-idx]').forEach((el) => {
       el.addEventListener('mouseenter', () => {
