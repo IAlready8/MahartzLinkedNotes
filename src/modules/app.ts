@@ -825,6 +825,33 @@ class ApplicationManager {
     list.querySelectorAll('.outline-item').forEach(el => el.classList.remove('active'));
     const activeBtn = list.querySelector(`.outline-item[data-target="${CSS.escape(activeId)}"]`) as HTMLElement | null;
     if (activeBtn) activeBtn.classList.add('active');
+    this.updateHashHeading(activeId);
+  }
+
+  private updateHashHeading(id: string): void {
+    try {
+      const hash = location.hash || '#/'
+      const [base] = hash.split('&h=');
+      const newHash = `${base}&h=${encodeURIComponent(id)}`;
+      history.replaceState(null, '', newHash);
+    } catch {}
+  }
+
+  private scrollToHashHeadingIfPresent(): void {
+    const previewPanel = el('#preview-panel') as HTMLElement | null;
+    if (!previewPanel) return;
+    const match = (location.hash || '').match(/[&?]h=([^&]+)/);
+    if (!match) return;
+    const id = decodeURIComponent(match[1]);
+    const target = previewPanel.querySelector(`#${CSS.escape(id)}`) as HTMLElement | null;
+    if (target) {
+      const containerTop = (previewPanel.firstElementChild as HTMLElement)?.getBoundingClientRect().top || previewPanel.getBoundingClientRect().top;
+      const rect = target.getBoundingClientRect();
+      const current = previewPanel.scrollTop;
+      const offset = rect.top - containerTop + current - 8;
+      previewPanel.scrollTo({ top: offset });
+      this.highlightActiveOutline();
+    }
   }
 
   private copyNoteLinkToClipboard(): void {

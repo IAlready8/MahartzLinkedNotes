@@ -149,7 +149,7 @@ class EnterpriseStore extends Store {
 - **Real-time Previews**: Instant rendering of complex content
 - **Accessibility Tools**: Alt-text generation and management
 
-### 2.3 Professional Navigation & Layout
+### 2.4 Professional Navigation & Layout
 **Target: Enterprise-grade information architecture**
 
 #### Navigation Systems
@@ -164,7 +164,7 @@ class EnterpriseStore extends Store {
 - **Panel Management**: Dockable, resizable interface panels
 - **Multi-window Support**: Browser-native multi-window workflows
 
-### 2.4 Onboarding & Empty States
+### 2.5 Onboarding & Empty States
 **Target: Exceptional first-time user experience**
 
 #### Guided Onboarding
@@ -243,7 +243,7 @@ class CollaborationEngine {
 - **Knowledge Gaps**: Automatic identification of missing connections
 - **Research Assistant**: AI-powered research and fact-checking
 
-### 3.1 AI-Powered Features
+### 3.2 AI-Powered Features
 **Target: Intelligent assistance and automation**
 
 #### Contextual AI
@@ -258,7 +258,7 @@ class CollaborationEngine {
 - **Duplicate Detection**: Smart identification of similar content
 - **Scheduled Operations**: Time-based note processing
 
-### 3.2 Advanced Visualization
+### 3.3 Advanced Visualization
 **Target: Multi-dimensional knowledge exploration**
 
 #### Enhanced Graph Systems
@@ -273,7 +273,7 @@ class CollaborationEngine {
 - **Heat Maps**: Visual pattern recognition
 - **Network Analysis**: Advanced relationship mapping
 
-### 3.3 Template System
+### 3.4 Template System
 **Target: Rapid knowledge structure creation**
 
 #### Template Engine
@@ -288,7 +288,7 @@ class CollaborationEngine {
 - **Content Templates**: Standardized content formats
 - **Workflow Templates**: Process automation templates
 
-### 3.4 Advanced Export/Import
+### 3.5 Advanced Export/Import
 **Target: Universal knowledge portability**
 
 #### Export Capabilities
