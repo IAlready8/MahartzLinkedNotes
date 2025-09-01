@@ -1,0 +1,473 @@
+/* Street Style - Urban Aesthetic for Mahart Linked Notes */
+
+/* Import street-style fonts */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Urbanist:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root {
+  /* Street Style Color Palette */
+  --street-primary: #ff0055; /* Neon pink */
+  --street-secondary: #00f0ff; /* Electric blue */
+  --street-accent: #ffcc00; /* Bright yellow */
+  --street-dark: #0a0a0a; /* Deep black */
+  --street-gray: #1a1a1a; /* Dark gray */
+  --street-light: #f0f0f0; /* Light gray */
+  --street-success: #00ff41; /* Neon green */
+  --street-warning: #ff5500; /* Orange */
+  --street-danger: #ff0033; /* Red */
+  
+  /* Graffiti-inspired gradients */
+  --graffiti-gradient: linear-gradient(135deg, #ff0055, #ff5500, #ffcc00, #00f0ff, #00ff41);
+  --street-gradient: linear-gradient(135deg, #0a0a0a, #1a1a1a, #2a2a2a);
+  --card-gradient: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(10, 10, 10, 0.9));
+  
+  /* Street typography */
+  --font-heading: 'Oswald', sans-serif;
+  --font-body: 'Urbanist', sans-serif;
+  
+  /* Street shadows */
+  --shadow-street: 0 4px 20px rgba(255, 0, 85, 0.3);
+  --shadow-neon: 0 0 10px rgba(255, 0, 85, 0.5), 0 0 20px rgba(255, 0, 85, 0.3);
+  --glow-primary: 0 0 5px var(--street-primary), 0 0 10px var(--street-primary);
+  --glow-secondary: 0 0 5px var(--street-secondary), 0 0 10px var(--street-secondary);
+  
+  /* Border radius */
+  --radius-street: 8px;
+  --radius-sharp: 0;
+}
+
+/* Base styles */
+body {
+  background: var(--street-dark);
+  color: var(--street-light);
+  font-family: var(--font-body);
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(255, 0, 85, 0.1) 0%, transparent 20%),
+    radial-gradient(circle at 90% 80%, rgba(0, 240, 255, 0.1) 0%, transparent 20%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+/* Street Style Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+h1 {
+  font-size: 2.5rem;
+  background: var(--graffiti-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: var(--shadow-street);
+}
+
+h2 {
+  font-size: 2rem;
+  color: var(--street-secondary);
+  text-shadow: var(--glow-secondary);
+}
+
+h3 {
+  font-size: 1.5rem;
+  color: var(--street-primary);
+  text-shadow: var(--glow-primary);
+}
+
+/* Street Style Sidebar */
+#sidebar {
+  background: var(--card-gradient);
+  border-right: 2px solid var(--street-primary);
+  box-shadow: var(--shadow-street);
+  position: relative;
+  overflow: hidden;
+}
+
+#sidebar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--graffiti-gradient);
+}
+
+.sidebar-header {
+  border-bottom: 1px solid rgba(255, 0, 85, 0.3);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.sidebar-header h1 {
+  font-size: 1.8rem;
+  margin: 0;
+  background: var(--graffiti-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Street Style Navigation */
+.sidebar-nav-item {
+  background: rgba(26, 26, 26, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-street);
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-nav-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 0, 85, 0.2), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.sidebar-nav-item:hover::before {
+  transform: translateX(100%);
+}
+
+.sidebar-nav-item:hover {
+  background: rgba(255, 0, 85, 0.1);
+  border-color: var(--street-primary);
+  transform: translateX(5px);
+  box-shadow: var(--shadow-street);
+}
+
+.sidebar-nav-item.active {
+  background: rgba(255, 0, 85, 0.2);
+  border-color: var(--street-primary);
+  box-shadow: var(--glow-primary);
+}
+
+.sidebar-nav-item i {
+  color: var(--street-secondary);
+  text-shadow: var(--glow-secondary);
+}
+
+/* Street Style Buttons */
+.btn-primary {
+  background: var(--graffiti-gradient);
+  border: none;
+  color: white;
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  border-radius: var(--radius-street);
+  box-shadow: var(--shadow-street);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-neon);
+}
+
+.btn-primary::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.btn-primary:hover::before {
+  transform: translateX(100%);
+}
+
+.btn-secondary {
+  background: var(--street-gray);
+  border: 1px solid var(--street-primary);
+  color: var(--street-light);
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: var(--radius-street);
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 0, 85, 0.1);
+  border-color: var(--street-secondary);
+  box-shadow: var(--glow-primary);
+}
+
+/* Street Style Inputs */
+.search-input, .input-field {
+  background: rgba(26, 26, 26, 0.7);
+  border: 1px solid rgba(255, 0, 85, 0.3);
+  border-radius: var(--radius-street);
+  color: var(--street-light);
+  font-family: var(--font-body);
+  transition: all 0.3s ease;
+}
+
+.search-input:focus, .input-field:focus {
+  outline: none;
+  border-color: var(--street-secondary);
+  box-shadow: var(--glow-secondary);
+}
+
+/* Street Style Cards */
+.card {
+  background: var(--card-gradient);
+  border: 1px solid rgba(255, 0, 85, 0.3);
+  border-radius: var(--radius-street);
+  box-shadow: var(--shadow-street);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--graffiti-gradient);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-neon);
+}
+
+.card-header {
+  border-bottom: 1px solid rgba(255, 0, 85, 0.3);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Street Style Note List */
+#note-list > div {
+  background: rgba(26, 26, 26, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-street);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+#note-list > div:hover {
+  background: rgba(255, 0, 85, 0.1);
+  border-color: var(--street-primary);
+  transform: translateX(10px);
+  box-shadow: var(--shadow-street);
+}
+
+#note-list > div::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--graffiti-gradient);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#note-list > div:hover::before {
+  opacity: 1;
+}
+
+#note-list > div.active {
+  background: rgba(255, 0, 85, 0.2);
+  border-color: var(--street-primary);
+  box-shadow: var(--glow-primary);
+}
+
+/* Street Style Editor */
+#note-title {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid rgba(255, 0, 85, 0.3);
+  border-radius: 0;
+  color: var(--street-light);
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+}
+
+#note-title:focus {
+  outline: none;
+  border-color: var(--street-secondary);
+  box-shadow: var(--glow-secondary);
+}
+
+#note-body {
+  background: rgba(26, 26, 26, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-street);
+  color: var(--street-light);
+  font-family: var(--font-body);
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+#note-body:focus {
+  outline: none;
+  border-color: var(--street-secondary);
+  box-shadow: var(--glow-secondary);
+}
+
+/* Street Style Preview */
+#note-preview {
+  background: rgba(26, 26, 26, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-street);
+  padding: 1rem;
+}
+
+#note-preview h1, #note-preview h2, #note-preview h3 {
+  color: var(--street-secondary);
+  text-shadow: var(--glow-secondary);
+}
+
+#note-preview a {
+  color: var(--street-primary);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--street-primary);
+}
+
+#note-preview a:hover {
+  color: var(--street-secondary);
+  border-bottom: 1px solid var(--street-secondary);
+  box-shadow: var(--glow-primary);
+}
+
+/* Street Style Tags */
+.tag {
+  background: rgba(255, 0, 85, 0.2);
+  border: 1px solid var(--street-primary);
+  border-radius: var(--radius-street);
+  color: var(--street-light);
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  padding: 0.25rem 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.tag:hover {
+  background: rgba(255, 0, 85, 0.3);
+  border-color: var(--street-secondary);
+  box-shadow: var(--glow-primary);
+}
+
+/* Street Style Toast Notifications */
+.toast {
+  background: var(--card-gradient);
+  border: 1px solid var(--street-primary);
+  border-radius: var(--radius-street);
+  box-shadow: var(--shadow-street);
+}
+
+.toast-success {
+  border-color: var(--street-success);
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+}
+
+.toast-error {
+  border-color: var(--street-danger);
+  box-shadow: 0 0 10px rgba(255, 0, 51, 0.5);
+}
+
+.toast-warning {
+  border-color: var(--street-warning);
+  box-shadow: 0 0 10px rgba(255, 85, 0, 0.5);
+}
+
+/* Street Style Loading Spinner */
+.spinner {
+  border: 2px solid rgba(255, 0, 85, 0.3);
+  border-top: 2px solid var(--street-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spinner-lg {
+  width: 2rem;
+  height: 2rem;
+  border-width: 3px;
+}
+
+/* Street Style Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--street-gray);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--graffiti-gradient);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  box-shadow: var(--glow-primary);
+}
+
+/* Street Style Animations */
+@keyframes streetPulse {
+  0% { box-shadow: 0 0 5px var(--street-primary); }
+  50% { box-shadow: 0 0 20px var(--street-primary); }
+  100% { box-shadow: 0 0 5px var(--street-primary); }
+}
+
+.pulse-street {
+  animation: streetPulse 2s infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  .sidebar-nav-item span {
+    display: none;
+  }
+  
+  .sidebar-nav-item kbd {
+    display: none;
+  }
+  
+  #sidebar {
+    width: 60px !important;
+  }
+}

@@ -1,0 +1,502 @@
+/* Component Library - Professional UI Components */
+
+/* Button Components */
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg border border-transparent px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+}
+
+.btn-primary {
+  @apply bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 focus:ring-blue-500;
+}
+
+.btn-secondary {
+  @apply border-gray-300 bg-white text-gray-700 hover:bg-gray-50 active:bg-gray-100 focus:ring-gray-500;
+}
+
+.btn-success {
+  @apply bg-green-600 text-white hover:bg-green-700 active:bg-green-800 focus:ring-green-500;
+}
+
+.btn-warning {
+  @apply bg-yellow-600 text-white hover:bg-yellow-700 active:bg-yellow-800 focus:ring-yellow-500;
+}
+
+.btn-error {
+  @apply bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus:ring-red-500;
+}
+
+.btn-ghost {
+  @apply text-gray-600 hover:bg-gray-100 active:bg-gray-200 focus:ring-gray-500;
+}
+
+.btn-link {
+  @apply border-none bg-transparent p-0 text-blue-600 underline-offset-4 hover:underline focus:ring-blue-500;
+}
+
+/* Button Sizes */
+.btn-xs {
+  @apply px-2 py-1 text-xs;
+}
+
+.btn-sm {
+  @apply px-3 py-1.5 text-sm;
+}
+
+.btn-lg {
+  @apply px-6 py-3 text-base;
+}
+
+.btn-xl {
+  @apply px-8 py-4 text-lg;
+}
+
+/* Input Components */
+.input {
+  @apply w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500;
+}
+
+.input-error {
+  @apply border-red-300 focus:border-red-500 focus:ring-red-500;
+}
+
+.input-success {
+  @apply border-green-300 focus:border-green-500 focus:ring-green-500;
+}
+
+.textarea {
+  @apply input min-h-[100px] resize-y;
+}
+
+/* Form Components */
+.form-group {
+  @apply space-y-1;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700;
+}
+
+.form-description {
+  @apply text-xs text-gray-500;
+}
+
+.form-error {
+  @apply text-xs text-red-600;
+}
+
+.form-success {
+  @apply text-xs text-green-600;
+}
+
+/* Checkbox and Radio */
+.checkbox, .radio {
+  @apply h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0;
+}
+
+.radio {
+  @apply rounded-full;
+}
+
+/* Select Component */
+.select {
+  @apply input appearance-none bg-white bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iNiIgdmlld0JveD0iMCAwIDEwIDYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik01IDZMMCAwSDEwTDUgNloiIGZpbGw9IiM2QjdBODAiLz4KPHN2Zz4K')] bg-[position:right_0.75rem_center] bg-no-repeat pr-10;
+}
+
+/* Card Components */
+.card {
+  @apply rounded-xl border border-gray-200 bg-white shadow-sm;
+}
+
+.card-header {
+  @apply border-b border-gray-200 px-6 py-4;
+}
+
+.card-title {
+  @apply text-lg font-semibold text-gray-900;
+}
+
+.card-description {
+  @apply mt-1 text-sm text-gray-500;
+}
+
+.card-body {
+  @apply px-6 py-4;
+}
+
+.card-footer {
+  @apply border-t border-gray-200 px-6 py-4;
+}
+
+/* Badge Components */
+.badge {
+  @apply inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium;
+}
+
+.badge-primary {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.badge-secondary {
+  @apply bg-gray-100 text-gray-800;
+}
+
+.badge-success {
+  @apply bg-green-100 text-green-800;
+}
+
+.badge-warning {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.badge-error {
+  @apply bg-red-100 text-red-800;
+}
+
+.badge-outline {
+  @apply border;
+}
+
+.badge-outline.badge-primary {
+  @apply border-blue-200 bg-transparent text-blue-600;
+}
+
+/* Alert Components */
+.alert {
+  @apply rounded-lg border p-4;
+}
+
+.alert-primary {
+  @apply border-blue-200 bg-blue-50 text-blue-800;
+}
+
+.alert-success {
+  @apply border-green-200 bg-green-50 text-green-800;
+}
+
+.alert-warning {
+  @apply border-yellow-200 bg-yellow-50 text-yellow-800;
+}
+
+.alert-error {
+  @apply border-red-200 bg-red-50 text-red-800;
+}
+
+.alert-title {
+  @apply font-medium;
+}
+
+.alert-description {
+  @apply mt-1 text-sm opacity-90;
+}
+
+/* Modal Components */
+.modal-backdrop {
+  @apply fixed inset-0 z-50 bg-black/50 backdrop-blur-sm;
+}
+
+.modal {
+  @apply fixed inset-0 z-50 flex items-center justify-center p-4;
+}
+
+.modal-content {
+  @apply w-full max-w-md rounded-xl bg-white shadow-2xl;
+}
+
+.modal-header {
+  @apply border-b border-gray-200 px-6 py-4;
+}
+
+.modal-title {
+  @apply text-lg font-semibold text-gray-900;
+}
+
+.modal-close {
+  @apply btn-ghost ml-auto h-8 w-8 rounded-full p-0;
+}
+
+.modal-body {
+  @apply px-6 py-4;
+}
+
+.modal-footer {
+  @apply flex justify-end gap-3 border-t border-gray-200 px-6 py-4;
+}
+
+/* Dropdown Components */
+.dropdown {
+  @apply relative;
+}
+
+.dropdown-trigger {
+  @apply btn;
+}
+
+.dropdown-content {
+  @apply absolute right-0 top-full z-10 mt-2 min-w-[200px] rounded-lg border border-gray-200 bg-white py-1 shadow-lg;
+}
+
+.dropdown-item {
+  @apply block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100;
+}
+
+.dropdown-divider {
+  @apply my-1 border-t border-gray-200;
+}
+
+/* Tab Components */
+.tabs {
+  @apply border-b border-gray-200;
+}
+
+.tab-list {
+  @apply flex space-x-8;
+}
+
+.tab {
+  @apply border-b-2 border-transparent py-2 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+.tab.active {
+  @apply border-blue-500 text-blue-600;
+}
+
+.tab-content {
+  @apply py-4;
+}
+
+/* Progress Components */
+.progress {
+  @apply h-2 w-full overflow-hidden rounded-full bg-gray-200;
+}
+
+.progress-bar {
+  @apply h-full bg-blue-600 transition-all duration-300;
+}
+
+.progress-error .progress-bar {
+  @apply bg-red-600;
+}
+
+.progress-success .progress-bar {
+  @apply bg-green-600;
+}
+
+.progress-warning .progress-bar {
+  @apply bg-yellow-600;
+}
+
+/* Skeleton Loading */
+.skeleton {
+  @apply animate-pulse rounded bg-gray-200;
+}
+
+.skeleton-text {
+  @apply skeleton h-4 w-full;
+}
+
+.skeleton-title {
+  @apply skeleton h-6 w-3/4;
+}
+
+.skeleton-avatar {
+  @apply skeleton h-10 w-10 rounded-full;
+}
+
+.skeleton-button {
+  @apply skeleton h-10 w-24;
+}
+
+/* Toast/Notification Components */
+.toast {
+  @apply pointer-events-auto fixed bottom-4 right-4 z-50 rounded-lg border border-gray-200 bg-white p-4 shadow-lg transition-all duration-300;
+}
+
+.toast-success {
+  @apply border-green-200 bg-green-50 text-green-800;
+}
+
+.toast-warning {
+  @apply border-yellow-200 bg-yellow-50 text-yellow-800;
+}
+
+.toast-error {
+  @apply border-red-200 bg-red-50 text-red-800;
+}
+
+.toast-title {
+  @apply font-medium;
+}
+
+.toast-description {
+  @apply mt-1 text-sm opacity-90;
+}
+
+/* Tooltip Components */
+.tooltip {
+  @apply invisible absolute z-10 rounded-lg bg-gray-900 px-3 py-2 text-sm text-white opacity-0 transition-all duration-200;
+}
+
+.tooltip.show {
+  @apply visible opacity-100;
+}
+
+/* Navigation Components */
+.nav {
+  @apply flex space-x-8;
+}
+
+.nav-link {
+  @apply text-sm font-medium text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+.nav-link.active {
+  @apply text-gray-900;
+}
+
+/* Sidebar Components */
+.sidebar {
+  @apply flex h-full w-64 flex-col bg-white border-r border-gray-200;
+}
+
+.sidebar-header {
+  @apply border-b border-gray-200 p-4;
+}
+
+.sidebar-body {
+  @apply flex-1 overflow-y-auto p-4;
+}
+
+.sidebar-footer {
+  @apply border-t border-gray-200 p-4;
+}
+
+.sidebar-nav {
+  @apply space-y-1;
+}
+
+.sidebar-nav-item {
+  @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+.sidebar-nav-item.active {
+  @apply bg-blue-50 text-blue-700;
+}
+
+/* Search Components */
+.search-input {
+  @apply input pl-10;
+}
+
+.search-icon {
+  @apply absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400;
+}
+
+.search-results {
+  @apply absolute top-full z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg;
+}
+
+.search-result {
+  @apply cursor-pointer px-4 py-2 hover:bg-gray-100;
+}
+
+/* Tag Components */
+.tag {
+  @apply inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800;
+}
+
+.tag-removable {
+  @apply pr-1;
+}
+
+.tag-remove {
+  @apply ml-1 h-3 w-3 cursor-pointer rounded-full hover:bg-blue-200;
+}
+
+/* Avatar Components */
+.avatar {
+  @apply inline-flex h-10 w-10 items-center justify-center rounded-full bg-gray-500 text-sm font-medium text-white;
+}
+
+.avatar-xs {
+  @apply h-6 w-6 text-xs;
+}
+
+.avatar-sm {
+  @apply h-8 w-8 text-xs;
+}
+
+.avatar-lg {
+  @apply h-12 w-12 text-base;
+}
+
+.avatar-xl {
+  @apply h-16 w-16 text-lg;
+}
+
+/* Loading Spinner */
+.spinner {
+  @apply h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600;
+}
+
+.spinner-sm {
+  @apply h-3 w-3;
+}
+
+.spinner-lg {
+  @apply h-6 w-6;
+}
+
+.spinner-xl {
+  @apply h-8 w-8;
+}
+
+/* Outline Panel */
+.outline-item {
+  @apply block w-full text-left px-2 py-1 rounded hover:bg-neutral-100;
+}
+
+.outline-item.active {
+  @apply bg-neutral-100;
+}
+
+/* Splitter */
+.splitter {
+  @apply w-1 bg-neutral-200 hover:bg-neutral-300 cursor-col-resize transition-colors;
+}
+
+@media (prefers-color-scheme: dark) {
+  .splitter {
+    @apply bg-neutral-700 hover:bg-neutral-600;
+  }
+}
+
+/* Dark Mode Overrides */
+@media (prefers-color-scheme: dark) {
+  .card {
+    @apply border-gray-700 bg-gray-800;
+  }
+  
+  .input {
+    @apply border-gray-600 bg-gray-700 text-white placeholder-gray-400;
+  }
+  
+  .btn-secondary {
+    @apply border-gray-600 bg-gray-700 text-white hover:bg-gray-600;
+  }
+  
+  .dropdown-content {
+    @apply border-gray-700 bg-gray-800;
+  }
+  
+  .dropdown-item {
+    @apply text-gray-300 hover:bg-gray-700;
+  }
+  
+  .sidebar {
+    @apply border-gray-700 bg-gray-800;
+  }
+  
+  .modal-content {
+    @apply bg-gray-800;
+  }
+}

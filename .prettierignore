@@ -1,0 +1,7 @@
+node_modules/
+dist/
+*.min.js
+*.min.css
+css/tailwind-output.css
+package-lock.json
+CHANGELOG.md

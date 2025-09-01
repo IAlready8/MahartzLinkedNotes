@@ -1,0 +1,389 @@
+# Mahart Linked Notes - Comprehensive .gitignore
+
+# ============================================================================
+# Node.js & NPM
+# ============================================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Package managers
+package-lock.json.backup
+.npm
+.eslintcache
+.yarn-integrity
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# ============================================================================
+# Environment & Configuration
+# ============================================================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.backup
+.env.*.backup
+
+# Configuration backups
+config.local.js
+config.*.js
+!config.example.js
+
+# ============================================================================
+# Build & Distribution
+# ============================================================================
+dist/
+build/
+out/
+.output/
+.vercel/
+.netlify/
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.vuepress/dist/
+.temp/
+.tmp/
+
+# CSS compilation
+css/*.map
+css/tailwind-output.css.map
+css/styles.min.css
+css/production.css
+
+# ============================================================================
+# Testing & Coverage
+# ============================================================================
+coverage/
+.nyc_output/
+*.lcov
+.coverage/
+test-results/
+test-report.html
+jest-coverage/
+e2e-results/
+playwright-report/
+test-screenshots/
+
+# Test artifacts
+*.test.log
+*.spec.log
+screenshots/
+videos/
+traces/
+
+# ============================================================================
+# Development & Debugging
+# ============================================================================
+*.log
+logs/
+pids
+*.pid
+*.seed
+*.pid.lock
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Debug files
+debug.log
+error.log
+access.log
+npm-debug.log
+yarn-debug.log
+lerna-debug.log
+
+# ============================================================================
+# Operating System Files
+# ============================================================================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.AppleDouble
+.LSOverride
+Icon
+
+# Windows
+Desktop.ini
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ============================================================================
+# Security & Sensitive Data
+# ============================================================================
+# API Keys & Secrets
+*.pem
+*.key
+*.crt
+*.cert
+*.p12
+*.pfx
+auth.json
+secrets.json
+credentials.json
+service-account.json
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+db.json
+database.json
+
+# Backup files
+*.backup
+*.bak
+*.old
+*.orig
+backup/
+backups/
+
+# ============================================================================
+# Application Specific
+# ============================================================================
+# Mahart Linked Notes specific
+data/backup/
+data/export/
+data/temp/
+data/cache/
+data/*.backup
+user-data/
+exports/
+imports/temp/
+
+# Plugin development
+plugins/dev/
+plugins/.temp/
+plugins/build/
+
+# Enterprise features
+enterprise-config.json
+license.key
+audit-logs/
+system-logs/
+
+# ============================================================================
+# Performance & Monitoring
+# ============================================================================
+# Performance logs
+perf.data
+*.perf
+profiling/
+metrics/
+monitoring/temp/
+performance-logs/
+
+# Bundle analysis
+bundle-analyzer-report.html
+webpack-bundle-analyzer/
+size-limit-report.json
+
+# ============================================================================
+# Documentation Generated
+# ============================================================================
+docs/build/
+docs/.vuepress/dist/
+docs/_book/
+_book/
+typedoc/
+jsdoc/
+
+# ============================================================================
+# Deployment & CI/CD
+# ============================================================================
+# Docker
+.dockerignore.backup
+docker-compose.override.yml
+docker-compose.local.yml
+
+# Kubernetes
+k8s/secrets/
+k8s/local/
+*.kubeconfig
+
+# Cloud deployment
+.firebase/
+.serverless/
+.gcloud/
+.aws/
+
+# CI/CD
+.github/workflows/local/
+.gitlab-ci.local.yml
+jenkins/local/
+.circleci/local/
+
+# ============================================================================
+# Third-party Tools
+# ============================================================================
+# Storybook
+storybook-static/
+.storybook/local/
+
+# Cypress
+cypress/downloads/
+cypress/fixtures/generated/
+cypress/screenshots/
+cypress/videos/
+
+# Playwright
+test-results/
+playwright/.cache/
+
+# ESLint
+.eslintcache
+
+# Prettier
+.prettiercache
+
+# TypeScript
+*.tsbuildinfo
+.tscache/
+
+# Rollup
+.rollup.cache/
+
+# Vite
+.vite/
+vite.config.local.js
+
+# ============================================================================
+# Temporary & Cache Files
+# ============================================================================
+tmp/
+temp/
+cache/
+.cache/
+*.tmp
+*.temp
+*_temp
+*_tmp
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+*.lock
+
+# Optional caches
+.npm/
+.yarn-cache/
+.pnpm-store/
+
+# ============================================================================
+# Archive & Compressed Files
+# ============================================================================
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.bz2
+*.xz
+*.tgz
+
+# ============================================================================
+# IDE & Editor Files
+# ============================================================================
+# Visual Studio Code
+.vscode/
+!.vscode/settings.example.json
+!.vscode/launch.example.json
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+.vim/
+*.swp
+*.swo
+Session.vim
+.netrwhist
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ============================================================================
+# Mobile Development
+# ============================================================================
+# React Native
+.expo/
+.expo-shared/
+ios/build/
+android/build/
+android/app/build/
+
+# ============================================================================
+# Final Catch-All Patterns
+# ============================================================================
+# Any file ending in .local
+*.local
+
+# Any directory ending in _local
+*_local/
+
+# Any file with secrets in the name
+*secret*
+*password*
+*credential*
+
+# Development overrides
+*.dev
+*.development
+override.*
+
+# Generated files
+generated/
+auto-generated/
+.generated/

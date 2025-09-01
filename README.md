@@ -17,3 +17,6 @@ Open `index.html` in a modern browser. No server needed.
 - Cmd/Ctrl+K: Quick search
 - Cmd/Ctrl+N: New note
 - Cmd/Ctrl+S: Save
+
+## Contributing
+See Repository Guidelines in `AGENTS.md` for structure, commands, and PR expectations.

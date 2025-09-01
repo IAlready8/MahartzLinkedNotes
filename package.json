@@ -4,14 +4,42 @@
   "description": "Advanced client-side knowledge management platform with AI assistance",
   "main": "index.html",
   "scripts": {
-    "dev": "python3 -m http.server 8000",
+    "dev": "vite --host --port 8000",
+    "build": "vite build",
+    "preview": "vite preview",
     "build-css": "tailwindcss -i ./css/tailwind-input.css -o ./css/tailwind-output.css --watch",
-    "build-css-prod": "tailwindcss -i ./css/tailwind-input.css -o ./css/tailwind-output.css --minify"
+    "build-css-prod": "tailwindcss -i ./css/tailwind-input.css -o ./css/tailwind-output.css --minify",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:e2e": "playwright test",
+    "lint": "eslint . --ext js,ts,jsx,tsx",
+    "lint:fix": "eslint . --ext js,ts,jsx,tsx --fix",
+    "format": "prettier --write .",
+    "type-check": "tsc --noEmit",
+    "prepare": "husky install"
   },
   "devDependencies": {
-    "tailwindcss": "^3.4.0",
+    "@eslint/js": "^9.34.0",
+    "@playwright/test": "^1.55.0",
+    "@tailwindcss/forms": "^0.5.0",
     "@tailwindcss/typography": "^0.5.0",
-    "@tailwindcss/forms": "^0.5.0"
+    "@types/node": "^24.3.0",
+    "@vitejs/plugin-legacy": "^7.2.1",
+    "@vitest/ui": "^3.2.4",
+    "eslint": "^9.34.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "husky": "^9.1.7",
+    "jsdom": "^26.1.0",
+    "lint-staged": "^16.1.5",
+    "playwright": "^1.55.0",
+    "prettier": "^3.6.2",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3",
+    "vite-plugin-pwa": "^1.0.3",
+    "vitest": "^3.2.4"
   },
   "keywords": [
     "knowledge-management",
@@ -22,5 +50,23 @@
     "javascript"
   ],
   "author": "Mahart Linked Notes",
-  "license": "MIT"
+  "license": "MIT",
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{html,css,json,md}": [
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "monaco-editor": "^0.52.2",
+    "localforage": "^1.10.0",
+    "marked": "^12.0.2",
+    "dompurify": "^3.1.7",
+    "ulid": "^2.3.0",
+    "d3": "^7.9.0",
+    "chart.js": "^4.4.4"
+  }
 }

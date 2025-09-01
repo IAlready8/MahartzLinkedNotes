@@ -1,0 +1,73 @@
+{
+  "headers": {
+    "Content-Security-Policy": {
+      "description": "Comprehensive CSP for client-side security",
+      "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https:; connect-src 'self' https:; worker-src 'self' blob:; child-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;"
+    },
+    "Strict-Transport-Security": {
+      "description": "Force HTTPS connections",
+      "value": "max-age=31536000; includeSubDomains; preload"
+    },
+    "X-Frame-Options": {
+      "description": "Prevent clickjacking",
+      "value": "DENY"
+    },
+    "X-Content-Type-Options": {
+      "description": "Prevent MIME type sniffing",
+      "value": "nosniff"
+    },
+    "Referrer-Policy": {
+      "description": "Control referrer information",
+      "value": "strict-origin-when-cross-origin"
+    },
+    "Permissions-Policy": {
+      "description": "Control browser features",
+      "value": "geolocation=(), microphone=(), camera=(), payment=(), usb=(), vr=(), accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), display-capture=(), document-domain=(), encrypted-media=(), fullscreen=(self), gyroscope=(), magnetometer=(), midi=(), picture-in-picture=(), publickey-credentials-get=(), sync-xhr=(), wake-lock=(), xr-spatial-tracking=()"
+    },
+    "X-XSS-Protection": {
+      "description": "Legacy XSS protection",
+      "value": "1; mode=block"
+    },
+    "Cross-Origin-Embedder-Policy": {
+      "description": "Control cross-origin isolation",
+      "value": "credentialless"
+    },
+    "Cross-Origin-Opener-Policy": {
+      "description": "Control cross-origin window access",
+      "value": "same-origin"
+    },
+    "Cross-Origin-Resource-Policy": {
+      "description": "Control cross-origin resource access",
+      "value": "cross-origin"
+    }
+  },
+  "meta_tags": {
+    "description": "Security-related meta tags to include in HTML",
+    "tags": [
+      {
+        "name": "viewport",
+        "content": "width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"
+      },
+      {
+        "http-equiv": "X-UA-Compatible",
+        "content": "IE=edge"
+      },
+      {
+        "name": "robots",
+        "content": "noindex, nofollow, noarchive, nosnippet"
+      },
+      {
+        "name": "format-detection",
+        "content": "telephone=no, email=no, address=no"
+      }
+    ]
+  },
+  "nginx_config": {
+    "description": "Nginx configuration for security headers",
+    "config": "# Security Headers Configuration for Mahart Linked Notes\n\n# Main security headers\nadd_header X-Frame-Options \"DENY\" always;\nadd_header X-Content-Type-Options \"nosniff\" always;\nadd_header X-XSS-Protection \"1; mode=block\" always;\nadd_header Referrer-Policy \"strict-origin-when-cross-origin\" always;\nadd_header Strict-Transport-Security \"max-age=31536000; includeSubDomains; preload\" always;\n\n# Content Security Policy\nadd_header Content-Security-Policy \"default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https:; worker-src 'self' blob:; child-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;\" always;\n\n# Permissions Policy\nadd_header Permissions-Policy \"geolocation=(), microphone=(), camera=(), payment=(), usb=(), vr=(), accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), display-capture=(), document-domain=(), encrypted-media=(), fullscreen=(self), gyroscope=(), magnetometer=(), midi=(), picture-in-picture=(), publickey-credentials-get=(), sync-xhr=(), wake-lock=(), xr-spatial-tracking=()\" always;\n\n# Cross-Origin Policies\nadd_header Cross-Origin-Embedder-Policy \"credentialless\" always;\nadd_header Cross-Origin-Opener-Policy \"same-origin\" always;\nadd_header Cross-Origin-Resource-Policy \"cross-origin\" always;\n\n# Hide server information\nserver_tokens off;\n\n# Disable unused HTTP methods\nif ($request_method !~ ^(GET|HEAD|POST|OPTIONS)$ ) {\n    return 405;\n}\n\n# Rate limiting\nlimit_req_zone $binary_remote_addr zone=main:10m rate=10r/s;\nlimit_req zone=main burst=20 nodelay;\n\n# File upload size limit\nclient_max_body_size 10M;\n\n# Timeout settings\nclient_body_timeout 12;\nclient_header_timeout 12;\nkeepalive_timeout 15;\nsend_timeout 10;"
+  },
+  "apache_config": {
+    "description": "Apache configuration for security headers",
+    "config": "# Security Headers Configuration for Mahart Linked Notes\n\n# Enable mod_headers\nLoadModule headers_module modules/mod_headers.so\n\n# Security Headers\nHeader always set X-Frame-Options \"DENY\"\nHeader always set X-Content-Type-Options \"nosniff\"\nHeader always set X-XSS-Protection \"1; mode=block\"\nHeader always set Referrer-Policy \"strict-origin-when-cross-origin\"\nHeader always set Strict-Transport-Security \"max-age=31536000; includeSubDomains; preload\"\n\n# Content Security Policy\nHeader always set Content-Security-Policy \"default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https:; worker-src 'self' blob:; child-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;\"\n\n# Permissions Policy\nHeader always set Permissions-Policy \"geolocation=(), microphone=(), camera=(), payment=(), usb=(), vr=(), accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), display-capture=(), document-domain=(), encrypted-media=(), fullscreen=(self), gyroscope=(), magnetometer=(), midi=(), picture-in-picture=(), publickey-credentials-get=(), sync-xhr=(), wake-lock=(), xr-spatial-tracking=()\"\n\n# Cross-Origin Policies\nHeader always set Cross-Origin-Embedder-Policy \"credentialless\"\nHeader always set Cross-Origin-Opener-Policy \"same-origin\"\nHeader always set Cross-Origin-Resource-Policy \"cross-origin\"\n\n# Hide server information\nServerTokens Prod\nServerSignature Off\n\n# Disable TRACE method\nTraceEnable Off\n\n# File security\n<Files \".env*\">\n    Require all denied\n</Files>\n\n<Files \"*.json\">\n    <RequireAll>\n        Require all granted\n        Require not expr %{THE_REQUEST} =~ /\\.(json)$/\n    </RequireAll>\n</Files>"
+  }
+}

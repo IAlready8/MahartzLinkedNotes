@@ -1,0 +1,993 @@
+/* Enhanced Street Style - Urban Aesthetic for Mahart Linked Notes */
+
+/* Import street-style fonts */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Urbanist:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rubik+Dirt&display=swap');
+
+:root {
+  /* Enhanced Street Style Color Palette */
+  --street-primary: #ff0055; /* Neon pink */
+  --street-secondary: #00f0ff; /* Electric blue */
+  --street-accent: #ffcc00; /* Bright yellow */
+  --street-dark: #0a0a0a; /* Deep black */
+  --street-gray: #1a1a1a; /* Dark gray */
+  --street-light: #f0f0f0; /* Light gray */
+  --street-success: #00ff41; /* Neon green */
+  --street-warning: #ff5500; /* Orange */
+  --street-danger: #ff0033; /* Red */
+  --street-purple: #bd00ff; /* Electric purple */
+  --street-cyan: #00fff2; /* Bright cyan */
+  
+  /* Graffiti-inspired gradients */
+  --graffiti-gradient: linear-gradient(135deg, #ff0055, #ff5500, #ffcc00, #00f0ff, #00ff41);
+  --graffiti-gradient-alt: linear-gradient(135deg, #bd00ff, #ff0055, #ffcc00);
+  --street-gradient: linear-gradient(135deg, #0a0a0a, #1a1a1a, #2a2a2a);
+  --card-gradient: linear-gradient(135deg, rgba(26, 26, 26, 0.9), rgba(10, 10, 10, 0.9));
+  --card-gradient-alt: linear-gradient(135deg, rgba(189, 0, 255, 0.1), rgba(255, 0, 85, 0.1));
+  
+  /* Street typography */
+  --font-heading: 'Oswald', sans-serif;
+  --font-body: 'Urbanist', sans-serif;
+  --font-graffiti: 'Rubik Dirt', cursive;
+  
+  /* Street shadows */
+  --shadow-street: 0 4px 20px rgba(255, 0, 85, 0.3);
+  --shadow-neon: 0 0 10px rgba(255, 0, 85, 0.5), 0 0 20px rgba(255, 0, 85, 0.3);
+  --glow-primary: 0 0 5px var(--street-primary), 0 0 10px var(--street-primary);
+  --glow-secondary: 0 0 5px var(--street-secondary), 0 0 10px var(--street-secondary);
+  --glow-purple: 0 0 5px var(--street-purple), 0 0 10px var(--street-purple);
+  --glow-cyan: 0 0 5px var(--street-cyan), 0 0 10px var(--street-cyan);
+  
+  /* Border radius */
+  --radius-street: 8px;
+  --radius-sharp: 0;
+  
+  /* Street patterns */
+  --pattern-graffiti: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ff0055' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+  --pattern-spray: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='1' fill='%2300f0ff' fill-opacity='0.1'/%3E%3C/svg%3E");
+}
+
+/* Base styles with urban textures */
+body {
+  background: var(--street-dark);
+  color: var(--street-light);
+  font-family: var(--font-body);
+  background-image: 
+    var(--pattern-graffiti),
+    var(--pattern-spray),
+    radial-gradient(circle at 10% 20%, rgba(255, 0, 85, 0.1) 0%, transparent 20%),
+    radial-gradient(circle at 90% 80%, rgba(0, 240, 255, 0.1) 0%, transparent 20%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Street Style Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+
+h1 {
+  font-size: 2.5rem;
+  background: var(--graffiti-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: var(--shadow-street);
+  position: relative;
+}
+
+h1::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--graffiti-gradient);
+  border-radius: 2px;
+}
+
+h2 {
+  font-size: 2rem;
+  color: var(--street-secondary);
+  text-shadow: var(--glow-secondary);
+}
+
+h3 {
+  font-size: 1.5rem;
+  color: var(--street-primary);
+  text-shadow: var(--glow-primary);
+}
+
+/* Graffiti-style headings */
+.graffiti-title {
+  font-family: var(--font-graffiti);
+  font-size: 3rem;
+  background: var(--graffiti-gradient-alt);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 10px rgba(189, 0, 255, 0.5);
+  transform: rotate(-2deg);
+  display: inline-block;
+}
+
+/* Street Style Sidebar */
+#sidebar {
+  background: var(--card-gradient);
+  border-right: 2px solid var(--street-primary);
+  box-shadow: var(--shadow-street);
+  position: relative;
+  overflow: hidden;
+  background-image: var(--pattern-spray);
+}
+
+#sidebar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--graffiti-gradient);
+}
+
+.sidebar-header {
+  border-bottom: 1px solid rgba(255, 0, 85, 0.3);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.sidebar-header::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--pattern-spray);
+}
+
+.sidebar-header h1 {
+  font-size: 1.8rem;
+  margin: 0;
+  background: var(--graffiti-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Street Style Navigation */
+.sidebar-nav-item {
+  background: rgba(26, 26, 26, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-street);
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(5px);
+}
+
+.sidebar-nav-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 0, 85, 0.2), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.sidebar-nav-item:hover::before {
+  transform: translateX(100%);
+}
+
+.sidebar-nav-item:hover {
+  background: rgba(255, 0, 85, 0.1);
+  border-color: var(--street-primary);
+  transform: translateX(5px);
+  box-shadow: var(--shadow-street);
+}
+
+.sidebar-nav-item.active {
+  background: rgba(255, 0, 85, 0.2);
+  border-color: var(--street-primary);
+  box-shadow: var(--glow-primary);
+}
+
+.sidebar-nav-item i {
+  color: var(--street-secondary);
+  text-shadow: var(--glow-secondary);
+  font-size: 1.2em;
+}
+
+.sidebar-nav-item span {
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* Street Style Buttons */
+.btn-primary {
+  background: var(--graffiti-gradient);
+  border: none;
+  color: white;
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  border-radius: var(--radius-street);
+  box-shadow: var(--shadow-street);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(5px);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-neon);
+}
+
+.btn-primary::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.btn-primary:hover::before {
+  transform: translateX(100%);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: var(--glow-primary);
+}
+
+.btn-secondary {
+  background: var(--street-gray);
+  border: 1px solid var(--street-primary);
+  color: var(--street-light);
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: var(--radius-street);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 0, 85, 0.1);
+  border-color: var(--street-secondary);
+  box-shadow: var(--glow-primary);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--street-success), #00cc33);
+  border: none;
+  color: var(--street-dark);
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  border-radius: var(--radius-street);
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(0, 255, 65, 0.7);
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, var(--street-warning), #ff3300);
+  border: none;
+  color: white;
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  border-radius: var(--radius-street);
+  box-shadow: 0 0 10px rgba(255, 85, 0, 0.5);
+  transition: all 0.3s ease;
+}
+
+.btn-warning:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(255, 85, 0, 0.7);
+}
+
+.btn-error {
+  background: linear-gradient(135deg, var(--street-danger), #cc0022);
+  border: none;
+  color: white;
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  border-radius: var(--radius-street);
+  box-shadow: 0 0 10px rgba(255, 0, 51, 0.5);
+  transition: all 0.3s ease;
+}
+
+.btn-error:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(255, 0, 51, 0.7);
+}
+
+/* Street Style Inputs */
+.search-input, .input-field, .input {
+  background: rgba(26, 26, 26, 0.7);
+  border: 1px solid rgba(255, 0, 85, 0.3);
+  border-radius: var(--radius-street);
+  color: var(--street-light);
+  font-family: var(--font-body);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.search-input:focus, .input-field:focus, .input:focus {
+  outline: none;
+  border-color: var(--street-secondary);
+  box-shadow: var(--glow-secondary);
+}
+
+.search-input::placeholder, .input-field::placeholder, .input::placeholder {
+  color: rgba(240, 240, 240, 0.5);
+}
+
+/* Street Style Cards */
+.card {
+  background: var(--card-gradient);
+  border: 1px solid rgba(255, 0, 85, 0.3);
+  border-radius: var(--radius-street);
+  box-shadow: var(--shadow-street);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  background-image: var(--pattern-spray);
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--graffiti-gradient);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-neon);
+}
+
+.card-header {
+  border-bottom: 1px solid rgba(255, 0, 85, 0.3);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.card-header::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--pattern-spray);
+}
+
+.card-title {
+  color: var(--street-secondary);
+  text-shadow: var(--glow-secondary);
+}
+
+/* Street Style Note List */
+#note-list > div {
+  background: rgba(26, 26, 26, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-street);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(5px);
+}
+
+#note-list > div:hover {
+  background: rgba(255, 0, 85, 0.1);
+  border-color: var(--street-primary);
+  transform: translateX(10px);
+  box-shadow: var(--shadow-street);
+}
+
+#note-list > div::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--graffiti-gradient);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#note-list > div:hover::before {
+  opacity: 1;
+}
+
+#note-list > div.active {
+  background: rgba(255, 0, 85, 0.2);
+  border-color: var(--street-primary);
+  box-shadow: var(--glow-primary);
+}
+
+#note-list > div.active::before {
+  opacity: 1;
+}
+
+.note-title {
+  font-weight: 600;
+  color: var(--street-light);
+}
+
+.note-preview {
+  color: rgba(240, 240, 240, 0.7);
+  font-size: 0.9rem;
+}
+
+.note-date {
+  color: rgba(240, 240, 240, 0.5);
+  font-size: 0.8rem;
+}
+
+/* Street Style Editor */
+#note-title {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid rgba(255, 0, 85, 0.3);
+  border-radius: 0;
+  color: var(--street-light);
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+#note-title:focus {
+  outline: none;
+  border-color: var(--street-secondary);
+  box-shadow: var(--glow-secondary);
+}
+
+#note-body {
+  background: rgba(26, 26, 26, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-street);
+  color: var(--street-light);
+  font-family: var(--font-body);
+  padding: 1rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+#note-body:focus {
+  outline: none;
+  border-color: var(--street-secondary);
+  box-shadow: var(--glow-secondary);
+}
+
+/* Street Style Preview */
+#preview-panel {
+  background: rgba(26, 26, 26, 0.3);
+  border-left: 1px solid rgba(255, 0, 85, 0.2);
+  backdrop-filter: blur(5px);
+}
+
+#note-preview {
+  background: rgba(26, 26, 26, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-street);
+  padding: 1rem;
+  backdrop-filter: blur(5px);
+}
+
+#note-preview h1, #note-preview h2, #note-preview h3 {
+  color: var(--street-secondary);
+  text-shadow: var(--glow-secondary);
+  position: relative;
+}
+
+#note-preview h1::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--graffiti-gradient);
+}
+
+#note-preview a {
+  color: var(--street-primary);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--street-primary);
+}
+
+#note-preview a:hover {
+  color: var(--street-secondary);
+  border-bottom: 1px solid var(--street-secondary);
+  box-shadow: var(--glow-primary);
+}
+
+#note-preview blockquote {
+  border-left: 3px solid var(--street-primary);
+  background: rgba(255, 0, 85, 0.1);
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 0 var(--radius-street) var(--radius-street) 0;
+}
+
+#note-preview code {
+  background: rgba(189, 0, 255, 0.2);
+  color: var(--street-cyan);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+}
+
+#note-preview pre {
+  background: rgba(26, 26, 26, 0.8);
+  border: 1px solid rgba(255, 0, 85, 0.3);
+  border-radius: var(--radius-street);
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+#note-preview pre code {
+  background: transparent;
+  color: var(--street-cyan);
+}
+
+/* Street Style Tags */
+.tag {
+  background: rgba(255, 0, 85, 0.2);
+  border: 1px solid var(--street-primary);
+  border-radius: var(--radius-street);
+  color: var(--street-light);
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  padding: 0.25rem 0.5rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+}
+
+.tag:hover {
+  background: rgba(255, 0, 85, 0.3);
+  border-color: var(--street-secondary);
+  box-shadow: var(--glow-primary);
+  transform: translateY(-2px);
+}
+
+.tag-primary {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: var(--street-secondary);
+  color: var(--street-secondary);
+}
+
+.tag-success {
+  background: rgba(0, 255, 65, 0.2);
+  border-color: var(--street-success);
+  color: var(--street-success);
+}
+
+.tag-warning {
+  background: rgba(255, 85, 0, 0.2);
+  border-color: var(--street-warning);
+  color: var(--street-warning);
+}
+
+.tag-error {
+  background: rgba(255, 0, 51, 0.2);
+  border-color: var(--street-danger);
+  color: var(--street-danger);
+}
+
+.tag-purple {
+  background: rgba(189, 0, 255, 0.2);
+  border-color: var(--street-purple);
+  color: var(--street-purple);
+}
+
+/* Street Style Toast Notifications */
+.toast {
+  background: var(--card-gradient);
+  border: 1px solid var(--street-primary);
+  border-radius: var(--radius-street);
+  box-shadow: var(--shadow-street);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.toast::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--graffiti-gradient);
+}
+
+.toast-success {
+  border-color: var(--street-success);
+  box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+}
+
+.toast-success::before {
+  background: linear-gradient(90deg, var(--street-success), #00cc33);
+}
+
+.toast-error {
+  border-color: var(--street-danger);
+  box-shadow: 0 0 10px rgba(255, 0, 51, 0.5);
+}
+
+.toast-error::before {
+  background: linear-gradient(90deg, var(--street-danger), #cc0022);
+}
+
+.toast-warning {
+  border-color: var(--street-warning);
+  box-shadow: 0 0 10px rgba(255, 85, 0, 0.5);
+}
+
+.toast-warning::before {
+  background: linear-gradient(90deg, var(--street-warning), #ff3300);
+}
+
+/* Street Style Loading Spinner */
+.spinner {
+  border: 2px solid rgba(255, 0, 85, 0.3);
+  border-top: 2px solid var(--street-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spinner-lg {
+  width: 2rem;
+  height: 2rem;
+  border-width: 3px;
+}
+
+/* Street Style Progress Bar */
+.progress {
+  background: rgba(26, 26, 26, 0.5);
+  border: 1px solid rgba(255, 0, 85, 0.3);
+  border-radius: var(--radius-street);
+  height: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  background: var(--graffiti-gradient);
+  height: 100%;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.progress-bar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: progress-shine 2s infinite;
+}
+
+@keyframes progress-shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Street Style Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--street-gray);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--graffiti-gradient);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  box-shadow: var(--glow-primary);
+}
+
+/* Street Style Animations */
+@keyframes streetPulse {
+  0% { box-shadow: 0 0 5px var(--street-primary); }
+  50% { box-shadow: 0 0 20px var(--street-primary); }
+  100% { box-shadow: 0 0 5px var(--street-primary); }
+}
+
+@keyframes streetBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.pulse-street {
+  animation: streetPulse 2s infinite;
+}
+
+.bounce-street {
+  animation: streetBounce 0.5s ease;
+}
+
+/* Street Style Badges */
+.badge {
+  background: rgba(255, 0, 85, 0.2);
+  border: 1px solid var(--street-primary);
+  border-radius: var(--radius-street);
+  color: var(--street-light);
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.5px;
+  padding: 0.2rem 0.4rem;
+  backdrop-filter: blur(5px);
+}
+
+.badge-primary {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: var(--street-secondary);
+  color: var(--street-secondary);
+}
+
+.badge-success {
+  background: rgba(0, 255, 65, 0.2);
+  border-color: var(--street-success);
+  color: var(--street-success);
+}
+
+.badge-warning {
+  background: rgba(255, 85, 0, 0.2);
+  border-color: var(--street-warning);
+  color: var(--street-warning);
+}
+
+.badge-error {
+  background: rgba(255, 0, 51, 0.2);
+  border-color: var(--street-danger);
+  color: var(--street-danger);
+}
+
+/* Street Style Alerts */
+.alert {
+  background: var(--card-gradient-alt);
+  border: 1px solid var(--street-primary);
+  border-radius: var(--radius-street);
+  padding: 1rem;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.alert::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--graffiti-gradient);
+}
+
+.alert-primary {
+  border-color: var(--street-secondary);
+}
+
+.alert-success {
+  border-color: var(--street-success);
+}
+
+.alert-warning {
+  border-color: var(--street-warning);
+}
+
+.alert-error {
+  border-color: var(--street-danger);
+}
+
+/* Street Style Modals */
+.modal-content {
+  background: var(--card-gradient);
+  border: 1px solid var(--street-primary);
+  border-radius: var(--radius-street);
+  box-shadow: var(--shadow-street);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-content::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--graffiti-gradient);
+}
+
+.modal-header {
+  border-bottom: 1px solid rgba(255, 0, 85, 0.3);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.modal-title {
+  color: var(--street-secondary);
+  text-shadow: var(--glow-secondary);
+}
+
+/* Street Style Dropdowns */
+.dropdown-content {
+  background: var(--card-gradient);
+  border: 1px solid var(--street-primary);
+  border-radius: var(--radius-street);
+  box-shadow: var(--shadow-street);
+  backdrop-filter: blur(10px);
+}
+
+.dropdown-item {
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  margin: 0.1rem 0.5rem;
+}
+
+.dropdown-item:hover {
+  background: rgba(255, 0, 85, 0.2);
+  color: var(--street-light);
+}
+
+/* Street Style Tabs */
+.tab {
+  color: rgba(240, 240, 240, 0.7);
+  border-bottom: 2px solid transparent;
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.tab:hover {
+  color: var(--street-light);
+}
+
+.tab.active {
+  color: var(--street-secondary);
+  border-bottom: 2px solid var(--street-secondary);
+  text-shadow: var(--glow-secondary);
+}
+
+/* Street Style Avatars */
+.avatar {
+  background: var(--graffiti-gradient);
+  border: 2px solid var(--street-primary);
+  box-shadow: var(--shadow-street);
+}
+
+.avatar-lg {
+  box-shadow: var(--shadow-neon);
+}
+
+/* Street Style Skeleton Loaders */
+.skeleton {
+  background: linear-gradient(90deg, 
+    rgba(26, 26, 26, 0.5), 
+    rgba(255, 0, 85, 0.1), 
+    rgba(26, 26, 26, 0.5));
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: var(--radius-street);
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Street Style Responsive adjustments */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  .sidebar-nav-item span {
+    display: none;
+  }
+  
+  .sidebar-nav-item kbd {
+    display: none;
+  }
+  
+  #sidebar {
+    width: 60px !important;
+  }
+  
+  .graffiti-title {
+    font-size: 2rem;
+  }
+  
+  .btn-primary, .btn-secondary {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .card {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Street Style Print Styles */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  
+  #sidebar {
+    display: none;
+  }
+  
+  .btn, .tag, .badge {
+    background: none !important;
+    border: 1px solid black !important;
+    color: black !important;
+    box-shadow: none !important;
+  }
+  
+  h1, h2, h3 {
+    background: none !important;
+    -webkit-text-fill-color: black !important;
+    text-shadow: none !important;
+  }
+}
