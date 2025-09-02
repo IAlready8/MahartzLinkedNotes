@@ -12,7 +12,6 @@ import { Analytics } from './analytics.js';
 import { Collaboration } from './collaboration.js';
 import { CommandPaletteExtensions } from './command-palette-extensions.js';
 import { CompetitiveImporters } from './competitive-importers.js';
-import { DataManagement } from './data-management.js';
 import { DataSync } from './data-sync.js';
 import { DynamicDashboards } from './dynamic-dashboards.js';
 import { SmartTemplates } from './smart-templates.js';
@@ -1132,12 +1131,12 @@ export const UI = {
     });
 
     if (results.length === 0) {
-      container.innerHTML = '
+      container.innerHTML = `
         <div class="text-center py-8">
           <p class="text-gray-400">No results found</p>
           <p class="text-gray-500 text-sm mt-2">Try adjusting your search filters or query</p>
         </div>
-      ';
+      `;
       return;
     }
 
@@ -1161,11 +1160,11 @@ export const UI = {
       </div>
     `).join('');
 
-    container.innerHTML = '
+    container.innerHTML = `
       <div class="mb-4">
         <p class="text-gray-400 text-sm">Found ${results.length} result${results.length !== 1 ? 's' : ''} for "${query}"</p>
       </div>
-      ' + html;
+      ` + html;
   },
 
   openNoteFromSearch(noteId) {
@@ -1490,7 +1489,7 @@ Template content here...`;
       const noteCount = notes.length;
       const estimatedSize = Math.round((JSON.stringify(notes).length / 1024) * 100) / 100;
       
-      historyContainer.innerHTML = '
+      historyContainer.innerHTML = `
         <div class="flex items-center justify-between">
           <div>
             <h4 class="font-medium text-white">Current Data</h4>
@@ -1498,7 +1497,7 @@ Template content here...`;
           </div>
           <button class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700" onclick="UI.exportJSON()">Export Now</button>
         </div>
-      ';
+      `;
     }
   },
 
