@@ -184,9 +184,11 @@ class RouterEngine {
       if (linkPath === activePath) {
         link.classList.add('active', 'bg-blue-600', 'text-white');
         link.classList.remove('text-gray-300', 'hover:text-white');
+        link.setAttribute('aria-current', 'page');
       } else {
         link.classList.remove('active', 'bg-blue-600', 'text-white');
         link.classList.add('text-gray-300', 'hover:text-white');
+        link.removeAttribute('aria-current');
       }
     });
   }

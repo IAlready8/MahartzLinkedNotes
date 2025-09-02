@@ -462,6 +462,14 @@ const searchEngine = new SearchEngine();
 
 export const Search = {
   buildIndex: (notes: Note[]) => searchEngine.buildIndex(notes),
+  // Build index during idle time to reduce main-thread contention (optional)
+  buildIndexIdle: (notes: Note[]) => {
+    if (typeof (window as any).requestIdleCallback === 'function') {
+      (window as any).requestIdleCallback(() => searchEngine.buildIndex(notes));
+    } else {
+      setTimeout(() => searchEngine.buildIndex(notes), 0);
+    }
+  },
   search: (query: string, limit?: number) => searchEngine.search(query, limit),
   searchByTag: (tagQuery: string, limit?: number) => searchEngine.searchByTag(tagQuery, limit),
   getRelatedNotes: (noteId: string, limit?: number) => searchEngine.getRelatedNotes(noteId, limit),

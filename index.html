@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
     <title>Mahart Linked Notes</title>
     <meta name="description" content="Advanced client-side knowledge management platform with AI assistance">
     
-    <!-- Preload critical resources -->
+    <!-- Preconnect & preload critical resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" as="style">
     
@@ -24,8 +27,9 @@
     
     <!-- Modern Dark Theme Styles -->
     <link rel="stylesheet" href="/css/styles.css">
-</head>
+  </head>
 <body class="font-primary" data-theme="dark">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <!-- Loading Screen -->
     <div id="app-loading">
         <div class="loading-content">
@@ -38,7 +42,7 @@
     <!-- Main Application Container -->
     <div id="app" class="hidden">
         <!-- Sidebar Navigation -->
-        <nav id="sidebar" data-testid="sidebar">
+        <nav id="sidebar" data-testid="sidebar" role="navigation" aria-label="Primary">
             <!-- Sidebar Header -->
             <header class="sidebar-header">
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-md);">
@@ -134,7 +138,7 @@
         </nav>
 
         <!-- Main Content Area -->
-        <main class="flex-1 flex flex-col overflow-hidden">
+        <main id="main-content" class="flex-1 flex flex-col overflow-hidden" role="main">
             <!-- Editor Page -->
             <div id="page-editor" class="page active">
                 <!-- Editor Header -->
@@ -149,7 +153,7 @@
                         >
                     </div>
                     <div class="editor-actions">
-                        <span id="save-status" class="save-status"></span>
+                        <span id="save-status" class="save-status" aria-live="polite" aria-atomic="true"></span>
                         <button id="save-btn" class="btn btn-primary btn-sm">
                             <i class="fas fa-save"></i>
                             <span>Save</span>
@@ -170,6 +174,7 @@
                     <button id="btn-check" class="btn btn-sm" title="Checklist"><i class="fas fa-square"></i></button>
                     <button id="btn-code" class="btn btn-sm" title="Code block"><i class="fas fa-code"></i></button>
                     <button id="btn-quote" class="btn btn-sm" title="Quote"><i class="fas fa-quote-left"></i></button>
+                    <button id="btn-highlight" class="btn btn-sm" title="Highlight selected text"><i class="fas fa-highlighter"></i></button>
                     <div style="width: 1px; height: 20px; background: var(--color-border-primary); margin: 0 var(--space-xs);"></div>
                     <button id="btn-toggle-preview" class="btn btn-sm" title="Show/Hide Preview"><i class="fas fa-eye"></i></button>
                     <button id="btn-toggle-editor-mode" class="btn btn-sm" title="Switch Editor Mode"><i class="fas fa-pen"></i></button>
@@ -366,3 +371,8 @@
     </script>
 </body>
 </html>
+    <noscript>
+        <div style="padding: 1rem; background: #fee2e2; color: #7f1d1d; text-align: center;">
+            JavaScript is required to run Mahart Linked Notes.
+        </div>
+    </noscript>

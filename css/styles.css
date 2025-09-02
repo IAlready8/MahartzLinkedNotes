@@ -119,6 +119,28 @@ body {
   overflow-x: hidden;
 }
 
+/* Accessibility: visible skip link */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+  width: auto;
+  height: auto;
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-accent);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  z-index: 10000;
+}
+
 /* Loading Screen */
 #app-loading {
   position: fixed;
@@ -170,6 +192,42 @@ body {
   height: 100vh;
   display: flex;
   background: var(--color-bg-primary);
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Improve keyboard focus visibility */
+:focus-visible {
+  outline: 2px solid var(--color-border-accent);
+  outline-offset: 2px;
+}
+
+/* Rendering optimization for heavy sections */
+#graph-container,
+.preview-content,
+#tag-list {
+  content-visibility: auto;
+  contain-intrinsic-size: 600px 400px;
+}
+
+/* Skeleton loading utility */
+.skeleton {
+  position: relative;
+  background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.12) 37%, rgba(255,255,255,0.06) 63%);
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.4s ease infinite;
+}
+@keyframes skeleton-loading {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
 }
 
 /* Sidebar */

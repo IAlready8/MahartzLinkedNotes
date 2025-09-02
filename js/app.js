@@ -532,7 +532,7 @@ const UI = {
     window.location.hash = '#/';
     await this.refreshHomePage();
     const titleInput = el('#title');
-    const editor = el('#editor');
+    const editor = el('#note-body');
     
     if (titleInput) {
       titleInput.value = '';
@@ -567,8 +567,8 @@ const UI = {
 
   bindHomePageEvents() {
     const saveBtn = el('#saveNoteInline');
-    const editor = el('#editor');
-    const title = el('#title');
+    const editor = el('#note-body');
+    const title = el('#note-title');
     
     if(saveBtn) saveBtn.onclick = () => this.save();
     if(editor) {
@@ -577,6 +577,30 @@ const UI = {
         if(dirty) dirty.classList.remove('hidden');
         this.renderPreviewLive();
       }, 250));
+      
+      // Add keyboard shortcuts for common markdown formatting
+      editor.addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.metaKey) {
+          switch(e.key) {
+            case 'b':
+              e.preventDefault();
+              this.insertMarkdownFormat('**', '**', 'Bold text');
+              break;
+            case 'i':
+              e.preventDefault();
+              this.insertMarkdownFormat('*', '*', 'Italic text');
+              break;
+            case 'k':
+              e.preventDefault();
+              this.insertMarkdownFormat('[[', ']]', 'Note Title');
+              break;
+            case 'h':
+              e.preventDefault();
+              this.addHighlight();
+              break;
+          }
+        }
+      });
     }
     if(title) {
       title.addEventListener('input', () => { 
@@ -617,6 +641,91 @@ const UI = {
         colorMenu.classList.add('hidden');
       };
     });
+
+    // Bind toolbar buttons
+    this.bindToolbarButtons();
+  },
+
+  // Bind all toolbar buttons for formatting
+  bindToolbarButtons() {
+    const boldBtn = el('#btn-bold');
+    const italicBtn = el('#btn-italic');
+    const h1Btn = el('#btn-h1');
+    const h2Btn = el('#btn-h2');
+    const h3Btn = el('#btn-h3');
+    const linkBtn = el('#btn-link');
+    const wikilinkBtn = el('#btn-wikilink');
+    const checkBtn = el('#btn-check');
+    const codeBtn = el('#btn-code');
+    const quoteBtn = el('#btn-quote');
+    const highlightBtn = el('#btn-highlight');
+    const previewBtn = el('#btn-toggle-preview');
+
+    if (boldBtn) boldBtn.onclick = () => this.insertMarkdownFormat('**', '**', 'Bold text');
+    if (italicBtn) italicBtn.onclick = () => this.insertMarkdownFormat('*', '*', 'Italic text');
+    if (h1Btn) h1Btn.onclick = () => this.insertMarkdownFormat('# ', '', 'Heading 1');
+    if (h2Btn) h2Btn.onclick = () => this.insertMarkdownFormat('## ', '', 'Heading 2');
+    if (h3Btn) h3Btn.onclick = () => this.insertMarkdownFormat('### ', '', 'Heading 3');
+    if (linkBtn) linkBtn.onclick = () => this.insertMarkdownFormat('[', '](https://example.com)', 'Link text');
+    if (wikilinkBtn) wikilinkBtn.onclick = () => this.insertMarkdownFormat('[[', ']]', 'Note Title');
+    if (checkBtn) checkBtn.onclick = () => this.insertMarkdownFormat('- [ ] ', '', 'Todo item');
+    if (codeBtn) codeBtn.onclick = () => this.insertMarkdownFormat('```\n', '\n```', 'Code block');
+    if (quoteBtn) quoteBtn.onclick = () => this.insertMarkdownFormat('> ', '', 'Quote');
+    if (highlightBtn) highlightBtn.onclick = () => this.addHighlight();
+    if (previewBtn) previewBtn.onclick = () => this.togglePreviewPanel();
+  },
+
+  // Insert markdown formatting around selected text or at cursor
+  insertMarkdownFormat(before, after, placeholder) {
+    const editor = el('#note-body');
+    if (!editor) return;
+    
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    const selectedText = editor.value.substring(start, end);
+    const textToInsert = selectedText || placeholder;
+    
+    const beforeText = editor.value.substring(0, start);
+    const afterText = editor.value.substring(end);
+    const formattedText = before + textToInsert + after;
+    
+    editor.value = beforeText + formattedText + afterText;
+    
+    // Position cursor appropriately
+    if (selectedText) {
+      // If text was selected, position after the formatting
+      const newCursorPos = start + formattedText.length;
+      editor.setSelectionRange(newCursorPos, newCursorPos);
+    } else {
+      // If placeholder was used, select the placeholder text
+      const selectionStart = start + before.length;
+      const selectionEnd = selectionStart + textToInsert.length;
+      editor.setSelectionRange(selectionStart, selectionEnd);
+    }
+    
+    editor.focus();
+    
+    // Trigger input event for live preview
+    editor.dispatchEvent(new Event('input'));
+  },
+
+  // Toggle the preview panel visibility
+  togglePreviewPanel() {
+    const previewPanel = el('#preview-panel');
+    const previewBtn = el('#btn-toggle-preview');
+    
+    if (previewPanel && previewBtn) {
+      const isHidden = previewPanel.style.display === 'none';
+      previewPanel.style.display = isHidden ? 'block' : 'none';
+      
+      // Update button icon
+      const icon = previewBtn.querySelector('i');
+      if (icon) {
+        icon.className = isHidden ? 'fas fa-eye' : 'fas fa-eye-slash';
+      }
+      
+      previewBtn.title = isHidden ? 'Hide Preview' : 'Show Preview';
+    }
   },
 
   async setNoteColor(color) {
@@ -1306,8 +1415,8 @@ const UI = {
       // Navigate to editor and create a basic template
       window.location.hash = '#/';
       setTimeout(() => {
-        const editor = el('#editor');
-        const title = el('#title');
+        const editor = el('#note-body');
+        const title = el('#note-title');
         if (title) title.value = `${templateName} - ${new Date().toLocaleDateString()}`;
         if (editor) {
           editor.value = this.getBasicTemplate(templateName);
@@ -2216,15 +2325,122 @@ ${note.body}
   },
 
   renderPreviewLive() {
-    const editor = el('#editor');
-    const preview = el('#preview');
+    const editor = el('#note-body');
+    const preview = el('#note-preview');
     if (!editor || !preview) return;
     
     const md = editor.value;
     if(typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined'){
-        preview.innerHTML = DOMPurify.sanitize(marked.parse(md));
+        let html = marked.parse(md);
+        
+        // Enhanced wikilink processing [[Note Title]] or [[ID:xxx]]
+        html = html.replace(/\[\[([^\]]+)\]\]/g, (match, linkText) => {
+          const isIdLink = linkText.startsWith('ID:');
+          const displayText = isIdLink ? linkText.substring(3) : linkText;
+          return `<a href="#" class="wikilink" data-link="${linkText}" style="color: #60a5fa; text-decoration: underline; cursor: pointer;">${displayText}</a>`;
+        });
+        
+        // Enhanced hashtag processing #tag
+        html = html.replace(/(?:^|\s)(#[a-zA-Z0-9_-]+)/g, (match, tag) => {
+          return match.replace(tag, `<span class="hashtag" style="color: #34d399; font-weight: 500; cursor: pointer;" data-tag="${tag}">${tag}</span>`);
+        });
+        
+        // Support for highlighted text ==text==
+        html = html.replace(/==(.*?)==/g, '<mark style="background: #fbbf24; color: #1f2937; padding: 2px 4px; border-radius: 3px;">$1</mark>');
+        
+        preview.innerHTML = DOMPurify.sanitize(html);
+        
+        // Add click handlers for wikilinks
+        preview.querySelectorAll('.wikilink').forEach(link => {
+          link.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const linkText = e.target.getAttribute('data-link');
+            await this.handleWikilinkClick(linkText);
+          });
+        });
+        
+        // Add click handlers for hashtags
+        preview.querySelectorAll('.hashtag').forEach(tag => {
+          tag.addEventListener('click', (e) => {
+            const tagName = e.target.getAttribute('data-tag');
+            this.searchNotesByTag(tagName);
+          });
+        });
+        
     } else {
         preview.textContent = md;
+    }
+  },
+
+  // Handle wikilink clicks - navigate to linked note or create new one
+  async handleWikilinkClick(linkText) {
+    const notes = await Store.allNotes();
+    let targetNote = null;
+    
+    if (linkText.startsWith('ID:')) {
+      // Direct ID reference
+      const id = linkText.substring(3);
+      targetNote = notes.find(n => n.id === id);
+    } else {
+      // Title-based reference
+      targetNote = notes.find(n => n.title.toLowerCase() === linkText.toLowerCase());
+    }
+    
+    if (targetNote) {
+      // Open existing note
+      await this.openNote(targetNote.id);
+    } else {
+      // Create new note with the linked title
+      const newNote = Note.create({ 
+        title: linkText.startsWith('ID:') ? 'Untitled' : linkText, 
+        body: '', 
+        tags: [] 
+      });
+      await Store.upsert(newNote);
+      await this.openNote(newNote.id);
+      this.toast(`Created new note: ${linkText}`);
+    }
+  },
+
+  // Search notes by hashtag
+  searchNotesByTag(tagName) {
+    const searchInput = el('#search-input');
+    if (searchInput) {
+      searchInput.value = tagName;
+      // Trigger search
+      const event = new Event('input');
+      searchInput.dispatchEvent(event);
+    }
+    this.toast(`Searching for ${tagName}`);
+  },
+
+  // Add highlighter feature - wrap selected text with ==highlights==
+  addHighlight() {
+    const editor = el('#note-body');
+    if (!editor) return;
+    
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    const selectedText = editor.value.substring(start, end);
+    
+    if (selectedText) {
+      const beforeText = editor.value.substring(0, start);
+      const afterText = editor.value.substring(end);
+      const highlightedText = `==${selectedText}==`;
+      
+      editor.value = beforeText + highlightedText + afterText;
+      
+      // Position cursor after the highlight
+      const newCursorPos = start + highlightedText.length;
+      editor.setSelectionRange(newCursorPos, newCursorPos);
+      editor.focus();
+      
+      // Trigger input event for live preview
+      editor.dispatchEvent(new Event('input'));
+      
+      this.toast('Text highlighted');
+    } else {
+      this.toast('Please select text to highlight');
     }
   },
 

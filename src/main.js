@@ -3,19 +3,33 @@ import '../css/styles.css';
 
 // Core modules
 import { Store } from './modules/store.js';
-import { Search } from './modules/search.js';
+import { Search } from './modules/search.ts';
 import { Router } from './modules/router.js';
 import { UI } from './modules/ui.js';
 import { initUtils } from './modules/util.js';
 
 // Performance monitoring
-import { Performance } from './modules/performance.js';
+import { Performance } from './modules/performance.ts';
 
 // Street Style Enhancements
 import { initStreetStyle } from './modules/street-style.js';
 
-// Service Worker for Offline Support
-// import { registerServiceWorker } from './modules/service-worker.js';
+// Service Worker registration (safe, lazy)
+function registerServiceWorker() {
+  if ('serviceWorker' in navigator) {
+    // Defer registration until after page load to avoid blocking
+    window.addEventListener('load', () => {
+      navigator.serviceWorker
+        .register('/src/modules/service-worker.js')
+        .then(reg => {
+          console.log('Service worker registered:', reg.scope);
+        })
+        .catch(err => {
+          console.warn('Service worker registration failed:', err);
+        });
+    });
+  }
+}
 
 // Advanced features (optional) are disabled for build stability.
 // If needed, re-enable or migrate them into src/modules/* with proper exports.

@@ -179,6 +179,11 @@ export const renderMD = (markdown) => {
   
   html = html.replace(/<code>([^<]+)<\/code>/g, 
     '<code class="inline-code">$1</code>');
+
+  // Ensure external links open safely in a new tab
+  // Add target and rel on anchors that look external (http/https)
+  html = html.replace(/<a(\s+[^>]*?)href=("|')(http[s]?:\/\/[^"']+)(\2)([^>]*)>/gi,
+    '<a$1href=$2$3$2 target="_blank" rel="noopener noreferrer"$5>');
   
   // Cache management
   if (markdownCache.size >= MAX_CACHE_SIZE) {
@@ -193,22 +198,38 @@ export const renderMD = (markdown) => {
 // Live preview with enhanced interactivity
 export const livePreviewDebounced = debounce((content, previewElement) => {
   if (!previewElement) return;
-  
-  try {
-    const rendered = renderMD(content);
-    previewElement.innerHTML = rendered;
-    
-    // Add interactive behaviors
-    addTagInteractivity(previewElement);
-    addWikilinkHandlers(previewElement);
-    
-  } catch (error) {
-    console.error('Error rendering markdown preview:', error);
-    previewElement.innerHTML = `
-      <div class="error-preview bg-red-50 border border-red-200 rounded p-4 text-red-800">
-        Error rendering preview: ${error.message}
-      </div>
-    `;
+
+  // Skip rendering if preview is not visible/connected
+  const isHidden = (
+    !previewElement.isConnected ||
+    previewElement.offsetParent === null ||
+    previewElement.getClientRects().length === 0
+  );
+  if (isHidden) return;
+
+  const render = () => {
+    try {
+      const rendered = renderMD(content);
+      previewElement.innerHTML = rendered;
+
+      // Add interactive behaviors
+      addTagInteractivity(previewElement);
+      addWikilinkHandlers(previewElement);
+    } catch (error) {
+      console.error('Error rendering markdown preview:', error);
+      previewElement.innerHTML = `
+        <div class="error-preview bg-red-50 border border-red-200 rounded p-4 text-red-800">
+          Error rendering preview: ${error.message}
+        </div>
+      `;
+    }
+  };
+
+  // Defer heavy work to idle time when available
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(() => render());
+  } else {
+    setTimeout(render, 0);
   }
 }, 50);
 

@@ -563,8 +563,9 @@ class ApplicationManager {
     try {
       const notes = await Store.allNotes();
       
-      // Build search index
-      Search.buildIndex(notes);
+      // Build search index (idle to avoid blocking initial render)
+      // @ts-ignore - buildIndexIdle added for perf
+      (Search as any).buildIndexIdle ? (Search as any).buildIndexIdle(notes) : Search.buildIndex(notes);
       
       // Update note count
       this.updateNoteCount(notes.length);
