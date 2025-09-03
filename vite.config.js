@@ -1,10 +1,12 @@
 import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 import legacy from '@vitejs/plugin-legacy';
 import { VitePWA } from 'vite-plugin-pwa';
-import { resolve } from 'path';
+// import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [
+    react(),
     legacy({
       targets: ['defaults', 'not IE 11']
     }),

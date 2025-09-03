@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahart Linked Notes</title>
+    <meta name="description" content="Advanced client-side knowledge management platform with AI assistance">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" as="style">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PWA Meta -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1e293b">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    
+    <!-- Design System Styles -->
+    <link rel="stylesheet" href="/src/styles/design-tokens.css">
+    <link rel="stylesheet" href="/src/styles/components.css">
+</head>
+<body class="font-primary bg-neutral-50 text-neutral-900 antialiased" data-theme="light">
+    <!-- Loading Screen -->
+    <div id="app-loading" class="fixed inset-0 z-50 flex items-center justify-center bg-neutral-50">
+        <div class="text-center">
+            <div class="mb-4">
+                <div class="spinner spinner-lg text-primary-600"></div>
+            </div>
+            <h2 class="text-lg font-semibold text-neutral-900 mb-2">Loading Mahart Notes</h2>
+            <p class="text-sm text-neutral-600">Initializing your knowledge workspace...</p>
+        </div>
+    </div>
+
+    <!-- Main Application Container -->
+    <div id="app" class="hidden h-screen flex overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar" data-testid="sidebar" class="sidebar">
+            <!-- Sidebar Header -->
+            <header class="sidebar-header">
+                <div class="flex items-center justify-between">
+                    <h1 class="text-xl font-bold text-neutral-900 truncate">Mahart Notes</h1>
+                    <div class="flex items-center gap-2">
+                        <!-- Sync Status Indicator -->
+                        <div class="flex items-center gap-2">
+                            <div id="sync-status" class="w-2 h-2 bg-gray-500 rounded-full" title="Application status"></div>
+                        </div>
+                        <!-- Menu Toggle for Mobile -->
+                        <button id="mobile-menu-toggle" data-testid="mobile-menu-toggle" class="btn-ghost p-2 lg:hidden">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="flex gap-2 mt-4">
+                    <button id="new-note-btn" data-testid="new-note-btn" class="btn-primary flex-1">
+                        <i class="fas fa-plus"></i>
+                        <span>New Note</span>
+                    </button>
+                    <button id="search-toggle-btn" class="btn-secondary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                
+                <!-- Search Bar -->
+                <div id="search-container" class="relative mt-4">
+                    <div class="relative">
+                        <i class="search-icon fas fa-search"></i>
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            data-testid="search-input"
+                            class="search-input" 
+                            placeholder="Search notes... (Ctrl+K)"
+                        >
+                    </div>
+                    <div id="search-results" data-testid="search-results" class="search-results hidden"></div>
+                </div>
+            </header>
+            
+            <!-- Navigation Menu -->
+            <div class="sidebar-body">
+                <nav class="sidebar-nav">
+                    <a href="#/" data-route="#/" class="sidebar-nav-item">
+                        <i class="fas fa-edit"></i>
+                        <span>Editor</span>
+                        <kbd class="ml-auto text-xs bg-neutral-100 px-2 py-1 rounded">⌘E</kbd>
+                    </a>
+                    <a href="#/graph" data-route="#/graph" class="sidebar-nav-item">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>Knowledge Graph</span>
+                        <kbd class="ml-auto text-xs bg-neutral-100 px-2 py-1 rounded">⌘G</kbd>
+                    </a>
+                    <a href="#/tags" data-route="#/tags" class="sidebar-nav-item">
+                        <i class="fas fa-tags"></i>
+                        <span>Tag Management</span>
+                        <kbd class="ml-auto text-xs bg-neutral-100 px-2 py-1 rounded">⌘T</kbd>
+                    </a>
+                    <a href="#/ai" data-route="#/ai" class="sidebar-nav-item">
+                        <i class="fas fa-brain"></i>
+                        <span>AI Assistant</span>
+                        <kbd class="ml-auto text-xs bg-neutral-100 px-2 py-1 rounded">⌘A</kbd>
+                    </a>
+                    <a href="#/settings" data-route="#/settings" class="sidebar-nav-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </nav>
+                
+                <!-- Note List -->
+                <div class="mt-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-semibold text-neutral-600 uppercase tracking-wide">Notes</h3>
+                        <span id="note-count" data-testid="note-count" class="text-xs text-neutral-500">0 notes</span>
+                    </div>
+                    <div id="note-list" data-testid="note-list" class="space-y-1">
+                        <!-- Note items will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar Footer -->
+            <footer class="sidebar-footer">
+                <div class="text-xs text-neutral-500 text-center">
+                    <div>v2.0.0</div>
+                    <div class="mt-1">
+                        <button id="theme-toggle" class="text-neutral-400 hover:text-neutral-600">
+                            <i class="fas fa-palette"></i>
+                            Theme
+                        </button>
+                    </div>
+                </div>
+            </footer>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- Editor Page -->
+            <div id="page-editor" class="page hidden flex-1 flex overflow-hidden">
+                <div class="flex-1 flex flex-col">
+                    <!-- Editor Toolbar -->
+                    <div class="border-b border-neutral-200 bg-white px-6 py-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <input 
+                                    type="text" 
+                                    id="note-title" 
+                                    data-testid="note-title"
+                                    class="text-xl font-semibold bg-transparent border-none outline-none text-neutral-900 placeholder-neutral-500" 
+                                    placeholder="Untitled Note"
+                                >
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span id="save-status" class="text-sm text-neutral-500"></span>
+                                <button id="save-btn" class="btn-primary btn-sm">
+                                    <i class="fas fa-save"></i>
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Editor Content -->
+                    <div class="flex-1 flex">
+                        <!-- Editor Panel -->
+                        <div class="flex-1 flex flex-col">
+                            <div class="flex-1 relative">
+                                <textarea 
+                                    id="note-body" 
+                                    data-testid="note-body"
+                                    class="w-full h-full p-6 resize-none bg-white border-none outline-none text-neutral-900 placeholder-neutral-500 font-mono" 
+                                    placeholder="Start writing your note..."
+                                ></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Preview Panel -->
+                        <div id="preview-panel" class="w-1/2 border-l border-neutral-200 bg-neutral-50 overflow-y-auto">
+                            <div class="p-6">
+                                <div id="note-preview" data-testid="note-preview" class="prose prose-neutral max-w-none">
+                                    <!-- Rendered markdown preview -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graph Page -->
+            <div id="page-graph" class="page hidden flex-1">
+                <div id="graph-container" data-testid="graph-container" class="w-full h-full">
+                    <svg id="graph-svg" class="w-full h-full"></svg>
+                </div>
+            </div>
+
+            <!-- Tags Page -->
+            <div id="page-tags" class="page hidden flex-1 p-6">
+                <div data-testid="tags-container">
+                    <h2 class="text-2xl font-bold text-neutral-900 mb-6">Tag Management</h2>
+                    <div id="tag-list" data-testid="tag-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Tags will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Page -->
+            <div id="page-ai" class="page hidden flex-1 p-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-neutral-900 mb-6">AI Assistant</h2>
+                    <p class="text-neutral-600">AI features will be available here.</p>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="page-settings" class="page hidden flex-1 p-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-neutral-900 mb-6">Settings</h2>
+                    <div class="card max-w-2xl">
+                        <div class="card-body space-y-6">
+                            <div class="form-group">
+                                <label class="form-label">Theme</label>
+                                <select id="theme-select" class="select">
+                                    <option value="light">Light</option>
+                                    <option value="dark">Dark</option>
+                                    <option value="system">System</option>
+                                </select>
+                            </div>
+                            
+                            <div class="flex gap-4">
+                                <button id="export-btn" data-testid="export-btn" class="btn-secondary">
+                                    <i class="fas fa-download"></i>
+                                    Export Data
+                                </button>
+                                <button id="import-btn" class="btn-secondary">
+                                    <i class="fas fa-upload"></i>
+                                    Import Data
+                                </button>
+                            </div>
+                            
+                            <div class="border-t pt-6">
+                                <button id="clear-data-btn" data-testid="clear-data-btn" class="btn-error">
+                                    <i class="fas fa-trash"></i>
+                                    Clear All Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" data-testid="mobile-menu" class="fixed inset-0 z-40 lg:hidden hidden">
+        <div class="modal-backdrop"></div>
+        <nav class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl transform transition-transform">
+            <!-- Mobile menu content will be populated here -->
+        </nav>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2">
+        <div id="toast" class="toast hidden">
+            <div id="toast-content"></div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-container" class="hidden">
+        <!-- Modals will be rendered here -->
+    </div>
+
+    <!-- App Ready Indicator for Testing -->
+    <div id="app-ready" data-testid="app-ready" style="display: none;"></div>
+
+    <!-- CDN Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.7/dist/purify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    <script src="https://unpkg.com/ulid@2.3.0/lib/index.umd.js"></script>
+
+    <!-- Main Application Entry Point -->
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
