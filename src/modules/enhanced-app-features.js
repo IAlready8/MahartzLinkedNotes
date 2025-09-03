@@ -686,7 +686,7 @@ export const EnhancedAppFeatures = {
   async renderPlugins() {
     console.log('Rendering plugins...');
   }
-});
+};
 
 // Override the original methods
 UI.setupRouter = UI.setupEnhancedRouter;

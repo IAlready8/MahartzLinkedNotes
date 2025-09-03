@@ -210,6 +210,7 @@ export const DataSync = {
     } catch (error) {
       console.error('Failed to repair issue:', issue, error);
     }
+  },    }
   },
 
   // Repair broken links

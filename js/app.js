@@ -1,36 +1,12 @@
-// 🤖 Review: This file was created by refactoring the monolithic app.js.
-// It contains the main UI object and its related logic.
+/* app.js — MODULARIZED FOR ROUTER */
 
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { Store } from './store.js';
-import { Graph } from './graph.js';
-import { AdvancedSearch } from './advanced-search.js';
-import { AdvancedUI } from './advanced-ui.js';
-import { AdvancedViz } from './advanced-viz.js';
-import { AIAssistant } from './ai-assistant.js';
-import { AIKnowledgeDiscovery } from './ai-knowledge-discovery.js';
-import { Analytics } from './analytics.js';
-import { Collaboration } from './collaboration.js';
-import { CommandPaletteExtensions } from './command-palette-extensions.js';
-import { CompetitiveImporters } from './competitive-importers.js';
-import { DataSync } from './data-sync.js';
-import { DynamicDashboards } from './dynamic-dashboards.js';
-import { SmartTemplates } from './smart-templates.js';
-import { PresentationGenerator } from './presentation-generator.js';
-import { Recommendations } from './recommendations.js';
-import { LearningMode } from './learning-mode.js';
-import { WorkspaceManager } from './workspace-manager.js';
-import { ThemeManager } from './themes.js';
-import { PluginSystem } from './plugin-system.js';
-import { definePage, initRouter } from './router.js';
-import { el, els, debounce, nowISO, ULID } from './util.js';
-import { ToastManager, LoadingManager, ContextMenu, TooltipManager, ProgressBar, AdvancedSearchUI, KeyboardShortcuts, StatusBar } from './advanced-ui-components.js';
-
-export const UI = {
+// 👑 Guide: The UI object is now structured around pages. 
+// Each page has its own init function to load resources on demand.
+const UI = {
   state: { currentId: null, autoLink: true, analytics: true, bc: true },
   bc: null,
 
+  // ✅ Fixed: The main init is now lean. It sets up the router and global handlers.
   async init() {
     console.log('App shell initializing...');
     this.bindGlobalHandlers();
@@ -43,6 +19,7 @@ export const UI = {
     }
   },
 
+  // 🗺️ Plan: Define all pages and their onLoad handlers for the router.
   setupRouter() {
     // Core Pages
     definePage('#/', {
@@ -98,10 +75,6 @@ export const UI = {
     definePage('#/ai', {
       pageId: 'page-ai',
       onLoad: this.initAiPage.bind(this)
-    });
-    definePage('#/ai-orchestration', {
-      pageId: 'page-ai-orchestration',
-      onLoad: this.initAiOrchestrationPage.bind(this)
     });
     definePage('#/recommendations', {
       pageId: 'page-recommendations',
@@ -226,74 +199,11 @@ export const UI = {
     await this.renderTagManager();
   },
 
-  async initAiPage() {
+  initAiPage() {
     console.log('Initializing AI Page...');
-    const container = el('#page-ai');
+    const container = el('#page-ai .bg-gray-800');
     if (container) {
-      try {
-        // Clear the container
-        container.innerHTML = '';
-        
-        // Dynamically import and render the React component
-        const { default: AIAssistantComponent } = await import('./AIAssistant.tsx');
-        
-        // Create a root and render the component
-        const root = ReactDOM.createRoot(container);
-        root.render(React.createElement(AIAssistantComponent));
-      } catch (error) {
-        console.error('Failed to load AI Assistant:', error);
-        container.innerHTML = `
-          <div class="p-8 text-center">
-            <div class="text-red-500 text-4xl mb-4">⚠️</div>
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Failed to Load AI Assistant</h2>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">There was an error loading the AI Assistant component.</p>
-            <button 
-              onclick="UI.initAiPage()" 
-              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-            >
-              Retry
-            </button>
-          </div>
-        `;
-      }
-    }
-  },
-
-  async initAiOrchestrationPage() {
-    console.log('Initializing AI Orchestration Platform Page...');
-    // We'll dynamically import and render the React component
-    try {
-      // Import the React component
-      const { default: AIOrchestrationPlatform } = await import('./AIOrchestrationPlatform.tsx');
-      
-      // Get the container element
-      const container = el('#page-ai-orchestration');
-      if (container) {
-        // Clear the container
-        container.innerHTML = '';
-        
-        // Create a root and render the component
-        const root = ReactDOM.createRoot(container);
-        root.render(React.createElement(AIOrchestrationPlatform));
-      }
-    } catch (error) {
-      console.error('Failed to load AI Orchestration Platform:', error);
-      const container = el('#page-ai-orchestration');
-      if (container) {
-        container.innerHTML = `
-          <div class="p-8 text-center">
-            <div class="text-red-500 text-4xl mb-4">⚠️</div>
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Failed to Load AI Orchestration Platform</h2>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">There was an error loading the AI Orchestration Platform component.</p>
-            <button 
-              onclick="UI.initAiOrchestrationPage()" 
-              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-            >
-              Retry
-            </button>
-          </div>
-        `;
-      }
+        container.innerHTML = '<p class="text-center text-gray-400">The AI Assistant module would be rendered here.</p>';
     }
   },
 
@@ -710,7 +620,7 @@ export const UI = {
   },
 
   async setNoteColor(color) {
-    if (!this.state.currentId) return; 
+    if (!this.state.currentId) return;
     
     const note = await Store.get(this.state.currentId);
     if (!note) return;
@@ -978,6 +888,8 @@ export const UI = {
     connectButtons.forEach(btn => {
       if (btn.textContent === 'Connect' && btn.closest('.border').querySelector('h4').textContent === 'Google Drive') {
         btn.onclick = () => this.connectGoogleDrive();
+      } else if (btn.textContent === 'Connect' && btn.closest('.border').querySelector('h4').textContent === 'Dropbox') {
+        btn.onclick = () => this.connectDropbox();
       }
     });
   },
@@ -997,6 +909,13 @@ export const UI = {
           const recommendationType = recommendation.querySelector('h4').textContent;
           console.log(`Applying recommendation: ${recommendationType}`);
           this.applyRecommendation(recommendation, recommendationType);
+        };
+      } else if (buttonText === 'Dismiss') {
+        btn.onclick = () => {
+          const recommendation = btn.closest('.bg-gray-700');
+          const recommendationType = recommendation.querySelector('h4').textContent;
+          console.log(`Dismissing recommendation: ${recommendationType}`);
+          this.dismissRecommendation(recommendation);
         };
       }
     });
@@ -1056,7 +975,7 @@ export const UI = {
       
       if (buttonText === 'Switch') {
         btn.onclick = () => {
-          const workspace = btn.closest('.bg-gray-700').querySelector('h4').textContent.trim();
+          const workspace = btn.closest('.bg-gray-700').querySelector('h4').textContent;
           console.log(`Switching to workspace: ${workspace}`);
           this.switchWorkspace(workspace);
         };
@@ -1075,6 +994,7 @@ export const UI = {
   },
 
   bindThemesPageEvents() {
+    // Bind clickable theme options
     const themeOptions = els('#page-themes .cursor-pointer');
     themeOptions.forEach(option => {
       option.onclick = () => {
@@ -1085,6 +1005,7 @@ export const UI = {
       };
     });
 
+    // Bind custom theme button
     const customThemeBtn = el('#page-themes button');
     if (customThemeBtn && customThemeBtn.textContent.includes('Apply Custom Theme')) {
       customThemeBtn.onclick = () => {
@@ -1093,6 +1014,7 @@ export const UI = {
       };
     }
 
+    // Bind color input changes for live preview
     const colorInputs = els('#page-themes input[type="color"]');
     const textInputs = els('#page-themes input[type="text"]');
     
@@ -1120,11 +1042,13 @@ export const UI = {
   },
 
   bindPluginsPageEvents() {
+    // Bind all plugin management buttons
     const pluginButtons = els('#page-plugins button');
     pluginButtons.forEach(btn => {
       const buttonText = btn.textContent.trim();
       
       if (buttonText === 'Install Plugin') {
+        // Main install plugin button
         btn.onclick = () => {
           console.log('Opening plugin installation dialog');
           this.openPluginInstallDialog();
@@ -1144,13 +1068,17 @@ export const UI = {
           this.activatePlugin(plugin);
         };
       } else if (buttonText === 'Install') {
-        const pluginCard = btn.closest('.border.border-gray-600');
-        const plugin = pluginCard.querySelector('h4').textContent.trim();
-        console.log(`Installing plugin: ${plugin}`);
-        this.installPlugin(plugin);
-      };
+        // Individual plugin install buttons in the store
+        btn.onclick = () => {
+          const pluginCard = btn.closest('.border.border-gray-600');
+          const plugin = pluginCard.querySelector('h4').textContent.trim();
+          console.log(`Installing plugin: ${plugin}`);
+          this.installPlugin(plugin);
+        };
+      }
     });
 
+    // Load plugin data
     this.loadPluginData();
 
     console.log(`Plugins page events bound - ${pluginButtons.length} buttons`);
@@ -1168,6 +1096,7 @@ export const UI = {
     if (typeof AdvancedSearch !== 'undefined') {
       AdvancedSearch.performSearch(query, filterType);
     } else {
+      // Enhanced fallback search with filters
       this.performBasicSearch(query, resultsContainer, filterType);
     }
   },
@@ -1175,14 +1104,17 @@ export const UI = {
   async performBasicSearch(query, container, filterType = 'All') {
     let notes = await Store.allNotes();
     
+    // Apply date filter if set
     if (this.searchFilters?.dateRange && this.searchFilters.dateRange !== 'All Time') {
       notes = this.filterNotesByDate(notes, this.searchFilters.dateRange);
     }
     
+    // Apply color filter if set
     if (this.searchFilters?.colors && this.searchFilters.colors.length > 0) {
       notes = notes.filter(note => this.searchFilters.colors.includes(note.color || '#6B7280'));
     }
 
+    // Apply search query with filter type
     const queryLower = query.toLowerCase();
     const results = notes.filter(note => {
       switch (filterType) {
@@ -1233,11 +1165,11 @@ export const UI = {
       <div class="mb-4">
         <p class="text-gray-400 text-sm">Found ${results.length} result${results.length !== 1 ? 's' : ''} for "${query}"</p>
       </div>
-      ` + html;
+      ${html}
+    `;
   },
 
   openNoteFromSearch(noteId) {
-    this.closeModals();
     window.location.hash = '#/';
     setTimeout(() => this.openNote(noteId), 100);
   },
@@ -1311,6 +1243,8 @@ export const UI = {
   loadAnalyticsDashboard() {
     if (typeof Analytics !== 'undefined') {
       Analytics.loadDashboard();
+    } else {
+      this.loadBasicAnalytics();
     }
   },
 
@@ -1331,6 +1265,7 @@ export const UI = {
 
   loadKnowledgeInsights() {
     console.log('Loading knowledge insights...');
+    // Placeholder for insights functionality
   },
 
   loadKnowledgeTimeline() {
@@ -1345,7 +1280,8 @@ export const UI = {
     let filteredNotes = notes;
 
     if (filter !== 'All') {
-      filteredNotes = notes; 
+      // Filter logic based on the filter type
+      filteredNotes = notes; // Placeholder
     }
 
     const html = filteredNotes.slice(0, 10).map(note => `
@@ -1367,6 +1303,7 @@ export const UI = {
     if (typeof SmartTemplates !== 'undefined') {
       SmartTemplates.applyTemplate(templateName);
     } else {
+      // Navigate to editor and create a basic template
       window.location.hash = '#/';
       setTimeout(() => {
         const editor = el('#editor');
@@ -1398,7 +1335,7 @@ export const UI = {
 
 ## Next Meeting
 - Date: 
-- Time: `, 
+- Time: `,
       'Project Planning': `# Project: [Project Name]
 
 ## Overview
@@ -1423,7 +1360,7 @@ Brief description of the project
 - 
 
 ## Next Steps
-1. `, 
+1. `,
       'Research Notes': `# Research: [Topic]
 
 ## Hypothesis
@@ -1444,9 +1381,7 @@ Summary of findings
 ## References
 - `
     };
-    return templates[templateName] || `# ${templateName}
-
-Template content here...`;
+    return templates[templateName] || `# ${templateName}\n\nTemplate content here...`;
   },
 
   async loadPresentationNotesList() {
@@ -1475,6 +1410,7 @@ Template content here...`;
   generatePresentation(title) {
     console.log(`Generating presentation: ${title}`);
     
+    // Get selected notes
     const checkboxes = els('#presentation-notes-list input[type="checkbox"]:checked');
     const selectedNoteIds = Array.from(checkboxes).map(cb => cb.value);
     
@@ -1486,6 +1422,7 @@ Template content here...`;
     if (typeof PresentationGenerator !== 'undefined') {
       PresentationGenerator.generate(title, selectedNoteIds);
     } else {
+      // Create a simple presentation preview
       this.createSimplePresentation(title, selectedNoteIds);
     }
   },
@@ -1494,7 +1431,25 @@ Template content here...`;
     const notes = await Store.allNotes();
     const selectedNotes = notes.filter(note => noteIds.includes(note.id));
     
-    const presentationContent = `# ${title}\n\n*Generated on ${new Date().toLocaleDateString()}*\n\n---\n\n${selectedNotes.map((note, index) => `\n## Slide ${index + 1}: ${note.title}\n\n${note.body}\n\n---\n`).join('\n')}\n\n## Thank You\n\n*Presentation created from ${selectedNotes.length} notes*\n`;
+    // Create a new note with presentation content
+    const presentationContent = `# ${title}
+
+*Generated on ${new Date().toLocaleDateString()}*
+
+---
+
+${selectedNotes.map((note, index) => `
+## Slide ${index + 1}: ${note.title}
+
+${note.body}
+
+---
+`).join('\n')}
+
+## Thank You
+
+*Presentation created from ${selectedNotes.length} notes*
+`;
 
     const presentationNote = {
       id: ULID(),
@@ -1510,6 +1465,7 @@ Template content here...`;
     await Store.upsert(presentationNote);
     toast(`Presentation "${title}" created as a new note`);
     
+    // Navigate to the new presentation note
     window.location.hash = '#/';
     setTimeout(() => this.openNote(presentationNote.id), 200);
   },
@@ -1525,12 +1481,16 @@ Template content here...`;
   exportJSON() {
     if (typeof DataManagement !== 'undefined') {
       DataManagement.exportJSON();
+    } else {
+      this.basicExportJSON();
     }
   },
 
   exportPDF() {
     if (typeof DataManagement !== 'undefined') {
       DataManagement.exportPDF();
+    } else {
+      alert('PDF export not available yet');
     }
   },
 
@@ -1547,6 +1507,8 @@ Template content here...`;
   },
 
   loadExportHistory() {
+    // This would normally load from localStorage or a database
+    // For now, just update the display with current data
     this.updateExportHistoryDisplay();
   },
 
@@ -1571,6 +1533,7 @@ Template content here...`;
   },
 
   downloadPreviousExport() {
+    // For demo, just export current data
     this.exportJSON();
     toast('Downloading current data');
   },
@@ -1586,6 +1549,7 @@ Template content here...`;
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
+    // Store export history
     this.addToExportHistory(filename, type, content.length);
   },
 
@@ -1598,6 +1562,7 @@ Template content here...`;
       timestamp: Date.now()
     });
     
+    // Keep only last 10 exports
     if (history.length > 10) {
       history.splice(10);
     }
@@ -1639,15 +1604,19 @@ Template content here...`;
   },
 
   selectAnswer(button, answerIndex) {
+    // Remove selection from other buttons
     const allAnswers = els('#page-learning .space-y-3 button');
     allAnswers.forEach(btn => {
       btn.className = 'w-full p-3 text-left bg-gray-600 hover:bg-gray-500 rounded transition-colors text-white';
     });
     
+    // Highlight selected answer
     button.className = 'w-full p-3 text-left bg-blue-600 hover:bg-blue-500 rounded transition-colors text-white';
     
+    // Store the selected answer
     this.quizState.selectedAnswers[this.quizState.currentQuestion] = answerIndex;
     
+    // Enable next button
     const nextBtn = el('#page-learning button[class*="bg-blue-600"]:last-of-type');
     if (nextBtn) {
       nextBtn.disabled = false;
@@ -1668,15 +1637,19 @@ Template content here...`;
     if (this.quizState.currentQuestion < this.quizState.totalQuestions - 1) {
       this.quizState.currentQuestion++;
       this.updateQuizDisplay();
+    } else {
+      this.finishQuiz();
     }
   },
 
   updateQuizDisplay() {
+    // Update question counter
     const questionText = el('#page-learning h4');
     if (questionText) {
       questionText.textContent = `Question ${this.quizState.currentQuestion + 1} of ${this.quizState.totalQuestions}`;
     }
 
+    // Update progress dots
     const dots = els('#page-learning .flex.gap-2 .rounded-full');
     dots.forEach((dot, index) => {
       if (index === this.quizState.currentQuestion) {
@@ -1688,6 +1661,7 @@ Template content here...`;
       }
     });
 
+    // Update button states
     const prevBtn = el('#page-learning button[class*="bg-gray-600"]');
     const nextBtn = el('#page-learning button[class*="bg-blue-600"]:last-of-type');
     
@@ -1708,6 +1682,7 @@ Template content here...`;
       }
     }
 
+    // Clear answer selections
     const answerButtons = els('#page-learning .space-y-3 button');
     answerButtons.forEach(btn => {
       btn.className = 'w-full p-3 text-left bg-gray-600 hover:bg-gray-500 rounded transition-colors text-white';
@@ -1718,11 +1693,13 @@ Template content here...`;
     const totalAnswered = Object.keys(this.quizState.selectedAnswers).length;
     toast(`Quiz completed! You answered ${totalAnswered} out of ${this.quizState.totalQuestions} questions.`);
     
+    // Reset quiz
     this.quizState = null;
     this.updateQuizDisplay();
   },
 
   loadRecommendations() {
+    // This would normally load from an AI service
     this.generateMockRecommendations();
   },
 
@@ -1735,17 +1712,17 @@ Template content here...`;
     const recommendations = [
       {
         title: 'Create Missing Link',
-        description: `Consider linking "${notes[0]?.title}" and "${notes[1]?.title}" - they share common themes.`, 
+        description: `Consider linking "${notes[0]?.title}" and "${notes[1]?.title}" - they share common themes.`,
         type: 'link'
       },
       {
         title: 'Tag Suggestion',
-        description: `Your recent notes about projects could benefit from the #planning tag.`, 
+        description: `Your recent notes about projects could benefit from the #planning tag.`,
         type: 'tag'
       },
       {
         title: 'Content Enhancement',
-        description: `Add more details to your notes about methodology for better searchability.`, 
+        description: `Add more details to your notes about methodology for better searchability.`,
         type: 'content'
       }
     ];
@@ -1767,12 +1744,14 @@ Template content here...`;
 
     recommendationsList.innerHTML = html;
     
+    // Re-bind events for the new buttons
     this.bindRecommendationsPageEvents();
   },
 
   applyRecommendation(element, type) {
     console.log(`Applying recommendation: ${type}`);
     
+    // Visual feedback
     element.style.transform = 'scale(0.95)';
     element.style.opacity = '0.7';
     
@@ -1780,6 +1759,7 @@ Template content here...`;
       element.style.transform = 'scale(1)';
       element.style.opacity = '0.5';
       
+      // Update button text
       const applyBtn = element.querySelector('button[class*="bg-green"]');
       if (applyBtn) {
         applyBtn.textContent = 'Applied';
@@ -1792,6 +1772,7 @@ Template content here...`;
   },
 
   dismissRecommendation(element) {
+    // Fade out animation
     element.style.transition = 'all 0.3s ease';
     element.style.transform = 'translateX(100px)';
     element.style.opacity = '0';
@@ -1811,6 +1792,7 @@ Template content here...`;
   },
 
   loadWorkspaceData() {
+    // Load workspace statistics
     this.updateWorkspaceStats();
   },
 
@@ -1821,6 +1803,7 @@ Template content here...`;
     workspaceCards.forEach(card => {
       const statsElement = card.querySelector('.text-gray-400');
       if (statsElement && statsElement.textContent.includes('•')) {
+        // Update note count for active workspace
         statsElement.textContent = `Personal knowledge base • ${notes.length} notes`;
       }
     });
@@ -1829,6 +1812,7 @@ Template content here...`;
   switchWorkspace(workspaceName) {
     console.log(`Switching to workspace: ${workspaceName}`);
     
+    // Update workspace selection UI
     const workspaceCards = els('#page-workspace .bg-gray-700');
     workspaceCards.forEach(card => {
       const cardTitle = card.querySelector('h4').textContent.trim();
@@ -1836,6 +1820,7 @@ Template content here...`;
       const button = card.querySelector('button');
       
       if (cardTitle === workspaceName) {
+        // Set as active
         card.className = 'bg-gray-700 rounded-lg p-4 border-l-4 border-blue-500';
         if (statusSpan) {
           statusSpan.textContent = 'Active';
@@ -1843,6 +1828,7 @@ Template content here...`;
         }
         if (button) button.style.display = 'none';
       } else {
+        // Set as inactive
         card.className = 'bg-gray-700 rounded-lg p-4';
         if (statusSpan) {
           statusSpan.style.display = 'none';
@@ -1872,6 +1858,7 @@ Template content here...`;
     
     console.log(`Creating workspace: ${name}`);
     
+    // Create new workspace card
     const workspaceContainer = el('#page-workspace .space-y-3');
     if (workspaceContainer) {
       const newWorkspaceHTML = `
@@ -1888,6 +1875,7 @@ Template content here...`;
       
       workspaceContainer.insertAdjacentHTML('beforeend', newWorkspaceHTML);
       
+      // Re-bind events for the new button
       this.bindWorkspacePageEvents();
     }
     
@@ -1897,6 +1885,7 @@ Template content here...`;
   },
 
   updateThemeSelection(selectedOption) {
+    // Remove border from all theme options
     const allOptions = els('#page-themes .border-2, #page-themes .border');
     allOptions.forEach(option => {
       if (option.classList.contains('border-2')) {
@@ -1904,10 +1893,12 @@ Template content here...`;
       }
     });
     
+    // Add blue border to selected option
     selectedOption.className = selectedOption.className.replace('border border-gray-600', 'border-2 border-blue-500');
   },
 
   previewCustomTheme() {
+    // This would normally apply a live preview
     console.log('Previewing custom theme...');
   },
 
@@ -1926,14 +1917,17 @@ Template content here...`;
   },
 
   loadPluginData() {
+    // Update plugin status and information
     this.updatePluginStats();
   },
 
   updatePluginStats() {
+    // This would normally load from plugin registry
     console.log('Plugin data loaded');
   },
 
   openPluginInstallDialog() {
+    // Create a simple modal for plugin installation
     const modalHTML = `
       <div id="plugin-install-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
@@ -1965,6 +1959,7 @@ Template content here...`;
       return;
     }
     
+    // Simulate installation
     toast(`Installing ${pluginName}...`);
     setTimeout(() => {
       toast(`${pluginName} installed successfully`);
@@ -1995,6 +1990,7 @@ Template content here...`;
       `;
       installedContainer.insertAdjacentHTML('beforeend', pluginHTML);
       
+      // Re-bind events
       this.bindPluginsPageEvents();
     }
   },
@@ -2004,5 +2000,269 @@ Template content here...`;
     if (modal) {
       modal.remove();
     }
-  }
+  },
+
+  configurePlugin(pluginName) {
+    console.log(`Configuring plugin: ${pluginName}`);
+    
+    // Create simple configuration dialog
+    const configHTML = `
+      <div id="plugin-config-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+          <h3 class="text-xl font-semibold text-white mb-4">Configure ${pluginName}</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="flex items-center justify-between py-2">
+                <span class="text-gray-300">Enable notifications</span>
+                <input type="checkbox" checked>
+              </label>
+              <label class="flex items-center justify-between py-2">
+                <span class="text-gray-300">Auto-sync</span>
+                <input type="checkbox">
+              </label>
+            </div>
+            <div class="flex gap-3">
+              <button onclick="UI.savePluginConfig('${pluginName}')" class="flex-1 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+              <button onclick="UI.closePluginDialog()" class="flex-1 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', configHTML);
+  },
+
+  savePluginConfig(pluginName) {
+    toast(`${pluginName} configuration saved`);
+    const modal = el('#plugin-config-modal');
+    if (modal) modal.remove();
+  },
+
+  activatePlugin(pluginName) {
+    console.log(`Activating plugin: ${pluginName}`);
+    const button = event.target;
+    const statusSpan = button.parentElement.querySelector('span');
+    
+    // Visual feedback
+    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Activating...';
+    button.disabled = true;
+    
+    setTimeout(() => {
+      // Update button and status
+      button.textContent = 'Configure';
+      button.className = 'px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-500';
+      button.disabled = false;
+      
+      if (statusSpan) {
+        statusSpan.textContent = 'Active';
+        statusSpan.className = 'px-2 py-1 bg-green-600 text-white text-xs rounded';
+      }
+      
+      toast(`${pluginName} activated successfully`);
+    }, 1500);
+  },
+
+  installPlugin(pluginName) {
+    console.log(`Installing plugin: ${pluginName}`);
+    const button = event.target;
+    
+    // Visual feedback
+    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Installing...';
+    button.disabled = true;
+    
+    setTimeout(() => {
+      button.textContent = 'Installed';
+      button.className = 'w-full py-1 bg-green-600 text-white text-xs rounded cursor-not-allowed';
+      toast(`${pluginName} installed successfully`);
+    }, 2000);
+  },
+
+  updateNavigation(currentPath) {
+    // Remove active class from all navigation items
+    const navItems = els('.nav-item');
+    navItems.forEach(item => {
+      item.classList.remove('active', 'bg-blue-600');
+      item.classList.add('hover:bg-blue-600');
+    });
+
+    // Add active class to current page
+    const currentNavItem = el(`a[href="${currentPath}"]`);
+    if (currentNavItem) {
+      currentNavItem.classList.add('active', 'bg-blue-600');
+      currentNavItem.classList.remove('hover:bg-blue-600');
+    }
+  },
+
+  updateSidebarStatus(noteCount) {
+    const noteCounter = el('#note-counter');
+    const noteCountEl = el('#noteCount');
+    
+    if (noteCounter) {
+      noteCounter.textContent = `${noteCount} note${noteCount !== 1 ? 's' : ''}`;
+    }
+    
+    if (noteCountEl) {
+      noteCountEl.textContent = noteCount;
+    }
+  },
+
+  // --- CORE LOGIC ---
+
+  async refreshCurrentPage() {
+      const path = window.location.hash || '#/';
+      console.log(`Refreshing page: ${path}`);
+      
+      // Update navigation active state
+      this.updateNavigation(path);
+      
+      if (path === '#/' || path === '') await this.refreshHomePage();
+      if (path === '#/tags') await this.renderTagManager();
+      if (path === '#/graph') await this.renderGraph();
+      if (path === '#/analytics') this.loadAnalyticsDashboard();
+  },
+
+  async refreshHomePage() {
+    const notes = await Store.allNotes();
+    this.updateSidebarStatus(notes.length);
+    this.renderNoteList(notes);
+  },
+
+  async openNote(id, alreadyOnPage = false) {
+    const n = await Store.get(id);
+    if (!n) {
+        console.error(`Note with id ${id} not found.`);
+        localStorage.removeItem('lastOpenNoteId');
+        return;
+    }
+
+    this.state.currentId = n.id;
+    localStorage.setItem('lastOpenNoteId', n.id);
+    
+    if (!alreadyOnPage && window.location.hash !== '#/') {
+        window.location.hash = '#/';
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    const titleEl = el('#title');
+    const editorEl = el('#editor');
+    const colorButton = el('#noteColorButton');
+    
+    if(titleEl) titleEl.value = n.title || '';
+    if(editorEl) editorEl.value = n.body || '';
+    if(colorButton) colorButton.style.backgroundColor = n.color || '#6B7280';
+    
+    const dirty = el('#dirty');
+    if(dirty) dirty.classList.add('hidden');
+    this.renderPreviewLive();
+    this.renderNoteList(await Store.allNotes()); // Refresh list to show active note
+  },
+
+  async newNote() {
+    const n = Note.create({ title: 'Untitled', body: '', tags: [] });
+    await Store.upsert(n);
+    await this.refreshHomePage();
+    await this.openNote(n.id);
+  },
+
+  async save() {
+    const id = this.state.currentId;
+    if (!id) return;
+
+    const n = await Store.get(id);
+    const titleEl = el('#title');
+    const editorEl = el('#editor');
+    
+    if(!titleEl || !editorEl) return;
+    
+    n.title = titleEl.value.trim() || '(untitled)';
+    n.body = editorEl.value;
+    n.tags = [...new Set((n.body.match(/#[a-z0-9_\-]+/gi) || []).map(t => t.toLowerCase()))];
+    
+    if (this.state.autoLink) {
+      const all = await Store.allNotes();
+      Note.computeLinks(n, all);
+    }
+    n.updatedAt = nowISO();
+    await Store.upsert(n);
+    const dirty = el('#dirty');
+    if(dirty) dirty.classList.add('hidden');
+    toast('Saved');
+    await this.refreshHomePage();
+    if (this.bc) this.bc.postMessage({ type: 'sync' });
+  },
+
+  // --- RENDERING LOGIC ---
+
+  renderNoteList(notes) {
+    const box = el('#noteList');
+    if (!box) return;
+
+    const sorted = [...notes].sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+    box.innerHTML = '';
+    for (const n of sorted) {
+      const div = document.createElement('div');
+      const isActive = n.id === this.state.currentId;
+      div.className = `p-2 rounded cursor-pointer ${isActive ? 'bg-blue-600' : 'hover:bg-gray-700'}`;
+      div.innerHTML = `
+        <div class="font-semibold text-white truncate">${n.title || '(untitled)'}</div>
+        <div class="text-xs text-gray-400">${(n.updatedAt || n.createdAt).slice(0, 10)}</div>
+      `;
+      div.onclick = () => this.openNote(n.id);
+      box.appendChild(div);
+    }
+    const noteCount = el('#noteCount');
+    if(noteCount) noteCount.textContent = notes.length;
+  },
+
+  renderPreviewLive() {
+    const editor = el('#editor');
+    const preview = el('#preview');
+    if (!editor || !preview) return;
+    
+    const md = editor.value;
+    if(typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined'){
+        preview.innerHTML = DOMPurify.sanitize(marked.parse(md));
+    } else {
+        preview.textContent = md;
+    }
+  },
+
+  async renderTagManager() {
+      const notes = await Store.allNotes();
+      const tagBox = el('#allTagsList');
+      if (!tagBox) return;
+      tagBox.innerHTML = '';
+      const counts = {};
+      for (const n of notes) for (const t of (n.tags || [])) counts[t] = (counts[t] || 0) + 1;
+      const items = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+      for (const [t, c] of items) {
+          const div = document.createElement('div');
+          div.className = 'flex justify-between items-center p-2 hover:bg-gray-700 rounded';
+          div.innerHTML = `<span>${t}</span><span class="text-sm text-gray-400 bg-gray-600 px-2 rounded-full">${c}</span>`;
+          tagBox.appendChild(div);
+      }
+      const totalTagCount = el('#totalTagCount');
+      if(totalTagCount) totalTagCount.textContent = items.length;
+  },
+  
+  async createNewTagFromManager() {
+      const newTagInput = el('#newTagInput');
+      if (!newTagInput || !newTagInput.value.trim()) return;
+      let tagName = newTagInput.value.trim();
+      if (!tagName.startsWith('#')) tagName = '#' + tagName;
+      console.log(`New tag created: ${tagName}`);
+      newTagInput.value = '';
+      await this.renderTagManager();
+      toast(`Tag ${tagName} created`);
+  },
+
+  async seed() {
+    console.log('Seeding database...');
+    const a = Note.create({ title: 'Welcome to Mahart Notes', tags: ['#welcome'], body: 'This is your first note. Select it from the list on the left.\n\n## Color-coded Notes\nYou can now assign colors to notes using the color button in the editor header. This helps organize your thoughts visually!', color: '#3B82F6' });
+    const b = Note.create({ title: 'How to use', tags: ['#guide'], body: '## Linking\nLink notes with [[Title]].\n\n## Tags\nAdd tags with #tags.\n\n## Graph Views\nVisit the Graph page to see your notes connected by tags or colors!', color: '#10B981' });
+    const all = [a, b];
+    for (const n of all) Note.computeLinks(n, all);
+    await Store.saveNotes(all);
+  },
 };

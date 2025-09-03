@@ -211,7 +211,7 @@ export const AIKnowledgeDiscovery = {
     
     // Find content similarities (simplified)
     for (let i = 0; i < Math.min(notes.length, 5); i++) {
-      for (let j = i + 1; j < Math.length, 5); j++) {
+      for (let j = i + 1; j < Math.min(notes.length, 5); j++) {
         const note1 = notes[i];
         const note2 = notes[j];
         
